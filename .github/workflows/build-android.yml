@@ -2,7 +2,7 @@ name: Build React Native Android
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
   workflow_dispatch:
 
@@ -10,38 +10,61 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Setup Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'  # npm 9+ bundled with Node 18+
+
+    - name: Setup Java 11
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'
-        cache: gradle
+        java-version: '11'
+        cache: 'gradle'
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3  # Installs cmdline-tools, platform-tools, accepts licenses
+      uses: android-actions/setup-android@v3
 
-    - name: Install Android SDK components  # Add build-tools, platforms as needed
-      run: sdkmanager --install "build-tools;35.0.0" "platforms;android-35"
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Cache Gradle & dependencies
+      uses: actions/cache@v4
       with:
-        node-version: '20'
-        cache: 'yarn'
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          android/.gradle
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
-    - name: Install dependencies
-      run: yarn install  # Or npm ci
+    - name: Accept Android licenses
+      run: |
+        sdkmanager --licenses
+        sdkmanager --update
+        sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+    - name: Install npm dependencies
+      run: npm ci  # Uses npm 9+ from Node 18
+
+    - name: Verify versions
+      run: |
+        node --version    # >=18.x
+        npm --version     # >=9.x  
+        java -version     # >=11.x
+        ./gradlew --version
 
     - name: Build Android APK
       run: |
         cd android
+        chmod +x gradlew
         ./gradlew clean assembleDebug --no-daemon
-        # Or ./gradlew bundleRelease for AAB (add signing secrets for release)
 
-    - name: Upload APK
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-debug.apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
