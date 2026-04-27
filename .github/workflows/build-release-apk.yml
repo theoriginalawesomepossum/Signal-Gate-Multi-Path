@@ -1,0 +1,102 @@
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: false
+        default: 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          sdkmanager "platforms;android-34"
+          sdkmanager "build-tools;34.0.0"
+          sdkmanager "platform-tools"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build release APK (unsigned)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          cd ..
+
+      - name: Upload release APK to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 30
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          files: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          tag_name: release-${{ github.run_number }}
+          body: |
+            # Release APK Build #${{ github.run_number }}
+            
+            **Build Date:** ${{ github.event.head_commit.timestamp }}
+            **Branch:** ${{ github.event.inputs.branch || 'main' }}
+            **Commit:** ${{ github.sha }}
+            
+            ## Installation Instructions
+            
+            1. Download `app-release-unsigned.apk` from this release
+            2. Transfer to your Android device
+            3. Enable "Unknown Sources" in Settings > Security
+            4. Open file manager and tap the APK to install
+            5. Grant permissions when prompted
+            
+            ## Notes
+            - This is a release build (unsigned)
+            - Optimized for distribution
+            - Not signed for Play Store (can be added later)
+            - Suitable for testing on devices
+            
+            ## For Play Store Submission
+            
+            To prepare for Play Store submission, you'll need to:
+            1. Create a keystore file for signing
+            2. Configure signing in build.gradle
+            3. Build a signed AAB (Android App Bundle)
+            4. Submit to Google Play Console
+            
+            Contact the developer for signing setup instructions.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print APK location
+        run: |
+          echo "✅ Release APK built successfully!"
+          echo "📍 Location: android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          echo "📦 Size: $(du -h android/app/build/outputs/apk/release/app-release-unsigned.apk | cut -f1)"
