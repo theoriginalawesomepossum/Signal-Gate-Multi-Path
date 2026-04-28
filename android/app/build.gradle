@@ -50,9 +50,9 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     
     // React Native
-    implementation 'com.facebook.react:react-native:0.73.0'
-    implementation 'com.facebook.react:react-android:0.73.0'
-    implementation 'com.facebook.react:hermes-android:0.73.0'
+    implementation 'com.facebook.react:react-native:0.72.0'
+    implementation 'com.facebook.react:react-android:0.72.0'
+    implementation 'com.facebook.react:hermes-android:0.72.0'
 
     // Navigation
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
@@ -67,7 +67,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
 
     // Telecom API for call screening
-    implementation 'androidx.telecom:telecom:1.0.0-alpha01'
+    implementation 'androidx.telecom:telecom:1.0.0-alpha10'
     
     // Testing
     testImplementation 'junit:junit:4.13.2'
