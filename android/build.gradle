@@ -7,13 +7,15 @@ buildscript {
         minSdkVersion = 21
         buildToolsVersion = "34.0.0"
     }
+
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20'
+        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
     }
 }
 
@@ -21,6 +23,15 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// Force consistent Kotlin JVM target (fixes your build failure)
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
     }
 }
 
