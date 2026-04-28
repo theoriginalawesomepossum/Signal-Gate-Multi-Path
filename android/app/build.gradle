@@ -6,6 +6,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     namespace "com.signalgate.multipoint"
+
     defaultConfig {
         applicationId "com.signalgate.multipoint"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -13,6 +14,17 @@ android {
         versionCode 1
         versionName "1.0.0"
         vectorDrawables.useSupportLibrary = true
+    }
+
+    // ✅ FIX: Force Java 17 compatibility
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // ✅ FIX: Force Kotlin JVM target to match Java
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     signingConfigs {
@@ -44,6 +56,7 @@ android {
     }
 }
 
+// Hermes toggle (kept as-is)
 project.ext.set('hermesEnabled', true)
 
 dependencies {
@@ -58,12 +71,12 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
 
-    // Kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
+    // Kotlin (keep version aligned with root build.gradle)
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.22'
 
     // Material Design
     implementation 'com.google.android.material:material:1.9.0'
-    
+
     // Testing
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
