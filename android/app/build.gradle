@@ -48,26 +48,21 @@ project.ext.set('hermesEnabled', true)
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    
-    // React Native
-    implementation 'com.facebook.react:react-native:0.72.0'
-    implementation 'com.facebook.react:react-android:0.72.0'
-    implementation 'com.facebook.react:hermes-android:0.72.0'
+
+    // Android Core
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.6.1'
 
     // Navigation
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
 
-    // Android Support
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.lifecycle:lifecycle-runtime:2.6.1'
-
     // Kotlin
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
 
-    // Telecom API for call screening
-    implementation 'androidx.telecom:telecom:1.0.0-alpha10'
+    // Material Design
+    implementation 'com.google.android.material:material:1.9.0'
     
     // Testing
     testImplementation 'junit:junit:4.13.2'
