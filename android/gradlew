@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+GRADLE_VERSION="8.5"
+GRADLE_HOME="$HOME/.gradle/wrapper/dists/gradle-$GRADLE_VERSION-bin"
+if [ ! -d "$GRADLE_HOME" ]; then
+  mkdir -p "$HOME/.gradle/wrapper/dists"
+  cd "$HOME/.gradle/wrapper/dists"
+  curl -L "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip" -o "gradle-$GRADLE_VERSION-bin.zip"
+  unzip -q "gradle-$GRADLE_VERSION-bin.zip"
+  rm "gradle-$GRADLE_VERSION-bin.zip"
+fi
+"$GRADLE_HOME/gradle-$GRADLE_VERSION/bin/gradle" "$@"
