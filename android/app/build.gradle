@@ -44,6 +44,8 @@ android {
     }
 }
 
+project.ext.set('hermesEnabled', true)
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     
