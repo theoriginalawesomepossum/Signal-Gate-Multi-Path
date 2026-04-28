@@ -1,42 +1,64 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+import zipfile
+import urllib.request
+from pathlib import Path
 
-GRADLE_VERSION="8.5"
-GRADLE_HOME="${GRADLE_USER_HOME:-$HOME}/.gradle/wrapper/dists"
-GRADLE_DIST="$GRADLE_HOME/gradle-$GRADLE_VERSION-bin"
+GRADLE_VERSION = "8.5"
+GRADLE_HOME = os.path.expanduser(os.environ.get("GRADLE_USER_HOME", "~/.gradle/wrapper/dists"))
+GRADLE_DIST = os.path.join(GRADLE_HOME, f"gradle-{GRADLE_VERSION}-bin")
+GRADLE_BIN = os.path.join(GRADLE_DIST, f"gradle-{GRADLE_VERSION}", "bin", "gradle")
 
-# Create directories
-mkdir -p "$GRADLE_HOME"
+def ensure_gradle():
+    """Download and extract Gradle if needed"""
+    if os.path.exists(GRADLE_BIN):
+        return
+    
+    print(f"Downloading Gradle {GRADLE_VERSION}...")
+    os.makedirs(GRADLE_DIST, exist_ok=True)
+    
+    # Download
+    url = f"https://services.gradle.org/distributions/gradle-{GRADLE_VERSION}-bin.zip"
+    zip_path = os.path.join(GRADLE_DIST, f"gradle-{GRADLE_VERSION}-bin.zip")
+    
+    try:
+        urllib.request.urlretrieve(url, zip_path)
+        print(f"Downloaded to {zip_path}")
+    except Exception as e:
+        print(f"ERROR: Failed to download Gradle: {e}")
+        sys.exit(1)
+    
+    # Extract using Python's zipfile
+    try:
+        print(f"Extracting {zip_path}...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(GRADLE_DIST)
+        print("Extraction complete")
+    except Exception as e:
+        print(f"ERROR: Failed to extract: {e}")
+        sys.exit(1)
+    
+    # Verify
+    if not os.path.exists(GRADLE_BIN):
+        print(f"ERROR: Gradle binary not found at {GRADLE_BIN}")
+        sys.exit(1)
+    
+    # Make executable
+    os.chmod(GRADLE_BIN, 0o755)
+    
+    # Cleanup
+    try:
+        os.remove(zip_path)
+    except:
+        pass
+    
+    print(f"Gradle {GRADLE_VERSION} installed successfully")
 
-# Download if not exists
-if [ ! -d "$GRADLE_DIST/gradle-$GRADLE_VERSION" ]; then
-  echo "Downloading Gradle $GRADLE_VERSION..."
-  cd "$GRADLE_HOME"
-  
-  # Remove any partial downloads
-  rm -f "gradle-$GRADLE_VERSION-bin.zip"
-  
-  # Download
-  curl -L -o "gradle-$GRADLE_VERSION-bin.zip" \
-    "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip"
-  
-  # Extract
-  unzip -q "gradle-$GRADLE_VERSION-bin.zip"
-  
-  # Verify extraction
-  if [ ! -f "$GRADLE_DIST/gradle-$GRADLE_VERSION/bin/gradle" ]; then
-    echo "ERROR: Gradle extraction failed!"
-    exit 1
-  fi
-  
-  # Cleanup
-  rm "gradle-$GRADLE_VERSION-bin.zip"
-  
-  echo "Gradle $GRADLE_VERSION installed successfully"
-fi
-
-# Make gradle executable
-chmod +x "$GRADLE_DIST/gradle-$GRADLE_VERSION/bin/gradle"
-
-# Run gradle
-exec "$GRADLE_DIST/gradle-$GRADLE_VERSION/bin/gradle" "$@"
+if __name__ == "__main__":
+    ensure_gradle()
+    
+    # Run gradle with all arguments
+    cmd = [GRADLE_BIN] + sys.argv[1:]
+    os.execv(GRADLE_BIN, cmd)
