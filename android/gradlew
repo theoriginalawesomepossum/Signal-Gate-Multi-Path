@@ -1,12 +1,42 @@
 #!/bin/bash
 set -e
+
 GRADLE_VERSION="8.5"
-GRADLE_HOME="$HOME/.gradle/wrapper/dists/gradle-$GRADLE_VERSION-bin"
-if [ ! -d "$GRADLE_HOME" ]; then
-  mkdir -p "$HOME/.gradle/wrapper/dists"
-  cd "$HOME/.gradle/wrapper/dists"
-  curl -L "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip" -o "gradle-$GRADLE_VERSION-bin.zip"
+GRADLE_HOME="${GRADLE_USER_HOME:-$HOME}/.gradle/wrapper/dists"
+GRADLE_DIST="$GRADLE_HOME/gradle-$GRADLE_VERSION-bin"
+
+# Create directories
+mkdir -p "$GRADLE_HOME"
+
+# Download if not exists
+if [ ! -d "$GRADLE_DIST/gradle-$GRADLE_VERSION" ]; then
+  echo "Downloading Gradle $GRADLE_VERSION..."
+  cd "$GRADLE_HOME"
+  
+  # Remove any partial downloads
+  rm -f "gradle-$GRADLE_VERSION-bin.zip"
+  
+  # Download
+  curl -L -o "gradle-$GRADLE_VERSION-bin.zip" \
+    "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip"
+  
+  # Extract
   unzip -q "gradle-$GRADLE_VERSION-bin.zip"
+  
+  # Verify extraction
+  if [ ! -f "$GRADLE_DIST/gradle-$GRADLE_VERSION/bin/gradle" ]; then
+    echo "ERROR: Gradle extraction failed!"
+    exit 1
+  fi
+  
+  # Cleanup
   rm "gradle-$GRADLE_VERSION-bin.zip"
+  
+  echo "Gradle $GRADLE_VERSION installed successfully"
 fi
-"$GRADLE_HOME/gradle-$GRADLE_VERSION/bin/gradle" "$@"
+
+# Make gradle executable
+chmod +x "$GRADLE_DIST/gradle-$GRADLE_VERSION/bin/gradle"
+
+# Run gradle
+exec "$GRADLE_DIST/gradle-$GRADLE_VERSION/bin/gradle" "$@"
