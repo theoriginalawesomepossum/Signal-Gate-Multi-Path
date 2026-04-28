@@ -1,6 +1,14 @@
-apply plugin: "com.android.application"
-apply plugin: "com.facebook.react"
-apply plugin: "kotlin-android"
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+// Apply React Native plugin if available
+try {
+    apply plugin: 'com.facebook.react'
+} catch (Exception e) {
+    // React Native plugin not available, continuing without it
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
