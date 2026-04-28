@@ -1,14 +1,5 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-}
-
-// Apply React Native plugin if available
-try {
-    apply plugin: 'com.facebook.react'
-} catch (Exception e) {
-    // React Native plugin not available, continuing without it
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -80,8 +71,4 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-}
-
-react {
-    jsEngine = "hermes"
 }
