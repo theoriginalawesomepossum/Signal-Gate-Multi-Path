@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.signalgate.multipoint">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Required permissions for call screening -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Optional (only if needed for background service behavior) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -22,20 +23,24 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <!-- CallScreeningService declaration -->
+        <!-- Call Screening Service -->
         <service
             android:name=".CallScreeningService"
             android:permission="android.permission.BIND_SCREENING_SERVICE"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.telecom.CallScreeningService" />
             </intent-filter>
+
         </service>
 
     </application>
