@@ -40,7 +40,20 @@ jobs:
           sdkmanager "platform-tools"
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps --no-optional --ignore-scripts
+        run: npm ci --legacy-peer-deps --no-optional
+
+      - name: Verify node_modules
+        run: |
+          if [ ! -d "node_modules" ]; then
+            echo "ERROR: node_modules not found!"
+            exit 1
+          fi
+          if [ ! -d "node_modules/react-native" ]; then
+            echo "ERROR: react-native not found in node_modules!"
+            exit 1
+          fi
+          echo "✅ node_modules verified"
+          ls -la node_modules | head -20
 
       - name: Build release APK (unsigned)
         run: |
