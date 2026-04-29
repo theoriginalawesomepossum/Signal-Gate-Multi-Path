@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun isDefaultCallScreener(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val roleManager = getSystemService(Context.ROLE_MANAGER) as RoleManager
+            val roleManager = getSystemService(RoleManager::class.java)
             return roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)
         } else {
             val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestSetDefaultCallScreener() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val roleManager = getSystemService(Context.ROLE_MANAGER) as RoleManager
+            val roleManager = getSystemService(RoleManager::class.java)
             val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
             startActivityForResult(intent, REQUEST_ID_SET_DEFAULT_CALL_SCREENER)
         } else {
