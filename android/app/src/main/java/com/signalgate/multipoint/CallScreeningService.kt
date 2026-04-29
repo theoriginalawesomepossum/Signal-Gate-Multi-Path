@@ -4,6 +4,8 @@ import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.util.Log
 import com.signalgate.multipoint.db.AppDatabase
+import com.signalgate.multipoint.db.CallLogEntry
+import com.signalgate.multipoint.utils.PhoneNumberUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,58 +20,70 @@ class CallScreeningService : CallScreeningService() {
     }
 
     override fun onScreenCall(callDetails: Call.Details) {
-        // Handle is the URI for the call (e.g., tel:+1234567890)
-        val phoneNumber = callDetails.handle?.schemeSpecificPart
+        val originalPhoneNumber = callDetails.handle?.schemeSpecificPart
 
-        if (phoneNumber == null) {
-            allowCall(callDetails)
+        if (originalPhoneNumber == null) {
+            logAndAllowCall(callDetails, "No phone number provided")
             return
         }
 
-        Log.d(TAG, "Screening incoming call from: $phoneNumber")
+        val normalizedPhoneNumber = PhoneNumberUtils.normalizePhoneNumber(originalPhoneNumber)
+        Log.d(TAG, "Screening incoming call from: $originalPhoneNumber (Normalized: $normalizedPhoneNumber)")
 
-        // Run blocking check in a coroutine
         serviceScope.launch {
-            val shouldBlock = checkBlockingLogic(phoneNumber)
+            val decision = checkBlockingLogic(normalizedPhoneNumber)
             
             withContext(Dispatchers.Main) {
-                if (shouldBlock) {
-                    blockCall(callDetails, phoneNumber)
-                } else {
-                    allowCall(callDetails)
+                when (decision.first) {
+                    CallDecision.ALLOW -> logAndAllowCall(callDetails, decision.second)
+                    CallDecision.BLOCK -> logAndBlockCall(callDetails, normalizedPhoneNumber, decision.second)
                 }
             }
         }
     }
 
-    private suspend fun checkBlockingLogic(phoneNumber: String): Boolean {
+    private suspend fun checkBlockingLogic(normalizedPhoneNumber: String): Pair<CallDecision, String> {
         val db = AppDatabase.getDatabase(applicationContext)
         val blockDao = db.blockDao()
+        val allowDao = db.allowDao()
 
-        // 1. Check exact match in local database
-        val exactMatch = blockDao.findByNumber(phoneNumber)
-        if (exactMatch != null) {
-            Log.d(TAG, "Exact match found in blocklist: $phoneNumber")
-            return true
+        // 1. Check AllowList (Whitelisting) first
+        val allowEntry = allowDao.findByNumber(normalizedPhoneNumber)
+        if (allowEntry != null) {
+            Log.d(TAG, "Allow match found in allowlist: $normalizedPhoneNumber")
+            return Pair(CallDecision.ALLOW, "Exact match in allowlist")
         }
 
-        // 2. Smart Logic: Check for patterns (simple prefix check for now)
-        // In a real app, we'd fetch all pattern entries and check regex or prefixes
-        val allEntries = blockDao.getAll()
-        for (entry in allEntries) {
-            if (entry.isPattern && phoneNumber.startsWith(entry.phoneNumber)) {
-                Log.d(TAG, "Pattern match found: $phoneNumber matches ${entry.phoneNumber}")
-                return true
+        // 2. Check exact match in BlockList
+        val exactBlockMatch = blockDao.findByNumber(normalizedPhoneNumber)
+        if (exactBlockMatch != null) {
+            Log.d(TAG, "Exact match found in blocklist: $normalizedPhoneNumber")
+            return Pair(CallDecision.BLOCK, "Exact match in blocklist")
+        }
+
+        // 3. Smart Logic: Check for patterns in BlockList
+        val allBlockEntries = blockDao.getAll()
+        for (entry in allBlockEntries) {
+            if (entry.isPattern && normalizedPhoneNumber.startsWith(entry.phoneNumber)) {
+                Log.d(TAG, "Pattern match found: $normalizedPhoneNumber matches ${entry.phoneNumber}")
+                return Pair(CallDecision.BLOCK, "Pattern match: ${entry.phoneNumber}")
             }
         }
 
-        // 3. Potential for further intelligence (e.g., STIR/SHAKEN, frequency, etc.)
-        // For now, if not in blocklist, we allow it.
-        return false
+        // 4. Default: Allow if no blocking rules are met
+        return Pair(CallDecision.ALLOW, "No blocking rules matched")
     }
 
-    private fun allowCall(callDetails: Call.Details) {
-        Log.d(TAG, "Allowing call")
+    private fun logAndAllowCall(callDetails: Call.Details, reason: String) {
+        serviceScope.launch {
+            val db = AppDatabase.getDatabase(applicationContext)
+            db.callLogDao().insert(CallLogEntry(
+                phoneNumber = callDetails.handle?.schemeSpecificPart ?: "Unknown",
+                decision = CallDecision.ALLOW.name,
+                reason = reason
+            ))
+        }
+        Log.d(TAG, "Allowing call. Reason: $reason")
         val response = CallResponse.Builder()
             .setDisallowCall(false)
             .setRejectCall(false)
@@ -79,8 +93,16 @@ class CallScreeningService : CallScreeningService() {
         respondToCall(callDetails, response)
     }
 
-    private fun blockCall(callDetails: Call.Details, phoneNumber: String) {
-        Log.d(TAG, "Blocking call from: $phoneNumber")
+    private fun logAndBlockCall(callDetails: Call.Details, phoneNumber: String, reason: String) {
+        serviceScope.launch {
+            val db = AppDatabase.getDatabase(applicationContext)
+            db.callLogDao().insert(CallLogEntry(
+                phoneNumber = callDetails.handle?.schemeSpecificPart ?: "Unknown",
+                decision = CallDecision.BLOCK.name,
+                reason = reason
+            ))
+        }
+        Log.d(TAG, "Blocking call from: $phoneNumber. Reason: $reason")
         val response = CallResponse.Builder()
             .setDisallowCall(true)
             .setRejectCall(true)
@@ -89,4 +111,6 @@ class CallScreeningService : CallScreeningService() {
             .build()
         respondToCall(callDetails, response)
     }
+
+    enum class CallDecision { ALLOW, BLOCK }
 }

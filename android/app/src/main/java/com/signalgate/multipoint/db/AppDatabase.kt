@@ -5,9 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [BlockEntry::class], version = 1, exportSchema = false)
+@Database(entities = [BlockEntry::class, AllowEntry::class, CallLogEntry::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun blockDao(): BlockDao
+    abstract fun allowDao(): AllowDao
+    abstract fun callLogDao(): CallLogDao
 
     companion object {
         @Volatile
@@ -19,7 +21,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "signal_gate_db"
-                ).build()
+                )
+                .fallbackToDestructiveMigration() // Allows database to be recreated on version mismatch
+                .build()
                 INSTANCE = instance
                 instance
             }

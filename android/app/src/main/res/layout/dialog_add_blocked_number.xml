@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/phoneNumberEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Phone Number or Pattern (e.g., +1800)"
+        android:inputType="phone" />
+
+    <EditText
+        android:id="@+id/labelEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Label (Optional, e.g., Spam Caller)" />
+
+    <Switch
+        android:id="@+id/isPatternSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Is Pattern? (e.g., +1800*)"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>
