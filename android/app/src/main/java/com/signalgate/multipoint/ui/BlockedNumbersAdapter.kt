@@ -5,20 +5,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
 import com.signalgate.multipoint.db.BlockEntry
 
 class BlockedNumbersAdapter(
-    private val onDeleteClick: (BlockEntry) -> Unit
-) : RecyclerView.Adapter<BlockedNumbersAdapter.BlockViewHolder>() {
-
-    private var blockList: List<BlockEntry> = emptyList()
-
-    fun submitList(newList: List<BlockEntry>) {
-        blockList = newList
-        notifyDataSetChanged()
-    }
+    private val onDeleteClick: (BlockEntry) -> Unit,
+    private val onWhitelistClick: (BlockEntry) -> Unit
+) : ListAdapter<BlockEntry, BlockedNumbersAdapter.BlockViewHolder>(BlockEntryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -27,11 +23,8 @@ class BlockedNumbersAdapter(
     }
 
     override fun onBindViewHolder(holder: BlockViewHolder, position: Int) {
-        val entry = blockList[position]
-        holder.bind(entry)
+        holder.bind(getItem(position))
     }
-
-    override fun getItemCount(): Int = blockList.size
 
     inner class BlockViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val phoneNumberTextView: TextView = itemView.findViewById(R.id.phoneNumberTextView)
@@ -42,6 +35,16 @@ class BlockedNumbersAdapter(
             phoneNumberTextView.text = entry.phoneNumber
             labelTextView.text = entry.label ?: if (entry.isPattern) "Pattern" else ""
             deleteButton.setOnClickListener { onDeleteClick(entry) }
+        }
+    }
+
+    private class BlockEntryDiffCallback : DiffUtil.ItemCallback<BlockEntry>() {
+        override fun areItemsTheSame(oldItem: BlockEntry, newItem: BlockEntry): Boolean {
+            return oldItem.phoneNumber == newItem.phoneNumber
+        }
+
+        override fun areContentsTheSame(oldItem: BlockEntry, newItem: BlockEntry): Boolean {
+            return oldItem == newItem
         }
     }
 }
