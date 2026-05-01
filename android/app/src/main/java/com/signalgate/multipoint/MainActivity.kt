@@ -16,8 +16,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.signalgate.multipoint.ui.BlockedNumbersFragment
+import com.signalgate.multipoint.ui.RecentCallsFragment
+import com.signalgate.multipoint.ui.SettingsFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,24 +33,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var requestContactsButton: Button
     private lateinit var manageBlockedNumbersButton: Button
     private lateinit var fragmentContainer: FragmentContainerView
+    private lateinit var bottomNavigation: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Set up root layout with bottom navigation
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = android.view.Gravity.CENTER_HORIZONTAL
-            setPadding(16, 16, 16, 16)
+            setPadding(0, 0, 0, 0)
         }
 
+        // Status text view
         statusTextView = TextView(this).apply {
             text = "Checking app status..."
             textSize = 20f
             gravity = android.view.Gravity.CENTER
-            setPadding(0, 0, 0, 32)
+            setPadding(0, 16, 0, 16)
         }
         rootLayout.addView(statusTextView)
 
+        // Setup buttons (will be shown/hidden based on permissions)
         setDefaultButton = Button(this).apply {
             text = "Set as Default Call Screener"
             setOnClickListener { requestSetDefaultCallScreener() }
@@ -63,16 +71,41 @@ class MainActivity : AppCompatActivity() {
 
         manageBlockedNumbersButton = Button(this).apply {
             text = "Manage Blocked Numbers"
-            setOnClickListener { showBlockedNumbersFragment() }
+            setOnClickListener { showFragment(BlockedNumbersFragment()) }
             visibility = View.GONE
         }
         rootLayout.addView(manageBlockedNumbersButton)
 
+        // Fragment container
         fragmentContainer = FragmentContainerView(this).apply {
-            id = View.generateViewId() // Generate a unique ID for the container
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+            id = View.generateViewId()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+            )
         }
         rootLayout.addView(fragmentContainer)
+
+        // Bottom navigation
+        bottomNavigation = BottomNavigationView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            menu.clear()
+            inflateMenu(R.menu.bottom_nav_menu)
+            setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.nav_blocked -> showFragment(BlockedNumbersFragment())
+                    R.id.nav_recent -> showFragment(RecentCallsFragment())
+                    R.id.nav_settings -> showFragment(SettingsFragment())
+                    else -> false
+                }
+            }
+            visibility = View.GONE // Hidden until setup is complete
+        }
+        rootLayout.addView(bottomNavigation)
 
         setContentView(rootLayout)
     }
@@ -90,8 +123,13 @@ class MainActivity : AppCompatActivity() {
             statusTextView.text = "Signal Gate is active and ready!"
             setDefaultButton.visibility = View.GONE
             requestContactsButton.visibility = View.GONE
-            manageBlockedNumbersButton.visibility = View.VISIBLE
-            showBlockedNumbersFragment() // Automatically show the management UI
+            manageBlockedNumbersButton.visibility = View.GONE
+            bottomNavigation.visibility = View.VISIBLE
+
+            // Set default fragment
+            if (supportFragmentManager.findFragmentById(fragmentContainer.id) == null) {
+                showFragment(BlockedNumbersFragment())
+            }
         } else {
             statusTextView.text = "Setup required:"
             if (!isDefaultCallScreener) {
@@ -105,11 +143,20 @@ class MainActivity : AppCompatActivity() {
                 requestContactsButton.visibility = View.GONE
             }
             manageBlockedNumbersButton.visibility = View.GONE
+            bottomNavigation.visibility = View.GONE
+
             // Clear fragment container if permissions are not met
             supportFragmentManager.findFragmentById(fragmentContainer.id)?.let {
                 supportFragmentManager.beginTransaction().remove(it).commit()
             }
         }
+    }
+
+    private fun showFragment(fragment: Fragment): Boolean {
+        supportFragmentManager.beginTransaction()
+            .replace(fragmentContainer.id, fragment)
+            .commit()
+        return true
     }
 
     private fun isDefaultCallScreener(): Boolean {
@@ -157,7 +204,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Contacts permission denied", Toast.LENGTH_SHORT).show()
             }
-            checkPermissionsAndRoles() // Re-check status after permission result
+            checkPermissionsAndRoles()
         }
     }
 
@@ -167,15 +214,3 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Set as default call screener", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Failed to set as default call screener", Toast.LENGTH_SHORT).show()
-            }
-            checkPermissionsAndRoles() // Re-check status after role result
-        }
-    }
-
-    private fun showBlockedNumbersFragment() {
-        supportFragmentManager.beginTransaction()
-            .replace(fragmentContainer.id, BlockedNumbersFragment())
-            .commit()
-    }
-}
