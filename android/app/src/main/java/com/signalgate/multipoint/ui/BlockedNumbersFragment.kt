@@ -8,22 +8,28 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
+import com.signalgate.multipoint.db.BlockEntry
 
 class BlockedNumbersFragment : Fragment() {
 
     private lateinit var viewModel: BlockedNumbersViewModel
+    private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: BlockedNumbersAdapter
+    private lateinit var emptyStateTextView: TextView
+    private lateinit var addButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return inflater.inflate(R.layout.fragment_blocked_numbers, container, false)
     }
 
@@ -32,44 +38,94 @@ class BlockedNumbersFragment : Fragment() {
 
         viewModel = ViewModelProvider(this).get(BlockedNumbersViewModel::class.java)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerViewBlockedNumbers)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = BlockedNumbersAdapter { entry ->
-            viewModel.deleteBlockedNumber(entry)
-        }
-        recyclerView.adapter = adapter
+        recyclerView = view.findViewById(R.id.recyclerViewBlockedNumbers)
+        emptyStateTextView = view.findViewById(R.id.emptyState)
+        addButton = view.findViewById(R.id.addBlockedNumberButton)
 
-        viewModel.blockedNumbers.observe(viewLifecycleOwner) { blockedNumbers ->
-            adapter.submitList(blockedNumbers)
+        setupRecyclerView()
+        setupObservers()
+        setupAddButton()
+    }
+
+    private fun setupRecyclerView() {
+        adapter = BlockedNumbersAdapter(
+            onDeleteClick = { entry ->
+                viewModel.deleteBlockedNumber(entry)
+                showUndoMessage(entry.phoneNumber)
+            },
+            onWhitelistClick = { entry ->
+                viewModel.addToWhitelist(entry.phoneNumber)
+                Toast.makeText(requireContext(), "Added to whitelist: ${entry.phoneNumber}", Toast.LENGTH_SHORT).show()
+            }
+        )
+
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@BlockedNumbersFragment.adapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.blockedNumbers.observe(viewLifecycleOwner) { entries ->
+            adapter.submitList(entries)
+            emptyStateTextView.visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
         }
 
-        view.findViewById<Button>(R.id.addBlockedNumberButton).setOnClickListener {
+        viewModel.actionResult.observe(viewLifecycleOwner) { result ->
+            result?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.clearActionResult()
+            }
+        }
+    }
+
+    private fun setupAddButton() {
+        addButton.setOnClickListener {
             showAddBlockedNumberDialog()
         }
     }
 
     private fun showAddBlockedNumberDialog() {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_blocked_number, null)
-        val phoneNumberEditText = dialogView.findViewById<EditText>(R.id.phoneNumberEditText)
-        val labelEditText = dialogView.findViewById<EditText>(R.id.labelEditText)
-        val isPatternSwitch = dialogView.findViewById<Switch>(R.id.isPatternSwitch)
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_add_blocked_number, null)
 
-        AlertDialog.Builder(context)
+        val phoneNumberEditText: EditText = dialogView.findViewById(R.id.phoneNumberEditText)
+        val labelEditText: EditText = dialogView.findViewById(R.id.labelEditText)
+        val isPatternSwitch: Switch = dialogView.findViewById(R.id.isPatternSwitch)
+
+        AlertDialog.Builder(requireContext())
             .setTitle("Add Blocked Number")
+            .setMessage("Enter phone number or pattern to block")
             .setView(dialogView)
             .setPositiveButton("Add") { dialog, _ ->
-                val phoneNumber = phoneNumberEditText.text.toString()
-                val label = labelEditText.text.toString().ifEmpty { null }
+                val phoneNumber = phoneNumberEditText.text.toString().trim()
+                val label = labelEditText.text.toString().trim().ifEmpty { null }
                 val isPattern = isPatternSwitch.isChecked
 
-                if (phoneNumber.isNotBlank()) {
-                    viewModel.addBlockedNumber(phoneNumber, label, isPattern)
+                if (phoneNumber.isNotEmpty()) {
+                    if (isPattern) {
+                        viewModel.addPatternRule(phoneNumber, label)
+                    } else {
+                        viewModel.addBlockedNumber(phoneNumber, label, isPattern)
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Phone number cannot be empty", Toast.LENGTH_SHORT).show()
                 }
                 dialog.dismiss()
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.cancel()
             }
+            .create()
             .show()
+    }
+
+    private fun showUndoMessage(number: String) {
+        Toast.makeText(
+            requireContext(),
+            "Blocked: $number. Check recent actions to undo",
+            Toast.LENGTH_LONG
+        ).show()
     }
 }
