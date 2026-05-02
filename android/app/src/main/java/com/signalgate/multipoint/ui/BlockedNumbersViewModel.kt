@@ -26,7 +26,7 @@ class BlockedNumbersViewModel(
         loadBlockedNumbers()
     }
 
-    fun loadBlockedNumbers() {
+    private fun loadBlockedNumbers() {
         viewModelScope.launch {
             _blockedNumbers.value = blockDao.getAll()
         }
@@ -69,3 +69,15 @@ class BlockedNumbersViewModel(
     fun addToWhitelist(phoneNumber: String) {
         viewModelScope.launch {
             val newEntry = AllowEntry(
+                phoneNumber = phoneNumber
+            )
+            allowDao.insert(newEntry)
+            _actionResult.value = "Added to whitelist: $phoneNumber"
+            loadBlockedNumbers()
+        }
+    }
+
+    fun clearActionResult() {
+        _actionResult.value = null
+    }
+}
