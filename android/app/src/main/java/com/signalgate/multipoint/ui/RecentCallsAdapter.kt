@@ -15,7 +15,7 @@ import com.signalgate.multipoint.utils.PhoneNumberUtils
 class RecentCallsAdapter(
     private val onBlockClick: (String) -> Unit,
     private val onWhitelistClick: (String) -> Unit
-) : ListAdapter<CallLogEntry, RecentCallsAdapter.CallViewHolder>(CallLogDiffCallback()) {
+) : ListAdapter<CallLogEntry, RecentCallsAdapter.CallViewHolder>(CallLogEntryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CallViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -43,7 +43,7 @@ class RecentCallsAdapter(
         }
     }
 
-    private class CallDiffCallback : DiffUtil.ItemCallback<CallLogEntry>() {
+    private class CallLogEntryDiffCallback : DiffUtil.ItemCallback<CallLogEntry>() {
         override fun areItemsTheSame(oldItem: CallLogEntry, newItem: CallLogEntry): Boolean {
             return oldItem.id == newItem.id
         }
