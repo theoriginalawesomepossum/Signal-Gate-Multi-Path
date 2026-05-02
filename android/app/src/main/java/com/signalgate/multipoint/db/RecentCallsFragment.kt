@@ -1,4 +1,4 @@
-package com.signalgate.multipoint.ui
+package com.signalgate.multipoint.ui  // ← CHANGED FROM .db TO .ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
 import com.signalgate.multipoint.db.CallLogEntry
+import com.signalgate.multipoint.ui.RecentCallsAdapter  // ← ADDED IMPORT
+import com.signalgate.multipoint.ui.RecentCallsViewModel  // ← ADDED IMPORT
 import com.signalgate.multipoint.utils.PhoneNumberUtils
 
 class RecentCallsFragment : Fragment() {
