@@ -1,18 +1,40 @@
 package com.signalgate.multipoint.utils
 
-object PhoneNumberUtils {
-    fun normalizePhoneNumber(phoneNumber: String): String {
-        // Remove all non-digit characters except for a leading plus sign
-        val digitsOnly = phoneNumber.replace(Regex("[^\\d+]"), "")
+import java.util.regex.Pattern
 
-        // If it starts with '+', keep it. Otherwise, assume US format for simplicity
-        // and add '+1' if it's a 10-digit number without a country code.
-        if (digitsOnly.startsWith("+")) {
-            return digitsOnly
-        } else if (digitsOnly.length == 10) {
-            return "+1" + digitsOnly
+object PhoneNumberUtils {
+
+    /**
+     * Formats a phone number for display (e.g., +1234567890 -> (123) 456-7890)
+     */
+    fun formatPhoneNumberForDisplay(phoneNumber: String): String {
+        return try {
+            // Remove all non-digit characters
+            val digits = phoneNumber.replace("[^0-9]".toRegex(), "")
+
+            // Format based on length
+            when (digits.length) {
+                10 -> formatUSNumber(digits)
+                11 -> formatInternationalNumber(digits)
+                else -> phoneNumber // Return original if format not recognized
+            }
+        } catch (e: Exception) {
+            phoneNumber // Return original on error
         }
-        // For other cases, return as is or implement more complex logic
-        return digitsOnly
+    }
+
+    private fun formatUSNumber(digits: String): String {
+        return "(${digits.substring(0, 3)}) ${digits.substring(3, 6)}-${digits.substring(6)}"
+    }
+
+    private fun formatInternationalNumber(digits: String): String {
+        return "+${digits.substring(0, digits.length - 10)} (${digits.substring(digits.length - 10, digits.length - 7)}) ${digits.substring(digits.length - 7, digits.length - 4)}-${digits.substring(digits.length - 4)}"
+    }
+
+    /**
+     * Normalizes phone number by removing formatting characters
+     */
+    fun normalizePhoneNumber(phoneNumber: String): String {
+        return phoneNumber.replace("[^0-9+]".toRegex(), "")
     }
 }
