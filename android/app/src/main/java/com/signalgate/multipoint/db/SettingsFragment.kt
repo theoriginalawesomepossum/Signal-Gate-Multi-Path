@@ -1,4 +1,4 @@
-package com.signalgate.multipoint.ui
+package com.signalgate.multipoint.ui  // ← CHANGED FROM .db TO .ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
