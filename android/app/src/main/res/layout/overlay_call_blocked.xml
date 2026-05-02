@@ -61,4 +61,3 @@
             android:layout_height="wrap_content"
             android:text="Dismiss"/>
     </LinearLayout>
-</LinearLayout>
