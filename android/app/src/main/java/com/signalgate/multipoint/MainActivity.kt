@@ -214,3 +214,10 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Set as default call screener", Toast.LENGTH_SHORT).show()
             } else {
+
+                      Toast.makeText(this, "Failed to set as default call screener", Toast.LENGTH_SHORT).show()
+            }
+            checkPermissionsAndRoles()
+        }
+    }  // ← ADD THIS CLOSING BRACE
+}  // ← AND THIS ONE FOR THE CLASS
