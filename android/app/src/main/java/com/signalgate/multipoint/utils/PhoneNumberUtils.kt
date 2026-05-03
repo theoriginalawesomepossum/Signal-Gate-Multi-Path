@@ -34,7 +34,7 @@ object PhoneNumberUtils {
     /**
      * Normalizes phone number by removing formatting characters
      */
-    fun normalizePhoneNumber(phoneNumber: String): String {
+    val displayNumber = PhoneNumberUtils.formatPhoneNumberForDisplay(call.phoneNumber)
         return phoneNumber.replace("[^0-9+]".toRegex(), "")
     }
 }
