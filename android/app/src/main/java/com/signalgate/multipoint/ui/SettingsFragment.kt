@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.signalgate.multipoint.R
@@ -64,6 +65,7 @@ class SettingsFragment : Fragment() {
         redSeekBar.progress = currentRed
         greenSeekBar.progress = currentGreen
         blueSeekBar.progress = currentBlue
+        updatePreview()
     }
 
     private fun setupSeekBars() {
@@ -117,9 +119,11 @@ class SettingsFragment : Fragment() {
     }
 
     private fun saveColors() {
-    with(sharedPreferences.edit()) {
-        putInt("shield_red", currentRed)
-        putInt("shield_green", currentGreen)
-        apply() // Blocks until write completes
+        with(sharedPreferences.edit()) {
+            putInt("shield_red", currentRed)
+            putInt("shield_green", currentGreen)
+            putInt("shield_blue", currentBlue)
+            apply()
+        }
     }
 }
