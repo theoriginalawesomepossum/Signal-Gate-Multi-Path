@@ -1,8 +1,3 @@
-# Remove the problematic file completely
-rm -f android/app/src/main/res/drawable/ic_launcher_foreground.xml
-
-# Create a fresh file using a simple text editor approach
-cat > android/app/src/main/res/drawable/ic_launcher_foreground.xml << 'EOF'
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -45,4 +40,3 @@ cat > android/app/src/main/res/drawable/ic_launcher_foreground.xml << 'EOF'
         android:y="48dp"
         android:text="SignalGate" />
 </vector>
-EOF
