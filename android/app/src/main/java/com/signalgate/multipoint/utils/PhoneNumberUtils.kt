@@ -1,7 +1,5 @@
 package com.signalgate.multipoint.utils
 
-import java.util.regex.Pattern
-
 object PhoneNumberUtils {
 
     /**
@@ -10,7 +8,7 @@ object PhoneNumberUtils {
     fun formatPhoneNumberForDisplay(phoneNumber: String): String {
         return try {
             // Remove all non-digit characters
-            val digits = phoneNumber.replace("[^0-9]".toRegex(), "")
+            val digits = phoneNumber.replace(Regex("[^0-9]"), "")
 
             // Format based on length
             when (digits.length) {
@@ -34,7 +32,7 @@ object PhoneNumberUtils {
     /**
      * Normalizes phone number by removing formatting characters
      */
-    val displayNumber = PhoneNumberUtils.formatPhoneNumberForDisplay(call.phoneNumber)
-        return phoneNumber.replace("[^0-9+]".toRegex(), "")
+    fun normalizePhoneNumber(phoneNumber: String): String {
+        return phoneNumber.replace(Regex("[^0-9+]"), "")
     }
 }
