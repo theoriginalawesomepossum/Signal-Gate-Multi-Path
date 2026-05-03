@@ -31,11 +31,11 @@
         android:fillColor="#4285F4" />
     <text
         android:gravity="center"
-        android:textSize="24"
+        android:textSize="24sp"
         android:textColor="#FFFFFF"
-        android:text="SignalGate"
         android:fontFamily="sans-serif-medium"
-        android:x="0"
-        android:y="48"
-        android:includeFontPadding="false" />
+        android:includeFontPadding="false"
+        android:x="0dp"
+        android:y="48dp"
+        android:text="SignalGate" />
 </vector>
