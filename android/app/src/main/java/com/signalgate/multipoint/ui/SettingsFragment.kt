@@ -117,6 +117,9 @@ class SettingsFragment : Fragment() {
     }
 
     private fun saveColors() {
-        with(sharedPreferences.edit()) {
-            putInt("shield_red", currentRed)
-            putInt("shield_green", currentGreen)
+    with(sharedPreferences.edit()) {
+        putInt("shield_red", currentRed)
+        putInt("shield_green", currentGreen)
+        apply() // Blocks until write completes
+    }
+}
