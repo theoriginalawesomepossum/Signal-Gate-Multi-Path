@@ -35,6 +35,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragmentContainer: FragmentContainerView
     private lateinit var bottomNavigation: BottomNavigationView
 
+    // Modern activity result API
+    private val setDefaultCallScreenerResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            Toast.makeText(this, "Set as default call screener", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Failed to set as default call screener", Toast.LENGTH_SHORT).show()
+        }
+        checkPermissionsAndRoles()
+    }
+
+    private val contactsPermissionResult = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(this, "Contacts permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Contacts permission denied", Toast.LENGTH_SHORT).show()
+        }
+        checkPermissionsAndRoles()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -173,11 +196,11 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = getSystemService(RoleManager::class.java)
             val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-            startActivityForResult(intent, REQUEST_ID_SET_DEFAULT_CALL_SCREENER)
+            setDefaultCallScreenerResult.launch(intent)
         } else {
             val intent = Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
             intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, packageName)
-            startActivityForResult(intent, REQUEST_ID_SET_DEFAULT_CALL_SCREENER)
+            setDefaultCallScreenerResult.launch(intent)
         }
     }
 
@@ -189,35 +212,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestContactsPermission() {
-        requestPermissions(arrayOf(android.Manifest.permission.READ_CONTACTS), REQUEST_CODE_READ_CONTACTS)
+        contactsPermissionResult.launch(android.Manifest.permission.READ_CONTACTS)
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_READ_CONTACTS) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Contacts permission granted", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Contacts permission denied", Toast.LENGTH_SHORT).show()
-            }
-            checkPermissionsAndRoles()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ID_SET_DEFAULT_CALL_SCREENER) {
-            if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "Set as default call screener", Toast.LENGTH_SHORT).show()
-            } else {
-
-                      Toast.makeText(this, "Failed to set as default call screener", Toast.LENGTH_SHORT).show()
-            }
-            checkPermissionsAndRoles()
-        }
-    }  // ← ADD THIS CLOSING BRACE
-}  // ← AND THIS ONE FOR THE CLASS
+}
