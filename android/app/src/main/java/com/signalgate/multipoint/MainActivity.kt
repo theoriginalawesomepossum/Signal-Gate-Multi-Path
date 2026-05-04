@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragmentContainer: FragmentContainerView
     private lateinit var bottomNavigation: BottomNavigationView
 
-    // Modern activity result API
     private val setDefaultCallScreenerResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -61,14 +60,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Set up root layout with bottom navigation
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = android.view.Gravity.CENTER_HORIZONTAL
             setPadding(0, 0, 0, 0)
         }
 
-        // Status text view
         statusTextView = TextView(this).apply {
             text = "Checking app status..."
             textSize = 20f
@@ -77,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         }
         rootLayout.addView(statusTextView)
 
-        // Setup buttons (will be shown/hidden based on permissions)
         setDefaultButton = Button(this).apply {
             text = "Set as Default Call Screener"
             setOnClickListener { requestSetDefaultCallScreener() }
@@ -99,7 +95,6 @@ class MainActivity : AppCompatActivity() {
         }
         rootLayout.addView(manageBlockedNumbersButton)
 
-        // Fragment container
         fragmentContainer = FragmentContainerView(this).apply {
             id = View.generateViewId()
             layoutParams = LinearLayout.LayoutParams(
@@ -110,7 +105,6 @@ class MainActivity : AppCompatActivity() {
         }
         rootLayout.addView(fragmentContainer)
 
-        // Bottom navigation
         bottomNavigation = BottomNavigationView(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -126,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     else -> false
                 }
             }
-            visibility = View.GONE // Hidden until setup is complete
+            visibility = View.GONE
         }
         rootLayout.addView(bottomNavigation)
 
@@ -149,26 +143,17 @@ class MainActivity : AppCompatActivity() {
             manageBlockedNumbersButton.visibility = View.GONE
             bottomNavigation.visibility = View.VISIBLE
 
-            // Set default fragment
+            // DEFAULT TO SETTINGS (safe) instead of BlockedNumbersFragment
             if (supportFragmentManager.findFragmentById(fragmentContainer.id) == null) {
-                showFragment(BlockedNumbersFragment())
+                showFragment(SettingsFragment())
             }
         } else {
             statusTextView.text = "Setup required:"
-            if (!isDefaultCallScreener) {
-                setDefaultButton.visibility = View.VISIBLE
-            } else {
-                setDefaultButton.visibility = View.GONE
-            }
-            if (!hasContactsPermission) {
-                requestContactsButton.visibility = View.VISIBLE
-            } else {
-                requestContactsButton.visibility = View.GONE
-            }
+            if (!isDefaultCallScreener) setDefaultButton.visibility = View.VISIBLE
+            if (!hasContactsPermission) requestContactsButton.visibility = View.VISIBLE
             manageBlockedNumbersButton.visibility = View.GONE
             bottomNavigation.visibility = View.GONE
 
-            // Clear fragment container if permissions are not met
             supportFragmentManager.findFragmentById(fragmentContainer.id)?.let {
                 supportFragmentManager.beginTransaction().remove(it).commit()
             }
