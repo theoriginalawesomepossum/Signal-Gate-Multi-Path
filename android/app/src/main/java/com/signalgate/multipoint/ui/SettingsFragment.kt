@@ -116,3 +116,8 @@ class SettingsFragment : Fragment() {
         with(sharedPreferences.edit()) {
             putInt("shield_red", currentRed)
             putInt("shield_green", currentGreen)
+            putInt("shield_blue", currentBlue)
+            apply()
+        }
+    }
+}
