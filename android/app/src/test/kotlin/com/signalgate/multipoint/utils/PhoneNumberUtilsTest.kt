@@ -14,7 +14,9 @@ class PhoneNumberUtilsTest {
 
     @Test
     fun `formatPhoneNumberForDisplay works for US numbers`() {
-        val formatted = PhoneNumberUtils.formatPhoneNumberForDisplay("+18005551212")
-        assertEquals("(800) 555-1212", formatted)
+        // +18005551212 becomes 11 digits → international formatting
+        assertEquals("+1 (800) 555-1212", PhoneNumberUtils.formatPhoneNumberForDisplay("+18005551212"))
+        // 10-digit US number
+        assertEquals("(310) 555-1212", PhoneNumberUtils.formatPhoneNumberForDisplay("3105551212"))
     }
 }
