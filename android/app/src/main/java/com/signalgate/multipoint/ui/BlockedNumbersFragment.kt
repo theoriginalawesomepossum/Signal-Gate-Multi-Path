@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
+import com.signalgate.multipoint.db.AppDatabase
 import com.signalgate.multipoint.db.BlockEntry
 
 class BlockedNumbersFragment : Fragment() {
@@ -36,7 +37,15 @@ class BlockedNumbersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(BlockedNumbersViewModel::class.java)
+        // FIXED: Provide database to ViewModel
+        val database = AppDatabase.getDatabase(requireContext())
+        val factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return BlockedNumbersViewModel(database) as T
+            }
+        }
+        viewModel = ViewModelProvider(this, factory).get(BlockedNumbersViewModel::class.java)
 
         recyclerView = view.findViewById(R.id.recyclerViewBlockedNumbers)
         emptyStateTextView = view.findViewById(R.id.emptyState)
@@ -47,6 +56,7 @@ class BlockedNumbersFragment : Fragment() {
         setupAddButton()
     }
 
+    // ... (rest of the file stays exactly the same)
     private fun setupRecyclerView() {
         adapter = BlockedNumbersAdapter(
             onDeleteClick = { entry ->
