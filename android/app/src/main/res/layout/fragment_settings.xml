@@ -5,10 +5,19 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Logo -->
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_signal_gate_logo"
+        android:contentDescription="Signal Gate Logo"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Shield Color Customization"
+        android:text="Shield + Tab Color Customization"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center_horizontal"
@@ -21,6 +30,15 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="24dp"
         android:background="#4285F4"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Signal Gate is active and ready!"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="32dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -87,4 +105,5 @@
             android:layout_weight="1"
             android:text="Apply"/>
     </LinearLayout>
+
 </LinearLayout>
