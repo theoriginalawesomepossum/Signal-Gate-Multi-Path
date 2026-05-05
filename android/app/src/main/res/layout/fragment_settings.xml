@@ -5,13 +5,58 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Professional PNG Logo -->
-    <ImageView
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:src="@drawable/ic_signal_gate_logo"
-        android:contentDescription="Signal Gate Logo"
-        android:layout_gravity="center_horizontal"
+    <!-- HEADER: Logo left + Status + Multi-Point Hub button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="24dp">
+
+        <!-- Logo - Top Left -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_signal_gate_logo"
+            android:contentDescription="Signal Gate Logo"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Status and Button column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Dynamic Status Line -->
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SignalGate Status: Active"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#00C853" />
+
+            <!-- Multi-Point Hub Button -->
+            <Button
+                android:id="@+id/multiPointHubButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Multi-Point Hub"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Page Title / Breadcrumb -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings / Colors"
+        android:textSize="22sp"
+        android:textStyle="bold"
         android:layout_marginBottom="24dp" />
 
     <!-- Shield Preview -->
@@ -22,15 +67,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="24dp"
         android:background="#4285F4"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Signal Gate is active and ready!"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="32dp" />
 
     <!-- Color Picker -->
     <TextView
