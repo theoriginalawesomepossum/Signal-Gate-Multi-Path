@@ -5,26 +5,16 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Signal Gate Logo (TextView) -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SIGNAL GATE"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textColor="#2196F3"
-        android:layout_marginBottom="8dp" />
+    <!-- Professional Vector Logo (the one you just added) -->
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:src="@drawable/ic_signal_gate_logo"
+        android:contentDescription="Signal Gate Logo"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Shield + Tab Color Customization"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center_horizontal"
-        android:layout_marginBottom="24dp"/>
-
+    <!-- Shield Preview -->
     <View
         android:id="@+id/previewShield"
         android:layout_width="100dp"
@@ -42,6 +32,7 @@
         android:gravity="center"
         android:layout_marginBottom="32dp" />
 
+    <!-- Color Picker -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
