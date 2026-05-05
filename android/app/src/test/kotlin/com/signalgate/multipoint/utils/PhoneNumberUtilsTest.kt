@@ -18,5 +18,6 @@ class PhoneNumberUtilsTest {
         // Matches your formatUSNumber + formatInternationalNumber logic
         assertEquals("+1 (800) 555-1212", PhoneNumberUtils.formatPhoneNumberForDisplay("+18005551212"))
         assertEquals("(310) 555-1212", PhoneNumberUtils.formatPhoneNumberForDisplay("3105551212"))
+        
     }
 }
