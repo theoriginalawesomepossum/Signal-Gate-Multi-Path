@@ -19,8 +19,8 @@ class SettingsFragment : Fragment() {
     private lateinit var redSeekBar: SeekBar
     private lateinit var greenSeekBar: SeekBar
     private lateinit var blueSeekBar: SeekBar
-    private lateinit var applyButton: Button
     private lateinit var previewButton: Button
+    private lateinit var applyButton: Button
 
     private var currentRed = 66
     private var currentGreen = 133
@@ -43,8 +43,11 @@ class SettingsFragment : Fragment() {
         redSeekBar = view.findViewById(R.id.redSeekBar)
         greenSeekBar = view.findViewById(R.id.greenSeekBar)
         blueSeekBar = view.findViewById(R.id.blueSeekBar)
-        applyButton = view.findViewById(R.id.applyButton)
         previewButton = view.findViewById(R.id.previewButton)
+        applyButton = view.findViewById(R.id.applyButton)
+
+        // Force initial size so shield is visible
+        previewShield.minimumHeight = 120
 
         loadSavedColors()
         setupSeekBars()
@@ -59,57 +62,43 @@ class SettingsFragment : Fragment() {
         redSeekBar.progress = currentRed
         greenSeekBar.progress = currentGreen
         blueSeekBar.progress = currentBlue
-        updatePreview()
+        updatePreview()   // force immediate preview
     }
 
     private fun setupSeekBars() {
-        redSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        val listener = object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentRed = progress
-                updatePreview()
+                when (seekBar?.id) {
+                    R.id.redSeekBar -> currentRed = progress
+                    R.id.greenSeekBar -> currentGreen = progress
+                    R.id.blueSeekBar -> currentBlue = progress
+                }
+                updatePreview()   // live update while dragging
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+        }
 
-        greenSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentGreen = progress
-                updatePreview()
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        blueSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentBlue = progress
-                updatePreview()
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+        redSeekBar.setOnSeekBarChangeListener(listener)
+        greenSeekBar.setOnSeekBarChangeListener(listener)
+        blueSeekBar.setOnSeekBarChangeListener(listener)
     }
 
     private fun updatePreview() {
-        previewShield.setBackgroundColor(
-            android.graphics.Color.rgb(currentRed, currentGreen, currentBlue)
-        )
+        val color = android.graphics.Color.rgb(currentRed, currentGreen, currentBlue)
+        previewShield.setBackgroundColor(color)
+        previewShield.invalidate()   // force redraw
     }
 
     private fun setupButtons() {
         previewButton.setOnClickListener {
             updatePreview()
-            Toast.makeText(requireContext(), "Preview updated (Shield + Tab)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Preview updated", Toast.LENGTH_SHORT).show()
         }
 
         applyButton.setOnClickListener {
             saveColors()
-            Toast.makeText(
-                requireContext(),
-                "Color saved for both Shield and Selected Tab!",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(requireContext(), "Color saved for Shield + Selected Tab icon/text!", Toast.LENGTH_SHORT).show()
         }
     }
 
