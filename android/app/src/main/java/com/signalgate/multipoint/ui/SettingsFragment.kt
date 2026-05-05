@@ -100,13 +100,14 @@ class SettingsFragment : Fragment() {
     private fun setupButtons() {
         previewButton.setOnClickListener {
             updatePreview()
+            Toast.makeText(requireContext(), "Preview updated (Shield + Tab)", Toast.LENGTH_SHORT).show()
         }
 
         applyButton.setOnClickListener {
             saveColors()
             Toast.makeText(
                 requireContext(),
-                "Shield color updated!",
+                "Color saved for both Shield and Selected Tab!",
                 Toast.LENGTH_SHORT
             ).show()
         }
