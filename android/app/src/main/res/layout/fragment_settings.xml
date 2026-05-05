@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- HEADER: Logo left + Status + Multi-Point Hub button -->
+    <!-- HEADER: Logo left + Status + Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
         android:gravity="center_vertical"
         android:layout_marginBottom="16dp">
 
-        <!-- Logo - Top Left (larger) -->
+        <!-- Logo - Top Left -->
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
@@ -21,7 +21,7 @@
             android:contentDescription="Signal Gate Logo"
             android:layout_marginEnd="16dp" />
 
-        <!-- Status and Button column -->
+        <!-- Status + Buttons column -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -38,13 +38,31 @@
                 android:textStyle="bold"
                 android:textColor="#00C853" />
 
-            <!-- Multi-Point Hub button -->
-            <Button
-                android:id="@+id/multiPointHubButton"
-                android:layout_width="wrap_content"
+            <!-- Button row -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="MULTI-POINT HUB"
-                android:layout_marginTop="8dp" />
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <!-- Multi-Point Hub button -->
+                <Button
+                    android:id="@+id/multiPointHubButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="MULTI-POINT HUB" />
+
+                <!-- Small ? Help button -->
+                <Button
+                    android:id="@+id/helpButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="?"
+                    android:textSize="20sp"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -75,7 +93,7 @@
         android:layout_marginBottom="24dp"
         android:background="#4285F4"/>
 
-    <!-- Color Picker -->
+    <!-- Color Picker (unchanged) -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
