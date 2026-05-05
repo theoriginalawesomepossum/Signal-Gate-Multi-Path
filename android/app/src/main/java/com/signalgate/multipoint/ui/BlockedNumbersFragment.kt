@@ -103,6 +103,7 @@ class BlockedNumbersFragment : Fragment() {
 
                 if (phoneNumber.isNotEmpty()) {
                     viewModel.addBlockedNumber(phoneNumber, label, isPattern)
+                    Toast.makeText(requireContext(), "Blocked added!", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(requireContext(), "Phone number cannot be empty", Toast.LENGTH_SHORT).show()
                 }
