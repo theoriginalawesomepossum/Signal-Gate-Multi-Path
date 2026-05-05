@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Status text - top aligned with logo -->
+            <!-- Status text -->
             <TextView
                 android:id="@+id/statusText"
                 android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                 android:textStyle="bold"
                 android:textColor="#00C853" />
 
-            <!-- Multi-Point Hub button - bottom aligned with logo -->
+            <!-- Multi-Point Hub button -->
             <Button
                 android:id="@+id/multiPointHubButton"
                 android:layout_width="wrap_content"
@@ -50,14 +50,14 @@
 
     </LinearLayout>
 
-    <!-- Horizontal separator under header -->
+    <!-- Separator line -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#E0E0E0"
         android:layout_marginBottom="24dp" />
 
-    <!-- Page title / breadcrumb -->
+    <!-- Page title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -99,4 +99,47 @@
         android:layout_marginBottom="4dp"/>
 
     <SeekBar
-        android:id="@+id/greenSeekBar
+        android:id="@+id/greenSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="255"
+        android:progress="133"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Blue:"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="4dp"/>
+
+    <SeekBar
+        android:id="@+id/blueSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="255"
+        android:progress="244"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/previewButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Preview"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/applyButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Apply"/>
+    </LinearLayout>
+
+</LinearLayout>
