@@ -1,4 +1,4 @@
-package com.signalgate.multipoint.ui  // ← CHANGED FROM .db TO .ui
+package com.signalgate.multipoint.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,10 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
-import com.signalgate.multipoint.db.CallLogEntry
-import com.signalgate.multipoint.ui.RecentCallsAdapter  // ← ADDED IMPORT
-import com.signalgate.multipoint.ui.RecentCallsViewModel  // ← ADDED IMPORT
-import com.signalgate.multipoint.utils.PhoneNumberUtils
+import com.signalgate.multipoint.db.AppDatabase
+import com.signalgate.multipoint.ui.RecentCallsAdapter
 
 class RecentCallsFragment : Fragment() {
 
@@ -34,7 +32,15 @@ class RecentCallsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(RecentCallsViewModel::class.java)
+        // FIXED: Provide database to RecentCallsViewModel
+        val database = AppDatabase.getDatabase(requireContext())
+        val factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return RecentCallsViewModel(database) as T
+            }
+        }
+        viewModel = ViewModelProvider(this, factory).get(RecentCallsViewModel::class.java)
 
         recyclerView = view.findViewById(R.id.recyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyState)
