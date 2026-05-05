@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
 import com.signalgate.multipoint.db.AppDatabase
-import com.signalgate.multipoint.ui.RecentCallsAdapter
 
 class RecentCallsFragment : Fragment() {
 
@@ -32,7 +31,6 @@ class RecentCallsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // FIXED: Provide database to RecentCallsViewModel
         val database = AppDatabase.getDatabase(requireContext())
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -53,17 +51,17 @@ class RecentCallsFragment : Fragment() {
         adapter = RecentCallsAdapter(
             onBlockClick = { number ->
                 viewModel.addBlockedNumber(number, null, false)
-                Toast.makeText(requireContext(), "Blocked: $number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Number blocked: $number", Toast.LENGTH_SHORT).show()
             },
             onWhitelistClick = { number ->
                 viewModel.addToWhitelist(number)
-                Toast.makeText(requireContext(), "Whitelisted: $number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Added to whitelist: $number", Toast.LENGTH_SHORT).show()
             }
         )
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = this@RecentCallsFragment.adapter
+            this.adapter = this@RecentCallsFragment.adapter
             setHasFixedSize(true)
         }
     }
