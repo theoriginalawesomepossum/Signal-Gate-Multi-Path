@@ -10,7 +10,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Setup area (shown before permissions are granted) -->
         <TextView
             android:id="@+id/statusTextView"
             android:layout_width="match_parent"
@@ -41,7 +40,6 @@
             android:text="Manage Blocked Numbers"
             android:visibility="gone" />
 
-        <!-- Fragment container -->
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
@@ -50,13 +48,12 @@
 
     </LinearLayout>
 
-    <!-- Bottom Navigation - FIXED with visible white text/icons -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="#1F1F1F"   <!-- dark bar -->
+        android:background="#1F1F1F"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="labeled"
         app:itemIconTint="@android:color/white"
