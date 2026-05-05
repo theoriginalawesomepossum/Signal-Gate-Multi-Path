@@ -1,27 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
     <EditText
         android:id="@+id/phoneNumberEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Phone Number or Pattern (e.g., +1800)"
+        android:hint="Phone number or pattern"
         android:inputType="phone" />
 
     <EditText
         android:id="@+id/labelEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Label (Optional, e.g., Spam Caller)" />
+        android:layout_marginTop="16dp"
+        android:hint="Optional label (e.g. Spam, RoboCall)" />
 
-    <Switch
-        android:id="@+id/isPatternSwitch"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Is Pattern? (e.g., +1800*)"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Is pattern (prefix)?" />
+
+        <Switch
+            android:id="@+id/isPatternSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
 
 </LinearLayout>
