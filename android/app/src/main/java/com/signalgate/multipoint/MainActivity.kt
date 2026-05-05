@@ -6,18 +6,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.telecom.TelecomManager
 import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.signalgate.multipoint.ui.BlockedNumbersFragment
 import com.signalgate.multipoint.ui.RecentCallsFragment
@@ -32,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var setDefaultButton: Button
     private lateinit var requestContactsButton: Button
     private lateinit var manageBlockedNumbersButton: Button
-    private lateinit var fragmentContainer: FragmentContainerView
     private lateinit var bottomNavigation: BottomNavigationView
 
     private val setDefaultCallScreenerResult = registerForActivityResult(
@@ -59,72 +55,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        val rootLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = android.view.Gravity.CENTER_HORIZONTAL
-            setPadding(0, 0, 0, 0)
-        }
+        statusTextView = findViewById(R.id.statusTextView)          // we'll add this ID in XML if needed
+        setDefaultButton = findViewById(R.id.setDefaultButton)
+        requestContactsButton = findViewById(R.id.requestContactsButton)
+        manageBlockedNumbersButton = findViewById(R.id.manageBlockedNumbersButton)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
 
-        statusTextView = TextView(this).apply {
-            text = "Checking app status..."
-            textSize = 20f
-            gravity = android.view.Gravity.CENTER
-            setPadding(0, 16, 0, 16)
-        }
-        rootLayout.addView(statusTextView)
-
-        setDefaultButton = Button(this).apply {
-            text = "Set as Default Call Screener"
-            setOnClickListener { requestSetDefaultCallScreener() }
-            visibility = View.GONE
-        }
-        rootLayout.addView(setDefaultButton)
-
-        requestContactsButton = Button(this).apply {
-            text = "Grant Contacts Permission"
-            setOnClickListener { requestContactsPermission() }
-            visibility = View.GONE
-        }
-        rootLayout.addView(requestContactsButton)
-
-        manageBlockedNumbersButton = Button(this).apply {
-            text = "Manage Blocked Numbers"
-            setOnClickListener { showFragment(BlockedNumbersFragment()) }
-            visibility = View.GONE
-        }
-        rootLayout.addView(manageBlockedNumbersButton)
-
-        fragmentContainer = FragmentContainerView(this).apply {
-            id = View.generateViewId()
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
-        }
-        rootLayout.addView(fragmentContainer)
-
-        bottomNavigation = BottomNavigationView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            menu.clear()
-            inflateMenu(R.menu.bottom_nav_menu)
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_blocked -> showFragment(BlockedNumbersFragment())
-                    R.id.nav_recent -> showFragment(RecentCallsFragment())
-                    R.id.nav_settings -> showFragment(SettingsFragment())
-                    else -> false
-                }
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_blocked -> showFragment(BlockedNumbersFragment())
+                R.id.nav_recent -> showFragment(RecentCallsFragment())
+                R.id.nav_settings -> showFragment(SettingsFragment())
             }
-            visibility = View.GONE
+            true
         }
-        rootLayout.addView(bottomNavigation)
 
-        setContentView(rootLayout)
+        setDefaultButton.setOnClickListener { requestSetDefaultCallScreener() }
+        requestContactsButton.setOnClickListener { requestContactsPermission() }
+        manageBlockedNumbersButton.setOnClickListener { showFragment(BlockedNumbersFragment()) }
     }
 
     override fun onResume() {
@@ -143,28 +93,22 @@ class MainActivity : AppCompatActivity() {
             manageBlockedNumbersButton.visibility = View.GONE
             bottomNavigation.visibility = View.VISIBLE
 
-            // DEFAULT TO SETTINGS (safe) instead of BlockedNumbersFragment
-            if (supportFragmentManager.findFragmentById(fragmentContainer.id) == null) {
-                showFragment(SettingsFragment())
+            if (supportFragmentManager.findFragmentById(R.id.fragment_container) == null) {
+                showFragment(BlockedNumbersFragment())
             }
         } else {
             statusTextView.text = "Setup required:"
             if (!isDefaultCallScreener) setDefaultButton.visibility = View.VISIBLE
             if (!hasContactsPermission) requestContactsButton.visibility = View.VISIBLE
-            manageBlockedNumbersButton.visibility = View.GONE
+            manageBlockedNumbersButton.visibility = View.VISIBLE
             bottomNavigation.visibility = View.GONE
-
-            supportFragmentManager.findFragmentById(fragmentContainer.id)?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
-            }
         }
     }
 
-    private fun showFragment(fragment: Fragment): Boolean {
+    private fun showFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(fragmentContainer.id, fragment)
+            .replace(R.id.fragment_container, fragment)
             .commit()
-        return true
     }
 
     private fun isDefaultCallScreener(): Boolean {
