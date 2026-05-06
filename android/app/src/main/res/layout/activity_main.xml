@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- HEADER (visible on EVERY tab) -->
+    <!-- HEADER (visible on every tab) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,7 +14,7 @@
         android:padding="16dp"
         android:background="#F8F9FA">
 
-        <!-- Logo - Top Left -->
+        <!-- Logo -->
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
@@ -21,14 +22,13 @@
             android:contentDescription="Signal Gate Logo"
             android:layout_marginEnd="16dp" />
 
-        <!-- Status + Buttons column -->
+        <!-- Status + Buttons -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Dynamic Status -->
             <TextView
                 android:id="@+id/statusText"
                 android:layout_width="match_parent"
@@ -38,7 +38,6 @@
                 android:textStyle="bold"
                 android:textColor="#00C853" />
 
-            <!-- Button row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,7 +71,7 @@
         android:layout_height="1dp"
         android:background="#E0E0E0" />
 
-    <!-- Setup area (shown only when permissions are missing) -->
+    <!-- Setup area (shown when permissions are missing) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -111,7 +110,7 @@
 
     </LinearLayout>
 
-    <!-- Main content area for all fragments -->
+    <!-- Main content for fragments -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
