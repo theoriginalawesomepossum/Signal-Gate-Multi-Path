@@ -4,7 +4,6 @@ import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.telecom.TelecomManager
@@ -16,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.signalgate.multipoint.ui.BlockedNumbersFragment
 import com.signalgate.multipoint.ui.RecentCallsFragment
@@ -24,16 +22,13 @@ import com.signalgate.multipoint.ui.SettingsFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_ID_SET_DEFAULT_CALL_SCREENER = 1
-    private val REQUEST_CODE_READ_CONTACTS = 2
-
-    private lateinit var statusTextView: TextView
+    private lateinit var statusText: TextView
+    private lateinit var multiPointHubButton: Button
+    private lateinit var helpButton: Button
     private lateinit var setDefaultButton: Button
     private lateinit var requestContactsButton: Button
     private lateinit var manageBlockedNumbersButton: Button
     private lateinit var bottomNavigation: BottomNavigationView
-
-    private lateinit var sharedPreferences: SharedPreferences
 
     private val setDefaultCallScreenerResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -61,14 +56,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        statusTextView = findViewById(R.id.statusTextView)
+        statusText = findViewById(R.id.statusText)
+        multiPointHubButton = findViewById(R.id.multiPointHubButton)
+        helpButton = findViewById(R.id.helpButton)
         setDefaultButton = findViewById(R.id.setDefaultButton)
         requestContactsButton = findViewById(R.id.requestContactsButton)
         manageBlockedNumbersButton = findViewById(R.id.manageBlockedNumbersButton)
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
+        // Bottom navigation
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_blocked -> showFragment(BlockedNumbersFragment())
@@ -78,35 +74,23 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        // Button listeners
+        multiPointHubButton.setOnClickListener {
+            Toast.makeText(this, "Multi-Point Hub coming soon!", Toast.LENGTH_SHORT).show()
+        }
+
+        helpButton.setOnClickListener {
+            Toast.makeText(this, "Help / Guide coming soon!", Toast.LENGTH_SHORT).show()
+        }
+
         setDefaultButton.setOnClickListener { requestSetDefaultCallScreener() }
         requestContactsButton.setOnClickListener { requestContactsPermission() }
         manageBlockedNumbersButton.setOnClickListener { showFragment(BlockedNumbersFragment()) }
-
-        updateBottomNavColor()   // apply saved color immediately
     }
 
     override fun onResume() {
         super.onResume()
         checkPermissionsAndRoles()
-        updateBottomNavColor()   // refresh color in case it changed in Settings
-    }
-
-    private fun updateBottomNavColor() {
-        val red = sharedPreferences.getInt("shield_red", 66)
-        val green = sharedPreferences.getInt("shield_green", 133)
-        val blue = sharedPreferences.getInt("shield_blue", 244)
-        val customColor = android.graphics.Color.rgb(red, green, blue)
-
-        val colorStateList = android.content.res.ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked),
-                intArrayOf(-android.R.attr.state_checked)
-            ),
-            intArrayOf(customColor, 0xFFFFFFFF.toInt())   // selected = custom color, unselected = white
-        )
-
-        bottomNavigation.itemIconTintList = colorStateList
-        bottomNavigation.itemTextColor = colorStateList
     }
 
     private fun checkPermissionsAndRoles() {
@@ -114,18 +98,15 @@ class MainActivity : AppCompatActivity() {
         val hasContactsPermission = hasReadContactsPermission()
 
         if (isDefaultCallScreener && hasContactsPermission) {
-            statusTextView.text = "Signal Gate is active and ready!"
+            statusText.text = "SignalGate Status: Active"
+            statusText.setTextColor(android.graphics.Color.parseColor("#00C853")) // green
             setDefaultButton.visibility = View.GONE
             requestContactsButton.visibility = View.GONE
             manageBlockedNumbersButton.visibility = View.GONE
             bottomNavigation.visibility = View.VISIBLE
-            updateBottomNavColor()   // make sure color is applied
-
-            if (supportFragmentManager.findFragmentById(R.id.fragment_container) == null) {
-                showFragment(BlockedNumbersFragment())
-            }
         } else {
-            statusTextView.text = "Setup required:"
+            statusText.text = "SignalGate Status: Not Active"
+            statusText.setTextColor(android.graphics.Color.parseColor("#F44336")) // red
             if (!isDefaultCallScreener) setDefaultButton.visibility = View.VISIBLE
             if (!hasContactsPermission) requestContactsButton.visibility = View.VISIBLE
             manageBlockedNumbersButton.visibility = View.VISIBLE
