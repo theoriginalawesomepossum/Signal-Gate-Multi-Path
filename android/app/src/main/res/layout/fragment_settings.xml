@@ -5,85 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- HEADER: Logo left + Status + Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
-
-        <!-- Logo - Top Left -->
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_signal_gate_logo"
-            android:contentDescription="Signal Gate Logo"
-            android:layout_marginEnd="16dp" />
-
-        <!-- Status + Buttons column -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <!-- Status text -->
-            <TextView
-                android:id="@+id/statusText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SignalGate Status: Active"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#00C853" />
-
-            <!-- Button row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
-
-                <!-- Multi-Point Hub button -->
-                <Button
-                    android:id="@+id/multiPointHubButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="MULTI-POINT HUB" />
-
-                <!-- Small ? Help button -->
-                <Button
-                    android:id="@+id/helpButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:text="?"
-                    android:textSize="20sp"
-                    android:layout_marginStart="8dp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- Separator line -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E0E0E0"
-        android:layout_marginBottom="24dp" />
-
-    <!-- Page title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Settings / Colors"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp" />
-
     <!-- Shield Preview -->
     <View
         android:id="@+id/previewShield"
@@ -93,7 +14,7 @@
         android:layout_marginBottom="24dp"
         android:background="#4285F4"/>
 
-    <!-- Color Picker (unchanged) -->
+    <!-- Color Picker -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
