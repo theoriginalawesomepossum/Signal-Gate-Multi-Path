@@ -4,6 +4,7 @@ import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.telecom.TelecomManager
@@ -15,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.signalgate.multipoint.ui.BlockedNumbersFragment
 import com.signalgate.multipoint.ui.RecentCallsFragment
@@ -29,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var requestContactsButton: Button
     private lateinit var manageBlockedNumbersButton: Button
     private lateinit var bottomNavigation: BottomNavigationView
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     private val setDefaultCallScreenerResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -55,6 +59,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         statusText = findViewById(R.id.statusText)
         multiPointHubButton = findViewById(R.id.multiPointHubButton)
@@ -86,11 +92,32 @@ class MainActivity : AppCompatActivity() {
         setDefaultButton.setOnClickListener { requestSetDefaultCallScreener() }
         requestContactsButton.setOnClickListener { requestContactsPermission() }
         manageBlockedNumbersButton.setOnClickListener { showFragment(BlockedNumbersFragment()) }
+
+        updateBottomNavColor() // apply saved color immediately
     }
 
     override fun onResume() {
         super.onResume()
         checkPermissionsAndRoles()
+        updateBottomNavColor() // refresh if color changed in Settings
+    }
+
+    private fun updateBottomNavColor() {
+        val red = sharedPreferences.getInt("shield_red", 66)
+        val green = sharedPreferences.getInt("shield_green", 133)
+        val blue = sharedPreferences.getInt("shield_blue", 244)
+        val customColor = android.graphics.Color.rgb(red, green, blue)
+
+        val colorStateList = android.content.res.ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_checked),
+                intArrayOf(-android.R.attr.state_checked)
+            ),
+            intArrayOf(customColor, 0xFFFFFFFF.toInt())
+        )
+
+        bottomNavigation.itemIconTintList = colorStateList
+        bottomNavigation.itemTextColor = colorStateList
     }
 
     private fun checkPermissionsAndRoles() {
