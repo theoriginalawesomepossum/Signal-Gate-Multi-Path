@@ -43,7 +43,18 @@
             </intent-filter>
 
         </service>
+<application
+        android:name=".MainApplication"
+        ... other attributes ... >
 
+        <!-- Your existing activities, services, etc. -->
+
+        <!-- ADD THIS LINE HERE -->
+        <receiver
+            android:name=".CallActionReceiver"
+            android:exported="false" />
+
+</application>
     </application>
 
 </manifest>
