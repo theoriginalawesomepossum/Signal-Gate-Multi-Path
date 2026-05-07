@@ -23,21 +23,20 @@ class CallActionReceiver : BroadcastReceiver() {
 
             when (action) {
                 "ACTION_BLOCK_PERMANENT" -> {
-                    db.blockDao().insert(BlockEntry(phoneNumber = phoneNumber, reason = "User blocked after call"))
-                    showToast(context, "Number blocked permanently: $phoneNumber")
+                    db.blockDao().insert(BlockEntry(phoneNumber = phoneNumber))
+                    showToast(context, "Number blocked permanently")
                 }
                 "ACTION_WHITELIST" -> {
                     db.allowDao().insert(com.signalgate.multipoint.db.AllowEntry(phoneNumber = phoneNumber))
-                    showToast(context, "Number whitelisted: $phoneNumber")
+                    showToast(context, "Number added to whitelist")
                 }
                 "ACTION_BLOCK_PREFIX" -> {
-                    db.blockDao().insert(BlockEntry(phoneNumber = phoneNumber, reason = "User blocked prefix", isPattern = true))
-                    showToast(context, "Prefix blocked: $phoneNumber")
+                    db.blockDao().insert(BlockEntry(phoneNumber = phoneNumber, isPattern = true))
+                    showToast(context, "Prefix blocked")
                 }
                 "ACTION_BLOCK_AREA_CODE" -> {
-                    // For simplicity, treat area code as prefix of the normalized number (first 3-4 digits)
-                    val areaCode = phoneNumber.take(4) // adjust if you want exact area code logic
-                    db.blockDao().insert(BlockEntry(phoneNumber = areaCode, reason = "User blocked area code", isPattern = true))
+                    val areaCode = phoneNumber.take(4) // first 4 digits as area code
+                    db.blockDao().insert(BlockEntry(phoneNumber = areaCode, isPattern = true))
                     showToast(context, "Area code blocked")
                 }
                 "ACTION_IGNORE" -> {
