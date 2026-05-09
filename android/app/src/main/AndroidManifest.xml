@@ -4,6 +4,7 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -44,7 +45,18 @@
 
         </service>
 
-        <!-- Post-call notification receiver -->
+        <!-- Detect call state changes -->
+        <receiver
+            android:name=".PhoneStateReceiver"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+
+        </receiver>
+
+        <!-- Notification action buttons -->
         <receiver
             android:name=".CallActionReceiver"
             android:exported="false" />
