@@ -10,7 +10,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
     companion object {
 
-        private const val TAG = "PhoneStateReceiver"
+        private const val TAG =
+            "PhoneStateReceiver"
 
         private var lastState: String? = null
     }
@@ -21,9 +22,14 @@ class PhoneStateReceiver : BroadcastReceiver() {
     ) {
 
         val state =
-            intent.getStringExtra(TelephonyManager.EXTRA_STATE)
+            intent.getStringExtra(
+                TelephonyManager.EXTRA_STATE
+            )
 
-        Log.d(TAG, "Phone state changed: $state")
+        Log.d(
+            TAG,
+            "Phone state changed: $state"
+        )
 
         // Detect ANY call ending
         if (
@@ -43,10 +49,17 @@ class PhoneStateReceiver : BroadcastReceiver() {
                     null
                 )
 
-            Log.d(TAG, "Call ended. Number: $number")
+            Log.d(
+                TAG,
+                "Call ended. Number: $number"
+            )
 
             number?.let {
-                PostCallNotifier.show(context, it)
+
+                PostCallNotifier.show(
+                    context,
+                    it
+                )
             }
         }
 
