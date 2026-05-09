@@ -36,6 +36,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var prefListener: SharedPreferences.OnSharedPreferenceChangeListener
 
+    // OPTIONAL IMPROVEMENT: prevent double registration
+    private var listenerRegistered = false
+
     private val setDefaultCallScreenerResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -72,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         manageBlockedNumbersButton = findViewById(R.id.manageBlockedNumbersButton)
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
-        // Bottom navigation listener
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_blocked -> showFragment(BlockedNumbersFragment())
@@ -82,25 +84,21 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // Button listeners
         multiPointHubButton.setOnClickListener {
             Toast.makeText(this, "Multi-Point Hub coming soon!", Toast.LENGTH_SHORT).show()
         }
+
         helpButton.setOnClickListener {
             Toast.makeText(this, "Help / Guide coming soon!", Toast.LENGTH_SHORT).show()
         }
+
         setDefaultButton.setOnClickListener { requestSetDefaultCallScreener() }
         requestContactsButton.setOnClickListener { requestContactsPermission() }
         manageBlockedNumbersButton.setOnClickListener { showFragment(BlockedNumbersFragment()) }
 
-        // Initial color setup
         updateAllColors()
 
-        // Optional: live update if settings change
-        prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key.startsWith("shield_")) updateAllColors()
-        }
-        sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener)
+        registerPreferenceListener()
     }
 
     override fun onResume() {
@@ -111,7 +109,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefListener)
+        if (listenerRegistered) {
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefListener)
+            listenerRegistered = false
+        }
+    }
+
+    private fun registerPreferenceListener() {
+        if (listenerRegistered) return
+
+        prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+
+            // FIXED NULL SAFETY ERROR HERE
+            if (key?.startsWith("shield_") == true) {
+                updateAllColors()
+            }
+        }
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener)
+        listenerRegistered = true
     }
 
     private fun updateAllColors() {
@@ -156,16 +172,22 @@ class MainActivity : AppCompatActivity() {
 
         if (isDefaultCallScreener && hasContactsPermission) {
             statusText.text = "SignalGate Status: Active"
-            statusText.setTextColor(Color.parseColor("#00C853")) // green
+            statusText.setTextColor(Color.parseColor("#00C853"))
+
             setDefaultButton.visibility = View.GONE
             requestContactsButton.visibility = View.GONE
             manageBlockedNumbersButton.visibility = View.GONE
             bottomNavigation.visibility = View.VISIBLE
         } else {
             statusText.text = "SignalGate Status: Not Active"
-            statusText.setTextColor(Color.parseColor("#F44336")) // red
-            setDefaultButton.visibility = if (!isDefaultCallScreener) View.VISIBLE else View.GONE
-            requestContactsButton.visibility = if (!hasContactsPermission) View.VISIBLE else View.GONE
+            statusText.setTextColor(Color.parseColor("#F44336"))
+
+            setDefaultButton.visibility =
+                if (!isDefaultCallScreener) View.VISIBLE else View.GONE
+
+            requestContactsButton.visibility =
+                if (!hasContactsPermission) View.VISIBLE else View.GONE
+
             manageBlockedNumbersButton.visibility = View.VISIBLE
             bottomNavigation.visibility = View.GONE
         }
