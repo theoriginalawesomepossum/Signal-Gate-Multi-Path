@@ -20,7 +20,9 @@ class CallScreeningService : CallScreeningService() {
     }
 
     override fun onScreenCall(callDetails: Call.Details) {
-        val originalPhoneNumber = callDetails.handle?.schemeSpecificPart
+
+        val originalPhoneNumber =
+            callDetails.handle?.schemeSpecificPart
 
         if (originalPhoneNumber == null) {
             logAndAllowCall(callDetails, "No phone number provided")
@@ -30,18 +32,32 @@ class CallScreeningService : CallScreeningService() {
         val normalizedPhoneNumber =
             PhoneNumberUtils.normalizePhoneNumber(originalPhoneNumber)
 
+        // Save last number for PhoneStateReceiver fallback
+        val prefs = getSharedPreferences("signalgate", MODE_PRIVATE)
+
+        prefs.edit()
+            .putString("LAST_CALL_NUMBER", normalizedPhoneNumber)
+            .apply()
+
         Log.d(
             TAG,
-            "Screening incoming call from: $originalPhoneNumber (Normalized: $normalizedPhoneNumber)"
+            "Screening incoming call from: $originalPhoneNumber"
         )
 
         serviceScope.launch {
-            val decision = checkBlockingLogic(normalizedPhoneNumber)
+
+            val decision =
+                checkBlockingLogic(normalizedPhoneNumber)
 
             withContext(Dispatchers.Main) {
+
                 when (decision.first) {
+
                     CallDecision.ALLOW ->
-                        logAndAllowCall(callDetails, decision.second)
+                        logAndAllowCall(
+                            callDetails,
+                            decision.second
+                        )
 
                     CallDecision.BLOCK ->
                         logAndBlockCall(
@@ -58,35 +74,42 @@ class CallScreeningService : CallScreeningService() {
         normalizedPhoneNumber: String
     ): Pair<CallDecision, String> {
 
-        val db = AppDatabase.getDatabase(applicationContext)
+        val db =
+            AppDatabase.getDatabase(applicationContext)
+
         val blockDao = db.blockDao()
         val allowDao = db.allowDao()
 
-        val allowEntry = allowDao.findByNumber(normalizedPhoneNumber)
+        val allowEntry =
+            allowDao.findByNumber(normalizedPhoneNumber)
 
         if (allowEntry != null) {
-            Log.d(TAG, "Allow match found in allowlist: $normalizedPhoneNumber")
-            return Pair(CallDecision.ALLOW, "Exact match in allowlist")
+
+            return Pair(
+                CallDecision.ALLOW,
+                "Exact match in allowlist"
+            )
         }
 
-        val exactBlockMatch = blockDao.findByNumber(normalizedPhoneNumber)
+        val exactBlockMatch =
+            blockDao.findByNumber(normalizedPhoneNumber)
 
         if (exactBlockMatch != null) {
-            Log.d(TAG, "Exact match found in blocklist: $normalizedPhoneNumber")
-            return Pair(CallDecision.BLOCK, "Exact match in blocklist")
+
+            return Pair(
+                CallDecision.BLOCK,
+                "Exact match in blocklist"
+            )
         }
 
         val allBlockEntries = blockDao.getAll()
 
         for (entry in allBlockEntries) {
+
             if (
                 entry.isPattern &&
                 normalizedPhoneNumber.startsWith(entry.phoneNumber)
             ) {
-                Log.d(
-                    TAG,
-                    "Pattern match found: $normalizedPhoneNumber matches ${entry.phoneNumber}"
-                )
 
                 return Pair(
                     CallDecision.BLOCK,
@@ -95,7 +118,10 @@ class CallScreeningService : CallScreeningService() {
             }
         }
 
-        return Pair(CallDecision.ALLOW, "No blocking rules matched")
+        return Pair(
+            CallDecision.ALLOW,
+            "No blocking rules matched"
+        )
     }
 
     private fun logAndAllowCall(
@@ -104,26 +130,33 @@ class CallScreeningService : CallScreeningService() {
     ) {
 
         serviceScope.launch {
-            val db = AppDatabase.getDatabase(applicationContext)
+
+            val db =
+                AppDatabase.getDatabase(applicationContext)
 
             db.callLogDao().insert(
                 CallLogEntry(
                     phoneNumber =
-                        callDetails.handle?.schemeSpecificPart ?: "Unknown",
-                    decision = CallDecision.ALLOW.name,
+                        callDetails.handle?.schemeSpecificPart
+                            ?: "Unknown",
+
+                    decision =
+                        CallDecision.ALLOW.name,
+
                     reason = reason
                 )
             )
         }
 
-        Log.d(TAG, "Allowing call. Reason: $reason")
+        Log.d(TAG, "Allowing call: $reason")
 
-        val response = CallResponse.Builder()
-            .setDisallowCall(false)
-            .setRejectCall(false)
-            .setSkipCallLog(false)
-            .setSkipNotification(false)
-            .build()
+        val response =
+            CallResponse.Builder()
+                .setDisallowCall(false)
+                .setRejectCall(false)
+                .setSkipCallLog(false)
+                .setSkipNotification(false)
+                .build()
 
         respondToCall(callDetails, response)
     }
@@ -135,26 +168,33 @@ class CallScreeningService : CallScreeningService() {
     ) {
 
         serviceScope.launch {
-            val db = AppDatabase.getDatabase(applicationContext)
+
+            val db =
+                AppDatabase.getDatabase(applicationContext)
 
             db.callLogDao().insert(
                 CallLogEntry(
                     phoneNumber =
-                        callDetails.handle?.schemeSpecificPart ?: "Unknown",
-                    decision = CallDecision.BLOCK.name,
+                        callDetails.handle?.schemeSpecificPart
+                            ?: "Unknown",
+
+                    decision =
+                        CallDecision.BLOCK.name,
+
                     reason = reason
                 )
             )
         }
 
-        Log.d(TAG, "Blocking call from: $phoneNumber. Reason: $reason")
+        Log.d(TAG, "Blocking call from $phoneNumber")
 
-        val response = CallResponse.Builder()
-            .setDisallowCall(true)
-            .setRejectCall(true)
-            .setSkipCallLog(false)
-            .setSkipNotification(true)
-            .build()
+        val response =
+            CallResponse.Builder()
+                .setDisallowCall(true)
+                .setRejectCall(true)
+                .setSkipCallLog(false)
+                .setSkipNotification(true)
+                .build()
 
         respondToCall(callDetails, response)
     }
