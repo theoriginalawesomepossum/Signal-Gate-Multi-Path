@@ -205,15 +205,16 @@
         android:alpha="0.92" />
 
     <!-- BOTTOM NAVIGATION -->
+    <!-- BOTTOM NAVIGATION -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="withId(R.id.bottom_navigation)"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#1A1A1A"
-        app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
-        app:itemRippleColor="@android:color/white" />
+    android:id="@+id/bottom_navigation"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#1A1A1A"
+    app:menu="@menu/bottom_nav_menu"
+    app:labelVisibilityMode="labeled"
+    app:itemIconTint="@android:color/white"
+    app:itemTextColor="@android:color/white"
+    app:itemRippleColor="@android:color/white" />
 
 </LinearLayout>
