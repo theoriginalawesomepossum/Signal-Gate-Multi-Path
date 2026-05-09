@@ -19,14 +19,12 @@ class MainActivityUiTest {
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
-    fun `main activity launches and shows settings by default`() {
-        onView(withId(R.id.previewShield)).check(matches(isDisplayed()))
-        // You can add more checks once other fragments are fully working
-    }
+    fun mainActivity_launches_without_crashing() {
 
-    @Test
-    fun `bottom navigation is visible after permissions granted`() {
-        // This test can be expanded as you fix other fragments
-        onView(withId(R.id.bottomNavigation)).check(matches(isDisplayed()))
+        onView(withId(R.id.headerContainer))
+            .check(matches(isDisplayed()))
+
+        onView(withId(R.id.bottom_navigation))
+            .check(matches(isDisplayed()))
     }
 }
