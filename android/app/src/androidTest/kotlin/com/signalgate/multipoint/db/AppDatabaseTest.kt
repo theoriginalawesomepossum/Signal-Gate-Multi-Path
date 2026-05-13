@@ -15,41 +15,76 @@ import java.io.IOException
 class AppDatabaseTest {
 
     private lateinit var db: AppDatabase
-    private lateinit var blockDao: BlockEntryDao
-    private lateinit var allowDao: AllowEntryDao
+    private lateinit var blockDao: BlockDao      // Changed to match AppDatabase
+    private lateinit var allowDao: AllowDao      // Changed to match AppDatabase
 
     @Before
     fun createDb() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .allowMainThreadQueries() // for tests only
-            .build()
-        blockDao = db.blockEntryDao()
-        allowDao = db.allowEntryDao()
+        try {
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                .allowMainThreadQueries() // Only for tests
+                .build()
+
+            blockDao = db.blockDao()
+            allowDao = db.allowDao()
+            println("✅ Test database created successfully")
+        } catch (e: Exception) {
+            throw AssertionError("Failed to create in-memory database", e)
+        }
     }
 
     @After
     @Throws(IOException::class)
     fun closeDb() {
-        db.close()
+        try {
+            db.close()
+            println("✅ Test database closed")
+        } catch (e: Exception) {
+            println("⚠️ Warning while closing database: ${e.message}")
+        }
     }
 
     @Test
     fun `insert and retrieve blocked number`() = runBlocking {
-        val block = BlockEntry(phoneNumber = "+18005551212", reason = "spam")
-        blockDao.insert(block)
+        try {
+            val block = BlockEntry(
+                phoneNumber = "+18005551212", 
+                label = "spam"           // Use 'label' instead of 'reason' if that's current
+            )
+            blockDao.insert(block)
 
-        val allBlocks = blockDao.getAll()
-        assertEquals(1, allBlocks.size)
-        assertEquals("+18005551212", allBlocks[0].phoneNumber)
+            val allBlocks = blockDao.getAll()
+            assertEquals("Should have exactly 1 blocked entry", 1, allBlocks.size)
+            assertEquals("+18005551212", allBlocks[0].phoneNumber)
+            println("✅ Blocked number insert/retrieve test passed")
+        } catch (e: Exception) {
+            throw AssertionError("Blocked number test failed", e)
+        }
     }
 
     @Test
     fun `allow list works independently`() = runBlocking {
-        val allow = AllowEntry(phoneNumber = "+13105551212")
-        allowDao.insert(allow)
+        try {
+            val allow = AllowEntry(phoneNumber = "+13105551212")
+            allowDao.insert(allow)
 
-        val allAllows = allowDao.getAll()
-        assertEquals(1, allAllows.size)
+            val allAllows = allowDao.getAll()
+            assertEquals("Should have exactly 1 allowed entry", 1, allAllows.size)
+            println("✅ Allow list test passed")
+        } catch (e: Exception) {
+            throw AssertionError("Allow list test failed", e)
+        }
+    }
+
+    @Test
+    fun `database contains all expected DAOs`() {
+        try {
+            assertEquals("BlockDao should exist", true, ::blockDao.isInitialized)
+            assertEquals("AllowDao should exist", true, ::allowDao.isInitialized)
+            println("✅ All DAOs are accessible")
+        } catch (e: Exception) {
+            throw AssertionError("DAO check failed", e)
+        }
     }
 }
