@@ -62,6 +62,8 @@
             android:name=".CallActionReceiver"
             android:exported="false" />
 
+        <activity android:name=".CrashLogActivity" />
+
     </application>
 
 </manifest>

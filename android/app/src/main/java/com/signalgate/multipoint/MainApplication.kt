@@ -2,6 +2,7 @@ package com.signalgate.multipoint
 
 import android.app.Application
 import android.os.Process
+import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,21 +18,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Keep crash handler on the main thread
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-
-            Log.e(
-                "SIGNALGATE_CRASH",
-                "Uncaught exception in thread: ${thread.name}",
-                throwable
-            )
-
-            throwable.printStackTrace()
-
-            // Optional: You could show a crash dialog here in the future
-            Process.killProcess(Process.myPid())
-            System.exit(1)
-        }
+        Thread.setDefaultUncaughtExceptionHandler(CrashHandler(this))
 
         // Initialize heavy components off the main thread
         applicationScope.launch {

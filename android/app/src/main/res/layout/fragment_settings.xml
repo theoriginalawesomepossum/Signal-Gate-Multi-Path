@@ -119,6 +119,14 @@
 
         </LinearLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/viewCrashLogsButton"
+            style="@style/SignalGateButton"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="View Crash Logs" />
+
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

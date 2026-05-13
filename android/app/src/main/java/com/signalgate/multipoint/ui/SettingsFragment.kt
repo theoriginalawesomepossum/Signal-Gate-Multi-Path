@@ -12,6 +12,8 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.slider.Slider
 import com.signalgate.multipoint.R
+import com.signalgate.multipoint.CrashLogActivity
+import android.content.Intent
 
 class SettingsFragment : Fragment() {
 
@@ -24,7 +26,8 @@ class SettingsFragment : Fragment() {
     private lateinit var blueSlider: Slider
 
     private lateinit var previewButton: MaterialButton
-    private lateinit var applyButton: MaterialButton
+        private lateinit var applyButton: MaterialButton
+        private lateinit var viewCrashLogsButton: MaterialButton
 
     private var currentRed = 66
     private var currentGreen = 133
@@ -73,6 +76,9 @@ class SettingsFragment : Fragment() {
         applyButton =
             view.findViewById(R.id.applyButton)
 
+        viewCrashLogsButton =
+            view.findViewById(R.id.viewCrashLogsButton)
+
         // Ensure shield preview stays visible
         previewShield.minimumHeight = 120
 
@@ -81,6 +87,7 @@ class SettingsFragment : Fragment() {
         setupSliders()
 
         setupButtons()
+        setupCrashLogButton()
     }
 
     private fun loadSavedColors() {
@@ -176,6 +183,13 @@ class SettingsFragment : Fragment() {
                     dialog.dismiss()
                 }
                 .show()
+        }
+    }
+
+    private fun setupCrashLogButton() {
+        viewCrashLogsButton.setOnClickListener {
+            val intent = Intent(requireContext(), CrashLogActivity::class.java)
+            startActivity(intent)
         }
     }
 
