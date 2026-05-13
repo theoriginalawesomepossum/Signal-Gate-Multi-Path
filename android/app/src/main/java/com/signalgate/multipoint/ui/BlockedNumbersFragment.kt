@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Switch
+import com.google.android.material.switchmaterial.SwitchMaterial
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -108,7 +108,7 @@ class BlockedNumbersFragment : Fragment() {
 
         val phoneNumberEditText: EditText = dialogView.findViewById(R.id.phoneNumberEditText)
         val labelEditText: EditText = dialogView.findViewById(R.id.labelEditText)
-        val isPatternSwitch: Switch = dialogView.findViewById(R.id.isPatternSwitch)
+        val isPatternSwitch: SwitchMaterial = dialogView.findViewById(R.id.isPatternSwitch)
 
         AlertDialog.Builder(requireContext())
             .setTitle("Add Blocked Number")
