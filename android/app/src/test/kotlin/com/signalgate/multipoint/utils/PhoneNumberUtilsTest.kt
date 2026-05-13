@@ -42,13 +42,14 @@ class PhoneNumberUtilsTest {
     }
 
     @Test
-    fun `handles invalid or null input gracefully`() {
+    fun `handles empty input gracefully`() {
         try {
-            assertEquals("", PhoneNumberUtils.normalizePhoneNumber(null))
-            assertEquals("Unknown", PhoneNumberUtils.formatPhoneNumberForDisplay(null))
-            println("✅ Null/Invalid input handling test passed")
+            // We can't pass null if the function doesn't accept String?, so we test empty string
+            assertEquals("", PhoneNumberUtils.normalizePhoneNumber(""))
+            assertEquals("Unknown", PhoneNumberUtils.formatPhoneNumberForDisplay(""))
+            println("✅ Empty input handling test passed")
         } catch (e: Exception) {
-            throw AssertionError("Null handling test failed", e)
+            throw AssertionError("Empty input handling test failed", e)
         }
     }
 }
