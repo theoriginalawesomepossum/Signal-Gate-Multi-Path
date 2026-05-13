@@ -13,7 +13,6 @@ class PhoneNumberUtilsTest {
             assertEquals("18005551212", PhoneNumberUtils.normalizePhoneNumber("1.800.555.1212"))
             assertEquals("+15551234567", PhoneNumberUtils.normalizePhoneNumber("+1 (555) 123-4567"))
             
-            // Edge cases
             assertEquals("", PhoneNumberUtils.normalizePhoneNumber(""))
             assertEquals("+123", PhoneNumberUtils.normalizePhoneNumber("+1-2-3"))
             
@@ -31,13 +30,14 @@ class PhoneNumberUtilsTest {
             assertEquals("(310) 555-1212", PhoneNumberUtils.formatPhoneNumberForDisplay("3105551212"))
             assertEquals("(555) 123-4567", PhoneNumberUtils.formatPhoneNumberForDisplay("+15551234567"))
             
-            // 11-digit international
-            assertEquals("+1 (234) 567-8901", PhoneNumberUtils.formatPhoneNumberForDisplay("+12345678901"))
+            // 11-digit international number
+            val result = PhoneNumberUtils.formatPhoneNumberForDisplay("+12345678901")
+            assertEquals("+1 (234) 567-8901", result)
             
-            // Edge cases
+            // Fallback cases
             assertEquals("123", PhoneNumberUtils.formatPhoneNumberForDisplay("123"))
             assertEquals("", PhoneNumberUtils.formatPhoneNumberForDisplay(""))
-            assertEquals("abc", PhoneNumberUtils.formatPhoneNumberForDisplay("abc")) // Should return original
+            assertEquals("abc", PhoneNumberUtils.formatPhoneNumberForDisplay("abc"))
             
             println("✅ formatPhoneNumberForDisplay tests passed")
         } catch (e: Exception) {
