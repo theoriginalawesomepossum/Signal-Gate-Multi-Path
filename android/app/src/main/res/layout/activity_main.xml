@@ -71,45 +71,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- ========================================================= -->
-    <!-- ACTION BUTTON ROW -->
-    <!-- ========================================================= -->
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:id="@+id/actionButtonContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingStart="@dimen/space_lg"
-            android:paddingTop="@dimen/space_md"
-            android:paddingEnd="@dimen/space_lg"
-            android:paddingBottom="@dimen/space_md">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/multiPointHubButton"
-                style="@style/SignalGateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height"
-                android:layout_marginEnd="@dimen/space_md"
-                android:text="MULTI-POINT HUB" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/helpButton"
-                style="@style/SignalGateButton"
-                android:layout_width="@dimen/button_height"
-                android:layout_height="@dimen/button_height"
-                android:text="?"
-                android:textSize="@dimen/text_subtitle" />
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
 
     <!-- ========================================================= -->
     <!-- DIVIDER -->
@@ -200,7 +162,8 @@
         android:layout_marginBottom="@dimen/space_md"
         android:src="@drawable/ic_signal_gate_logo"
         android:contentDescription="SignalGate Logo"
-        android:alpha="0.92" />
+        android:alpha="0.92"
+        android:visibility="visible" />
 
     <!-- ========================================================= -->
     <!-- BOTTOM NAVIGATION -->

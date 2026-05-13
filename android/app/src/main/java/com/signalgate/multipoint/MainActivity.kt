@@ -32,8 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var setupCard: View
 
-    private lateinit var multiPointHubButton: MaterialButton
-    private lateinit var helpButton: MaterialButton
+
     private lateinit var setDefaultButton: MaterialButton
     private lateinit var requestContactsButton: MaterialButton
     private lateinit var manageBlockedNumbersButton: MaterialButton
@@ -139,11 +138,7 @@ class MainActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
         setupCard = findViewById(R.id.setupCard)
 
-        multiPointHubButton =
-            findViewById(R.id.multiPointHubButton)
 
-        helpButton =
-            findViewById(R.id.helpButton)
 
         setDefaultButton =
             findViewById(R.id.setDefaultButton)
@@ -186,23 +181,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupButtons() {
 
-        multiPointHubButton.setOnClickListener {
 
-            Toast.makeText(
-                this,
-                "Multi-Point Hub coming soon!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        helpButton.setOnClickListener {
-
-            Toast.makeText(
-                this,
-                "Help / Guide coming soon!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
 
         setDefaultButton.setOnClickListener {
             requestSetDefaultCallScreener()
@@ -353,7 +332,7 @@ class MainActivity : AppCompatActivity() {
             setupCard.visibility = View.GONE
 
             bottomNavigation.visibility = View.VISIBLE
-
+            footerLogo.visibility = View.VISIBLE
         } else {
 
             statusText.text = "● Setup Required"
@@ -383,6 +362,7 @@ class MainActivity : AppCompatActivity() {
 
             bottomNavigation.visibility =
                 View.GONE
+            footerLogo.visibility = View.GONE
         }
     }
 
