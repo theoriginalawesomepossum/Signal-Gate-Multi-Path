@@ -15,18 +15,19 @@ class BlockedNumbersFragmentTest {
 
     @Test
     fun fragmentLoadsWithoutCrashing() {
-        // This test will fail (and show clear error) if the fragment crashes on launch
-        val scenario = launchFragmentInContainer<BlockedNumbersFragment>()
+        try {
+            // This will catch crashes during fragment creation
+            val scenario = launchFragmentInContainer<BlockedNumbersFragment>()
 
-        // Basic UI checks
-        onView(withId(R.id.recyclerViewBlockedNumbers)).check(matches(isDisplayed()))
-        // Empty state should be visible initially
-        onView(withId(R.id.emptyState)).check(matches(isDisplayed()))
-    }
+            // Verify main views are displayed
+            onView(withId(R.id.recyclerViewBlockedNumbers)).check(matches(isDisplayed()))
+            onView(withId(R.id.emptyState)).check(matches(isDisplayed()))
+            onView(withId(R.id.addBlockedNumberButton)).check(matches(isDisplayed()))
 
-    @Test
-    fun addButtonIsClickable() {
-        launchFragmentInContainer<BlockedNumbersFragment>()
-        onView(withId(R.id.addBlockedNumberButton)).check(matches(isDisplayed()))
+            println("✅ BlockedNumbersFragment loaded successfully")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw AssertionError("BlockedNumbersFragment crashed on launch: ${e.message}", e)
+        }
     }
 }
