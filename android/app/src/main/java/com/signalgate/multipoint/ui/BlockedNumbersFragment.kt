@@ -73,9 +73,26 @@ class BlockedNumbersFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        // Existing observer
         viewModel.blockedNumbers.observe(viewLifecycleOwner) { entries ->
             adapter.submitList(entries)
             emptyStateTextView.visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
+        }
+
+        // NEW: Error observer
+        viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
+            errorMsg?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
+            }
+        }
+
+        // Optional: Also observe actionResult for better feedback
+        viewModel.actionResult.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.clearActionResult()
+            }
         }
     }
 
@@ -103,7 +120,7 @@ class BlockedNumbersFragment : Fragment() {
 
                 if (phoneNumber.isNotEmpty()) {
                     viewModel.addBlockedNumber(phoneNumber, label, isPattern)
-                    Toast.makeText(requireContext(), "Blocked added!", Toast.LENGTH_SHORT).show()
+                    // Removed duplicate Toast - ViewModel now handles success message
                 } else {
                     Toast.makeText(requireContext(), "Phone number cannot be empty", Toast.LENGTH_SHORT).show()
                 }
