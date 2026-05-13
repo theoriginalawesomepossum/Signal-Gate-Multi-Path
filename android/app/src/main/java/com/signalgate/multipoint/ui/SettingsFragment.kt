@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.slider.Slider
 import com.signalgate.multipoint.R
 
 class SettingsFragment : Fragment() {
@@ -19,12 +19,12 @@ class SettingsFragment : Fragment() {
 
     private lateinit var previewShield: View
 
-    private lateinit var redSeekBar: SeekBar
-    private lateinit var greenSeekBar: SeekBar
-    private lateinit var blueSeekBar: SeekBar
+    private lateinit var redSlider: Slider
+    private lateinit var greenSlider: Slider
+    private lateinit var blueSlider: Slider
 
-    private lateinit var previewButton: Button
-    private lateinit var applyButton: Button
+    private lateinit var previewButton: MaterialButton
+    private lateinit var applyButton: MaterialButton
 
     private var currentRed = 66
     private var currentGreen = 133
@@ -58,13 +58,13 @@ class SettingsFragment : Fragment() {
         previewShield =
             view.findViewById(R.id.previewShield)
 
-        redSeekBar =
+        redSlider =
             view.findViewById(R.id.redSeekBar)
 
-        greenSeekBar =
+        greenSlider =
             view.findViewById(R.id.greenSeekBar)
 
-        blueSeekBar =
+        blueSlider =
             view.findViewById(R.id.blueSeekBar)
 
         previewButton =
@@ -78,7 +78,7 @@ class SettingsFragment : Fragment() {
 
         loadSavedColors()
 
-        setupSeekBars()
+        setupSliders()
 
         setupButtons()
     }
@@ -103,54 +103,28 @@ class SettingsFragment : Fragment() {
                 244
             )
 
-        redSeekBar.progress = currentRed
-        greenSeekBar.progress = currentGreen
-        blueSeekBar.progress = currentBlue
+        redSlider.value = currentRed.toFloat()
+        greenSlider.value = currentGreen.toFloat()
+        blueSlider.value = currentBlue.toFloat()
 
         updatePreview()
     }
 
-    private fun setupSeekBars() {
+    private fun setupSliders() {
 
-        val listener =
-            object : SeekBar.OnSeekBarChangeListener {
-
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-
-                    when (seekBar?.id) {
-
-                        R.id.redSeekBar ->
-                            currentRed = progress
-
-                        R.id.greenSeekBar ->
-                            currentGreen = progress
-
-                        R.id.blueSeekBar ->
-                            currentBlue = progress
-                    }
-
-                    // Live preview while dragging
-                    updatePreview()
-                }
-
-                override fun onStartTrackingTouch(
-                    seekBar: SeekBar?
-                ) {}
-
-                override fun onStopTrackingTouch(
-                    seekBar: SeekBar?
-                ) {}
+        val listener = Slider.OnChangeListener { slider, value, fromUser ->
+            when (slider.id) {
+                R.id.redSeekBar -> currentRed = value.toInt()
+                R.id.greenSeekBar -> currentGreen = value.toInt()
+                R.id.blueSeekBar -> currentBlue = value.toInt()
             }
+            // Live preview while dragging
+            updatePreview()
+        }
 
-        redSeekBar.setOnSeekBarChangeListener(listener)
-
-        greenSeekBar.setOnSeekBarChangeListener(listener)
-
-        blueSeekBar.setOnSeekBarChangeListener(listener)
+        redSlider.addOnChangeListener(listener)
+        greenSlider.addOnChangeListener(listener)
+        blueSlider.addOnChangeListener(listener)
     }
 
     private fun updatePreview() {
