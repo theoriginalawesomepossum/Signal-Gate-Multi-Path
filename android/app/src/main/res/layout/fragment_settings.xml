@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/space_lg"
+    app:cardBackgroundColor="@color/surface_card"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/space_lg">
+
+        <!-- TITLE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Shield Appearance"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/space_xl"
+            android:textAppearance="@style/TextAppearance.SignalGate.Headline" />
+
+        <!-- SHIELD PREVIEW -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/space_xl"
+            app:cardCornerRadius="60dp"
+            app:cardBackgroundColor="@color/surface_variant"
+            app:cardElevation="@dimen/card_elevation">
+
+            <View
+                android:id="@+id/previewShield"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_primary" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- RED -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Red"
+            android:textAppearance="@style/TextAppearance.SignalGate.SectionTitle"
+            android:layout_marginBottom="@dimen/space_sm" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/redSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="255"
+            android:value="66" />
+
+        <!-- GREEN -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Green"
+            android:textAppearance="@style/TextAppearance.SignalGate.SectionTitle"
+            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginBottom="@dimen/space_sm" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/greenSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="255"
+            android:value="133" />
+
+        <!-- BLUE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Blue"
+            android:textAppearance="@style/TextAppearance.SignalGate.SectionTitle"
+            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginBottom="@dimen/space_sm" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/blueSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="255"
+            android:value="244" />
+
+        <!-- ACTION BUTTONS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/space_xl">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/previewButton"
+                style="@style/SignalGateButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="Preview"
+                android:layout_marginEnd="@dimen/space_sm" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/applyButton"
+                style="@style/SignalGateButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="Apply" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,101 @@
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: false
+        default: 'main'
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run Unit Tests
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew test --no-daemon
+
+  build:
+    name: Build Release APK
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build release APK (unsigned)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload release APK to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 30
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          files: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          tag_name: release-${{ github.run_number }}
+          body: |
+            # Release APK Build #${{ github.run_number }}
+            
+            **Build Date:** ${{ github.event.head_commit.timestamp }}
+            **Branch:** ${{ github.event.inputs.branch || 'main' }}
+            **Commit:** ${{ github.sha }}
+            
+            ## Status
+            - Unit Tests Passed
+            - Native Android Build Complete
+            
+            ## Installation Instructions
+            1. Download `app-release-unsigned.apk` from this release
+            2. Transfer to your Android device
+            3. Enable "Unknown Sources" in Settings > Security
+            4. Open file manager and tap the APK to install
+            5. Grant permissions when prompted
+            
+            ## Notes
+            - Pure Native Android (Kotlin) build
+            - Optimized APK size
+            - Unsigned for testing purposes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print APK location
+        run: |
+          echo "Release APK built successfully!"
+          echo "Location: android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          echo "Size: $(du -h android/app/build/outputs/apk/release/app-release-unsigned.apk | cut -f1)"

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="app_theme" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Primary branding -->
+        <item name="color_primary">@color/color_primary</item>
+        <item name="color_primary_variant">@color/color_primary_dark</item>
+        <item name="color_secondary">@color/color_accent</item>
+
+        <!-- Backgrounds -->
+        <item name="android:window_background">@color/background_primary</item>
+        <item name="color_surface">@color/card_background</item>
+
+        <!-- Status/navigation bars -->
+        <item name="android:status_bar_color">@color/background_primary</item>
+        <item name="android:navigation_bar_color">@color/background_primary</item>
+
+        <!-- Text -->
+        <item name="android:text_color">@color/text_primary</item>
+
+    </style>
+
+</resources>

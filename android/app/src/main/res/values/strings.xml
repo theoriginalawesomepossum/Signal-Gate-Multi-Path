@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">SignalGate</string>
+
+    <!-- Navigation -->
+    <string name="nav_blocked">Blocked</string>
+    <string name="nav_recent">Recent</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Buttons -->
+    <string name="add_block_rule">Add Block Rule</string>
+    <string name="block_this_time">Block This Time</string>
+    <string name="block_permanently">Block Permanently</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="whitelist">Whitelist</string>
+    <string name="block">Block</string>
+
+    <!-- Dialogs -->
+    <string name="add_blocked_number_title">Add Blocked Number</string>
+    <string name="phone_number_hint">Phone Number or Pattern (e.g., +1800)</string>
+    <string name="label_hint">Label (Optional)</string>
+    <string name="is_pattern_switch">Is Pattern?</string>
+
+    <!-- Status Messages -->
+    <string name="no_blocked_numbers">No blocked numbers yet</string>
+    <string name="no_recent_calls">No recent calls</string>
+    <string name="setup_required">Setup required:</string>
+    <string name="signal_gate_active">Signal Gate is active and ready!</string>
+    <string name="contacts_permission_granted">Contacts permission granted</string>
+    <string name="contacts_permission_denied">Contacts permission denied</string>
+    <string name="set_as_default_success">Set as default call screener</string>
+    <string name="set_as_default_failed">Failed to set as default call screener</string>
+
+    <!-- Actions -->
+    <string name="block_rule_added">Block rule added: %s</string>
+    <string name="blocked_number">Blocked: %s</string>
+    <string name="whitelisted_number">Whitelisted: %s</string>
+</resources>

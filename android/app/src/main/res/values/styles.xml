@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ========================================================= -->
+    <!-- BOTTOM NAVIGATION -->
+    <!-- ========================================================= -->
+
+    <style name="bottom_navigation_style"
+        parent="Widget.Material3.BottomNavigationView">
+
+        <item name="android:background">@color/bottom_nav_background</item>
+        <item name="itemTextColor">@color/bottom_nav_selected</item>
+        <item name="itemIconTint">@color/bottom_nav_selected</item>
+
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- PREMIUM BUTTON -->
+    <!-- ========================================================= -->
+
+    <style name="signal_gate_button"
+        parent="Widget.Material3.Button">
+
+        <item name="cornerRadius">18dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">52dp</item>
+
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- CARD STYLE -->
+    <!-- ========================================================= -->
+
+    <style name="signal_gate_card"
+        parent="Widget.Material3.CardView.Elevated">
+
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardElevation">6dp</item>
+        <item name="cardCornerRadius">20dp</item>
+
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- DIALOG THEME -->
+    <!-- ========================================================= -->
+
+    <style name="dialog_theme"
+        parent="Theme.Material3.Dark.Dialog">
+
+        <item name="android:windowBackground">@color/card_background</item>
+
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- TYPOGRAPHY SYSTEM -->
+    <!-- ========================================================= -->
+
+    <style name="text_appearance_signal_gate_headline"
+        parent="TextAppearance.Material3.HeadlineSmall">
+
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="text_appearance_signal_gate_section_title"
+        parent="TextAppearance.Material3.TitleMedium">
+
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="text_appearance_signal_gate_body"
+        parent="TextAppearance.Material3.BodyMedium">
+
+        <item name="android:textColor">@color/text_secondary</item>
+
+    </style>
+
+    <style name="text_appearance_signal_gate_caption"
+        parent="TextAppearance.Material3.BodySmall">
+
+        <item name="android:textColor">@color/text_muted</item>
+
+    </style>
+
+    <style name="text_appearance_signal_gate_status"
+        parent="TextAppearance.Material3.LabelLarge">
+
+        <item name="android:textColor">@color/success</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <!-- ALIASES FOR BACKWARD COMPATIBILITY -->
+    <style name="BottomNavigationStyle" parent="bottom_navigation_style" />
+    <style name="SignalGateButton" parent="signal_gate_button" />
+    <style name="SignalGateCard" parent="signal_gate_card" />
+    <style name="DialogTheme" parent="dialog_theme" />
+    <style name="TextAppearance.SignalGate.Headline" parent="text_appearance_signal_gate_headline" />
+    <style name="TextAppearance.SignalGate.SectionTitle" parent="text_appearance_signal_gate_section_title" />
+    <style name="TextAppearance.SignalGate.Body" parent="text_appearance_signal_gate_body" />
+    <style name="TextAppearance.SignalGate.Caption" parent="text_appearance_signal_gate_caption" />
+    <style name="TextAppearance.SignalGate.Status" parent="text_appearance_signal_gate_status" />
+
+</resources>

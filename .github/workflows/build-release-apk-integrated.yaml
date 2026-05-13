@@ -1,0 +1,128 @@
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write # Required for creating releases and uploading assets
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run Unit Tests
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew test --no-daemon
+
+  build:
+    name: Build Release APK
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Find APK Path
+        id: find_apk
+        run: |
+          # Dynamically find the APK to avoid naming mismatches (unsigned vs signed)
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "ERROR: No APK found!"
+            exit 1
+          fi
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          echo "Found APK at: $APK_PATH"
+
+      - name: Upload release APK to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: ${{ steps.find_apk.outputs.apk_path }}
+          retention-days: 30
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          files: ${{ steps.find_apk.outputs.apk_path }}
+          tag_name: release-${{ github.run_number }}
+          body: |
+            # Release APK Build #${{ github.run_number }}
+            
+            **Build Date:** ${{ github.event.head_commit.timestamp }}
+            **Branch:** ${{ github.event.inputs.branch || 'main' }}
+            **Commit:** ${{ github.sha }}
+            
+            ## Status
+            - Unit Tests Passed
+            - Native Android Build Complete
+            
+            ## Installation Instructions
+            
+            1. Download the APK from this release
+            2. Transfer to your Android device
+            3. Enable "Unknown Sources" in Settings > Security
+            4. Open file manager and tap the APK to install
+            5. Grant permissions when prompted
+            
+            ## Notes
+            - Pure Native Android (Kotlin) build
+            - Optimized for distribution
+            - Not signed for Play Store (can be added later)
+            - Suitable for testing on devices
+            
+            ## For Play Store Submission
+            
+            To prepare for Play Store submission, you'll need to:
+            1. Create a keystore file for signing
+            2. Configure signing in build.gradle
+            3. Build a signed AAB (Android App Bundle)
+            4. Submit to Google Play Console
+            
+            Contact the developer for signing setup instructions.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print APK location
+        run: |
+          echo "Release APK built successfully!"
+          echo "Location: ${{ steps.find_apk.outputs.apk_path }}"
+          echo "Size: $(du -h ${{ steps.find_apk.outputs.apk_path }} | cut -f1)"
