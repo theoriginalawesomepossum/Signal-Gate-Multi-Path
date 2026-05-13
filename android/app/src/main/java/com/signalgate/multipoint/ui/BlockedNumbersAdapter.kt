@@ -33,14 +33,14 @@ class BlockedNumbersAdapter(
 
         fun bind(entry: BlockEntry) {
             phoneNumberTextView.text = entry.phoneNumber
-            labelTextView.text = entry.label ?: if (entry.isPattern) "Pattern" else ""
+            labelTextView.text = entry.label ?: if (entry.isPattern) "Pattern Rule" else ""
             deleteButton.setOnClickListener { onDeleteClick(entry) }
         }
     }
 
     private class BlockEntryDiffCallback : DiffUtil.ItemCallback<BlockEntry>() {
         override fun areItemsTheSame(oldItem: BlockEntry, newItem: BlockEntry): Boolean {
-            return oldItem.phoneNumber == newItem.phoneNumber
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: BlockEntry, newItem: BlockEntry): Boolean {
