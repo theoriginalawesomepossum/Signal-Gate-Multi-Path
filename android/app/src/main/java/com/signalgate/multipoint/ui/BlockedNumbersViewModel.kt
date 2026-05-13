@@ -22,62 +22,98 @@ class BlockedNumbersViewModel(
     private val _actionResult = MutableLiveData<String?>()
     val actionResult: LiveData<String?> = _actionResult
 
+    // NEW: Error handling
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
+
     init {
         loadBlockedNumbers()
     }
 
     private fun loadBlockedNumbers() {
         viewModelScope.launch {
-            _blockedNumbers.value = blockDao.getAll()
+            try {
+                _error.value = null
+                _blockedNumbers.value = blockDao.getAll()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _error.value = "Failed to load blocked numbers: ${e.message}"
+                _blockedNumbers.value = emptyList()
+            }
         }
     }
 
     fun addBlockedNumber(phoneNumber: String, label: String?, isPattern: Boolean) {
         viewModelScope.launch {
-            val newEntry = BlockEntry(
-                phoneNumber = phoneNumber,
-                label = label,
-                isPattern = isPattern
-            )
-            blockDao.insert(newEntry)
-            _actionResult.value = "Block rule added: $phoneNumber"
-            loadBlockedNumbers()
+            try {
+                val newEntry = BlockEntry(
+                    phoneNumber = phoneNumber,
+                    label = label,
+                    isPattern = isPattern
+                )
+                blockDao.insert(newEntry)
+                _actionResult.value = "Block rule added: $phoneNumber"
+                loadBlockedNumbers()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _error.value = "Failed to add block rule: ${e.message}"
+            }
         }
     }
 
     fun addPatternRule(pattern: String, label: String?) {
         viewModelScope.launch {
-            val newEntry = BlockEntry(
-                phoneNumber = pattern,
-                label = label,
-                isPattern = true
-            )
-            blockDao.insert(newEntry)
-            _actionResult.value = "Pattern rule added: $pattern"
-            loadBlockedNumbers()
+            try {
+                val newEntry = BlockEntry(
+                    phoneNumber = pattern,
+                    label = label,
+                    isPattern = true
+                )
+                blockDao.insert(newEntry)
+                _actionResult.value = "Pattern rule added: $pattern"
+                loadBlockedNumbers()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _error.value = "Failed to add pattern rule: ${e.message}"
+            }
         }
     }
 
     fun deleteBlockedNumber(entry: BlockEntry) {
         viewModelScope.launch {
-            blockDao.deleteByNumber(entry.phoneNumber)
-            _actionResult.value = "Removed from blocklist: ${entry.phoneNumber}"
-            loadBlockedNumbers()
+            try {
+                blockDao.deleteByNumber(entry.phoneNumber)
+                _actionResult.value = "Removed from blocklist: ${entry.phoneNumber}"
+                loadBlockedNumbers()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _error.value = "Failed to delete number: ${e.message}"
+            }
         }
     }
 
     fun addToWhitelist(phoneNumber: String) {
         viewModelScope.launch {
-            val newEntry = AllowEntry(
-                phoneNumber = phoneNumber
-            )
-            allowDao.insert(newEntry)
-            _actionResult.value = "Added to whitelist: $phoneNumber"
-            loadBlockedNumbers()
+            try {
+                val newEntry = AllowEntry(
+                    phoneNumber = phoneNumber
+                )
+                allowDao.insert(newEntry)
+                _actionResult.value = "Added to whitelist: $phoneNumber"
+                loadBlockedNumbers()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _error.value = "Failed to add to whitelist: ${e.message}"
+            }
         }
     }
 
     fun clearActionResult() {
         _actionResult.value = null
+    }
+
+    // NEW: Clear error after showing it
+    fun clearError() {
+        _error.value = null
     }
 }
