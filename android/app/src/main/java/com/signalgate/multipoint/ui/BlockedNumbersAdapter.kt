@@ -3,7 +3,7 @@ package com.signalgate.multipoint.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
+import com.google.android.material.button.MaterialButton
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -29,7 +29,7 @@ class BlockedNumbersAdapter(
     inner class BlockViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val phoneNumberTextView: TextView = itemView.findViewById(R.id.phoneNumberTextView)
         private val labelTextView: TextView = itemView.findViewById(R.id.labelTextView)
-        private val deleteButton: ImageButton = itemView.findViewById(R.id.deleteButton)
+        private val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteButton)
 
         fun bind(entry: BlockEntry) {
             phoneNumberTextView.text = entry.phoneNumber
