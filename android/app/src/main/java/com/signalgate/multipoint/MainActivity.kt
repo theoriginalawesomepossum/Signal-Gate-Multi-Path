@@ -30,7 +30,7 @@ import com.signalgate.multipoint.ui.SettingsFragment
 class MainActivity : AppCompatActivity() {
 
     private lateinit var statusText: TextView
-    private lateinit var statusTextView: TextView
+    private lateinit var setupCard: View
 
     private lateinit var multiPointHubButton: MaterialButton
     private lateinit var helpButton: MaterialButton
@@ -137,8 +137,7 @@ class MainActivity : AppCompatActivity() {
     private fun initializeViews() {
 
         statusText = findViewById(R.id.statusText)
-
-        statusTextView = findViewById(R.id.statusTextView)
+        setupCard = findViewById(R.id.setupCard)
 
         multiPointHubButton =
             findViewById(R.id.multiPointHubButton)
@@ -289,18 +288,6 @@ class MainActivity : AppCompatActivity() {
         return Color.rgb(red, green, blue)
     }
 
-    /*
-        PROFESSIONAL UNIVERSAL THEME SYSTEM
-
-        Automatically themes:
-        - ALL MaterialButtons
-        - ALL future buttons
-        - Fragment buttons
-        - Dynamically added buttons
-
-        No more manual button registration needed.
-     */
-
     private fun updateGlobalButtonColors() {
 
         val customColor = getThemeColor()
@@ -363,15 +350,7 @@ class MainActivity : AppCompatActivity() {
                 Color.parseColor("#00C853")
             )
 
-            statusTextView.text =
-                "SignalGate protection is fully active."
-
-            setDefaultButton.visibility = View.GONE
-
-            requestContactsButton.visibility = View.GONE
-
-            manageBlockedNumbersButton.visibility =
-                View.GONE
+            setupCard.visibility = View.GONE
 
             bottomNavigation.visibility = View.VISIBLE
 
@@ -383,8 +362,7 @@ class MainActivity : AppCompatActivity() {
                 Color.parseColor("#F44336")
             )
 
-            statusTextView.text =
-                "Complete setup steps below to activate SignalGate."
+            setupCard.visibility = View.VISIBLE
 
             setDefaultButton.visibility =
                 if (!isDefaultCallScreener) {
