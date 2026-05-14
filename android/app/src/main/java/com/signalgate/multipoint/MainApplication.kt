@@ -4,11 +4,13 @@ import android.app.Application
 import android.os.Process
 import android.content.Intent
 import android.util.Log
+import androidx.work.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import com.signalgate.multipoint.db.AppDatabase
+import java.util.concurrent.TimeUnit
 
 class MainApplication : Application() {
 
@@ -28,14 +30,30 @@ class MainApplication : Application() {
                 
                 Log.d("MainApplication", "Database pre-warmed successfully")
                 
-                // Add other future background init tasks here:
-                // - Notification channels
-                // - WorkManager setup
-                // - Preference defaults, etc.
+                scheduleSync()
 
             } catch (e: Exception) {
                 Log.e("MainApplication", "Error during background initialization", e)
             }
         }
+    }
+
+    private fun scheduleSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val syncRequest = PeriodicWorkRequestBuilder<MultiPointSyncWorker>(
+            12, TimeUnit.HOURS
+        )
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "MultiPointSync",
+            ExistingPeriodicWorkPolicy.KEEP,
+            syncRequest
+        )
     }
 }

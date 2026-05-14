@@ -32,6 +32,9 @@ interface UnifiedEntryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: UnifiedEntry)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entries: List<UnifiedEntry>)
+
     @Query("DELETE FROM unified_entries WHERE phoneNumber = :number AND sourceId = :sourceId")
     suspend fun delete(number: String, sourceId: Int)
 
