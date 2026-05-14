@@ -34,12 +34,12 @@ class SyncEngine(private val context: Context) {
             val currentBatch = mutableListOf<UnifiedEntry>()
 
             inputStream.use { stream ->
-                // Use the reader to get a sequence and iterate manually to allow suspension
-                val reader = csvReader().readAllAsSequence(stream)
-                val iterator = reader.iterator()
+                // The correct method in kotlin-csv is readAllAsSequence on the reader
+                val rows = csvReader().readAllAsSequence(stream)
                 
-                while (iterator.hasNext() && count < limit) {
-                    val row = iterator.next()
+                for (row in rows) {
+                    if (count >= limit) break
+                    
                     val number = row.getOrNull(0) ?: continue
                     val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
                     val isPattern = row.getOrNull(2)?.toBoolean() ?: false
