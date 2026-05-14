@@ -1,3 +1,4 @@
+ 
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.google.android.material.card.MaterialCardView
@@ -25,13 +26,26 @@
             android:layout_marginBottom="@dimen/space_xl"
             android:textAppearance="@style/TextAppearance.SignalGate.Headline" />
 
-        <!-- CRASH LOGS BUTTON -->
+        <!-- CRASH LOGS BUTTON — unchanged -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/viewCrashLogsButton"
             style="@style/SignalGateButton"
             android:layout_width="match_parent"
             android:layout_height="@dimen/button_height"
             android:text="View Crash Logs" />
+
+        <!-- SPACING -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_md" />
+
+        <!-- DEBUG LOGS BUTTON — new -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/viewDebugLogsButton"
+            style="@style/SignalGateButton"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="View Debug Logs" />
 
     </LinearLayout>
 
