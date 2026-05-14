@@ -92,57 +92,57 @@ class CallScreeningService : CallScreeningService() {
         normalizedPhoneNumber: String
     ): Pair<CallDecision, String> {
 
-        val db =
-            AppDatabase.getDatabase(applicationContext)
+        val db = AppDatabase.getDatabase(applicationContext)
+        val unifiedDao = db.unifiedEntryDao()
+        val sourceDao = db.sourceDao()
 
-        val blockDao = db.blockDao()
-        val allowDao = db.allowDao()
+        // 1. Get all matches for this number
+        val matches = unifiedDao.findByNumber(normalizedPhoneNumber)
+        
+        // 2. Get enabled sources to check priorities
+        val enabledSources = sourceDao.getEnabledSources().associateBy { it.id }
 
-        val allowEntry =
-            allowDao.findByNumber(normalizedPhoneNumber)
-
-        if (allowEntry != null) {
-
-            return Pair(
-                CallDecision.ALLOW,
-                "Exact match in allowlist"
-            )
+        // Priority 1: Manual Allow (sourceId = 0, action = ALLOW)
+        if (matches.any { it.sourceId == 0 && it.action == "ALLOW" }) {
+            return Pair(CallDecision.ALLOW, "Manual Allow-list match")
         }
 
-        val exactBlockMatch =
-            blockDao.findByNumber(normalizedPhoneNumber)
-
-        if (exactBlockMatch != null) {
-
-            return Pair(
-                CallDecision.BLOCK,
-                "Exact match in blocklist"
-            )
+        // Priority 2: Manual Block (sourceId = 0, action = BLOCK)
+        if (matches.any { it.sourceId == 0 && it.action == "BLOCK" }) {
+            return Pair(CallDecision.BLOCK, "Manual Block-list match")
         }
 
-        val allBlockEntries =
-            blockDao.getAll()
-
-        for (entry in allBlockEntries) {
-
-            if (
-                entry.isPattern &&
-                normalizedPhoneNumber.startsWith(
-                    entry.phoneNumber
-                )
-            ) {
-
-                return Pair(
-                    CallDecision.BLOCK,
-                    "Pattern match: ${entry.phoneNumber}"
-                )
+        // Priority 3: Pattern Rules (Check all patterns in DB)
+        val patterns = unifiedDao.getAllPatterns()
+        for (pattern in patterns) {
+            if (normalizedPhoneNumber.startsWith(pattern.phoneNumber)) {
+                // If it's an ALLOW pattern, allow it immediately
+                if (pattern.action == "ALLOW") {
+                    return Pair(CallDecision.ALLOW, "Pattern Allow match: ${pattern.phoneNumber}")
+                }
+                // If it's a BLOCK pattern, we'll block it (unless an allow-list match was found earlier)
+                return Pair(CallDecision.BLOCK, "Pattern Block match: ${pattern.phoneNumber}")
             }
         }
 
-        return Pair(
-            CallDecision.ALLOW,
-            "No blocking rules matched"
-        )
+        // Priority 4: Aggregated Hub Sources (External lists)
+        // Sort matches by source priority
+        val hubMatches = matches
+            .filter { it.sourceId != 0 && enabledSources.containsKey(it.sourceId) }
+            .sortedBy { enabledSources[it.sourceId]?.priority ?: 999 }
+
+        if (hubMatches.isNotEmpty()) {
+            val bestMatch = hubMatches.first()
+            val sourceName = enabledSources[bestMatch.sourceId]?.name ?: "Unknown Hub"
+            
+            return if (bestMatch.action == "ALLOW") {
+                Pair(CallDecision.ALLOW, "Hub Allow match: $sourceName")
+            } else {
+                Pair(CallDecision.BLOCK, "Hub Block match: $sourceName")
+            }
+        }
+
+        return Pair(CallDecision.ALLOW, "No blocking rules matched")
     }
 
     private fun logAndAllowCall(
