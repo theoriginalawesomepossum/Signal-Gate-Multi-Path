@@ -6,6 +6,7 @@ import com.signalgate.multipoint.db.AppDatabase
 import com.signalgate.multipoint.db.Source
 import com.signalgate.multipoint.db.UnifiedEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URL
@@ -34,35 +35,41 @@ class SyncEngine(private val context: Context) {
             val currentBatch = mutableListOf<UnifiedEntry>()
 
             inputStream.use { stream ->
-                // The correct method in kotlin-csv is readAllAsSequence on the reader
-                val rows = csvReader().readAllAsSequence(stream)
-                
-                for (row in rows) {
-                    if (count >= limit) break
-                    
-                    val number = row.getOrNull(0) ?: continue
-                    val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
-                    val isPattern = row.getOrNull(2)?.toBoolean() ?: false
+                // The library requires being inside an 'open' block to use readAllAsSequence
+                csvReader().open(stream) {
+                    val rows = readAllAsSequence()
+                    for (row in rows) {
+                        if (count >= limit) break
+                        
+                        val number = row.getOrNull(0) ?: continue
+                        val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
+                        val isPattern = row.getOrNull(2)?.toBoolean() ?: false
 
-                    currentBatch.add(
-                        UnifiedEntry(
-                            phoneNumber = number,
-                            action = action,
-                            sourceId = source.id,
-                            isPattern = isPattern
+                        currentBatch.add(
+                            UnifiedEntry(
+                                phoneNumber = number,
+                                action = action,
+                                sourceId = source.id,
+                                isPattern = isPattern
+                            )
                         )
-                    )
 
-                    if (currentBatch.size >= batchSize) {
-                        unifiedDao.insertAll(currentBatch)
-                        currentBatch.clear()
+                        if (currentBatch.size >= batchSize) {
+                            // Bridge the non-suspend block to our suspend DAO
+                            runBlocking {
+                                unifiedDao.insertAll(currentBatch)
+                            }
+                            currentBatch.clear()
+                        }
+                        count++
                     }
-                    count++
-                }
 
-                // Insert remaining entries
-                if (currentBatch.isNotEmpty()) {
-                    unifiedDao.insertAll(currentBatch)
+                    // Insert remaining entries
+                    if (currentBatch.isNotEmpty()) {
+                        runBlocking {
+                            unifiedDao.insertAll(currentBatch)
+                        }
+                    }
                 }
             }
 
