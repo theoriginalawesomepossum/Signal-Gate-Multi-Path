@@ -14,7 +14,7 @@ class CrashLogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Set theme programmatically or ensure it uses the app theme
-        setTheme(R.style.Theme_SignalGate)
+        setTheme(R.style.app_theme)
         
         val layout = android.widget.LinearLayout(this).apply {
             orientation = android.widget.LinearLayout.VERTICAL
