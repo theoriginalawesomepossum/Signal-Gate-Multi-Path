@@ -33,33 +33,34 @@ class SyncEngine(private val context: Context) {
             val batchSize = 1000
             val currentBatch = mutableListOf<UnifiedEntry>()
 
-            csvReader().open(inputStream) {
-                readAllAsSequence().forEach { row ->
-                    if (count >= limit) return@forEach
-                    
-                    val number = row.getOrNull(0) ?: return@forEach
-                    val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
-                    val isPattern = row.getOrNull(2)?.toBoolean() ?: false
+            val rows = csvReader().readAllAsSequence(inputStream)
+            
+            for (row in rows) {
+                if (count >= limit) break
+                
+                val number = row.getOrNull(0) ?: continue
+                val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
+                val isPattern = row.getOrNull(2)?.toBoolean() ?: false
 
-                    currentBatch.add(
-                        UnifiedEntry(
-                            phoneNumber = number,
-                            action = action,
-                            sourceId = source.id,
-                            isPattern = isPattern
-                        )
+                currentBatch.add(
+                    UnifiedEntry(
+                        phoneNumber = number,
+                        action = action,
+                        sourceId = source.id,
+                        isPattern = isPattern
                     )
+                )
 
-                    if (currentBatch.size >= batchSize) {
-                        unifiedDao.insertAll(currentBatch)
-                        currentBatch.clear()
-                    }
-                    count++
-                }
-                // Insert remaining entries
-                if (currentBatch.isNotEmpty()) {
+                if (currentBatch.size >= batchSize) {
                     unifiedDao.insertAll(currentBatch)
+                    currentBatch.clear()
                 }
+                count++
+            }
+
+            // Insert remaining entries
+            if (currentBatch.isNotEmpty()) {
+                unifiedDao.insertAll(currentBatch)
             }
 
             // Update last synced time
