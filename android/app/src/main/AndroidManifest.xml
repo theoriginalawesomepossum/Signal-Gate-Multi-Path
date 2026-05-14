@@ -62,8 +62,10 @@
             android:name=".CallActionReceiver"
             android:exported="false" />
 
-        <activity android:name=".CrashLogActivity" />
-
-    </application>
+        <activity android:name=".CrashLogActivity"
+            android:name=".LogcatReaderActivity"
+            android:exported="false"
+            android:theme="@style/app_theme" />
+        </application>
 
 </manifest>
