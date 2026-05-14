@@ -33,34 +33,37 @@ class SyncEngine(private val context: Context) {
             val batchSize = 1000
             val currentBatch = mutableListOf<UnifiedEntry>()
 
-            val rows = csvReader().readAllAsSequence(inputStream)
-            
-            for (row in rows) {
-                if (count >= limit) break
+            inputStream.use { stream ->
+                // Use the reader to get a sequence and iterate manually to allow suspension
+                val reader = csvReader().readAllAsSequence(stream)
+                val iterator = reader.iterator()
                 
-                val number = row.getOrNull(0) ?: continue
-                val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
-                val isPattern = row.getOrNull(2)?.toBoolean() ?: false
+                while (iterator.hasNext() && count < limit) {
+                    val row = iterator.next()
+                    val number = row.getOrNull(0) ?: continue
+                    val action = row.getOrNull(1)?.uppercase() ?: "BLOCK"
+                    val isPattern = row.getOrNull(2)?.toBoolean() ?: false
 
-                currentBatch.add(
-                    UnifiedEntry(
-                        phoneNumber = number,
-                        action = action,
-                        sourceId = source.id,
-                        isPattern = isPattern
+                    currentBatch.add(
+                        UnifiedEntry(
+                            phoneNumber = number,
+                            action = action,
+                            sourceId = source.id,
+                            isPattern = isPattern
+                        )
                     )
-                )
 
-                if (currentBatch.size >= batchSize) {
-                    unifiedDao.insertAll(currentBatch)
-                    currentBatch.clear()
+                    if (currentBatch.size >= batchSize) {
+                        unifiedDao.insertAll(currentBatch)
+                        currentBatch.clear()
+                    }
+                    count++
                 }
-                count++
-            }
 
-            // Insert remaining entries
-            if (currentBatch.isNotEmpty()) {
-                unifiedDao.insertAll(currentBatch)
+                // Insert remaining entries
+                if (currentBatch.isNotEmpty()) {
+                    unifiedDao.insertAll(currentBatch)
+                }
             }
 
             // Update last synced time
@@ -68,7 +71,6 @@ class SyncEngine(private val context: Context) {
 
         } catch (e: Exception) {
             e.printStackTrace()
-            // In Phase 4, we'll log this to the CrashLog system
         }
     }
 }
