@@ -13,23 +13,48 @@ class CrashLogActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val scrollView = ScrollView(this)
-        val textView = TextView(this).apply {
-            textSize = 10f
-            fontFeatureSettings = "monospace"
-            setPadding(16, 16, 16, 16)
-        }
-        scrollView.addView(textView)
-
-        val shareButton = Button(this).apply {
-            text = "Share Logs"
-        }
-
+        // Set theme programmatically or ensure it uses the app theme
+        setTheme(R.style.Theme_SignalGate)
+        
         val layout = android.widget.LinearLayout(this).apply {
             orientation = android.widget.LinearLayout.VERTICAL
-            addView(shareButton)
-            addView(scrollView)
+            setBackgroundColor(android.graphics.Color.parseColor("#121212")) // background_primary
+            setPadding(32, 32, 32, 32)
         }
+
+        val header = TextView(this).apply {
+            text = "SYSTEM CRASH LOGS"
+            textSize = 18f
+            setTextColor(android.graphics.Color.WHITE)
+            setPadding(0, 0, 0, 32)
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+        }
+        layout.addView(header)
+
+        val shareButton = com.google.android.material.button.MaterialButton(this).apply {
+            text = "SHARE LOG REPORT"
+            setBackgroundColor(android.graphics.Color.parseColor("#4285F4")) // button_primary
+            setTextColor(android.graphics.Color.WHITE)
+        }
+        layout.addView(shareButton)
+
+        val scrollView = ScrollView(this).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1.0f
+            )
+            setPadding(0, 32, 0, 0)
+        }
+        
+        val textView = TextView(this).apply {
+            textSize = 12f
+            setTextColor(android.graphics.Color.parseColor("#BDBDBD")) // text_secondary
+            typeface = android.graphics.Typeface.MONOSPACE
+        }
+        scrollView.addView(textView)
+        layout.addView(scrollView)
+
         setContentView(layout)
 
         val crashDir = File(filesDir, "crashes")

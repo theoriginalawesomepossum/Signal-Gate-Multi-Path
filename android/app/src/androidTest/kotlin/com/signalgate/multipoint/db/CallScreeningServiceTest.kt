@@ -1,38 +1,69 @@
 package com.signalgate.multipoint
 
-import android.telecom.Call
-import com.signalgate.multipoint.db.BlockEntry
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.signalgate.multipoint.db.UnifiedEntry
+import com.signalgate.multipoint.db.Source
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CallScreeningServiceTest {
 
-    // Mocked blocking logic from your service
-    private fun shouldBlockCall(incomingNumber: String?, blockedList: List<BlockEntry>): Boolean {
-        if (incomingNumber == null) return false
-        val cleanNumber = incomingNumber.replace(Regex("[^0-9+]"), "")
-        return blockedList.any { block ->
-            val cleanBlock = block.phoneNumber.replace(Regex("[^0-9+]"), "")
-            cleanNumber.contains(cleanBlock) || cleanBlock.contains(cleanNumber)
+    // Mocking the priority logic for unit testing
+    private fun mockCheckBlockingLogic(
+        normalizedNumber: String,
+        matches: List<UnifiedEntry>,
+        enabledSources: Map<Int, Source>,
+        patterns: List<UnifiedEntry>
+    ): String {
+        // Priority 1: Manual Allow
+        if (matches.any { it.sourceId == 0 && it.action == "ALLOW" }) return "ALLOW: Manual Allow"
+
+        // Priority 2: Manual Block
+        if (matches.any { it.sourceId == 0 && it.action == "BLOCK" }) return "BLOCK: Manual Block"
+
+        // Priority 3: Patterns
+        for (pattern in patterns) {
+            if (normalizedNumber.startsWith(pattern.phoneNumber)) {
+                return if (pattern.action == "ALLOW") "ALLOW: Pattern" else "BLOCK: Pattern"
+            }
         }
+
+        // Priority 4: Hub Sources
+        val hubMatches = matches
+            .filter { it.sourceId != 0 && enabledSources.containsKey(it.sourceId) }
+            .sortedBy { enabledSources[it.sourceId]?.priority ?: 999 }
+
+        if (hubMatches.isNotEmpty()) {
+            val best = hubMatches.first()
+            return if (best.action == "ALLOW") "ALLOW: Hub" else "BLOCK: Hub"
+        }
+
+        return "ALLOW: Default"
     }
 
     @Test
-    fun `blocks known spam number`() {
-        val blocked = listOf(BlockEntry(phoneNumber = "+18005551212", reason = "spam"))
-        assertTrue(shouldBlockCall("+1-800-555-1212", blocked))
+    fun `manual allow overrides hub block`() {
+        val matches = listOf(
+            UnifiedEntry(phoneNumber = "123", action = "ALLOW", sourceId = 0), // Manual Allow
+            UnifiedEntry(phoneNumber = "123", action = "BLOCK", sourceId = 1)  // Hub Block
+        )
+        val sources = mapOf(1 to Source(id = 1, name = "Hub", type = "URL", pathOrUrl = "", priority = 1))
+        
+        val result = mockCheckBlockingLogic("123", matches, sources, emptyList())
+        assertEquals("ALLOW: Manual Allow", result)
     }
 
     @Test
-    fun `does not block safe number`() {
-        val blocked = listOf(BlockEntry(phoneNumber = "+18005551212", reason = "spam"))
-        assertFalse(shouldBlockCall("+13105551212", blocked))
-    }
-
-    @Test
-    fun `handles null number gracefully`() {
-        val blocked = listOf<BlockEntry>()
-        assertFalse(shouldBlockCall(null, blocked))
+    fun `hub priority respects sorting`() {
+        val matches = listOf(
+            UnifiedEntry(phoneNumber = "123", action = "BLOCK", sourceId = 2), // Priority 10
+            UnifiedEntry(phoneNumber = "123", action = "ALLOW", sourceId = 1)  // Priority 5
+        )
+        val sources = mapOf(
+            1 to Source(id = 1, name = "High Priority", type = "URL", pathOrUrl = "", priority = 5),
+            2 to Source(id = 2, name = "Low Priority", type = "URL", pathOrUrl = "", priority = 10)
+        )
+        
+        val result = mockCheckBlockingLogic("123", matches, sources, emptyList())
+        assertEquals("ALLOW: Hub", result) // Priority 5 wins
     }
 }
