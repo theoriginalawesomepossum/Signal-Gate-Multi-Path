@@ -1,5 +1,4 @@
- <?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,7 +24,7 @@
             android:layout_marginBottom="@dimen/space_xl"
             android:textAppearance="@style/TextAppearance.SignalGate.Headline" />
 
-        <!-- CRASH LOGS BUTTON — unchanged -->
+        <!-- CRASH LOGS BUTTON -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/viewCrashLogsButton"
             style="@style/SignalGateButton"
@@ -38,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/space_md" />
 
-        <!-- DEBUG LOGS BUTTON — new -->
+        <!-- DEBUG LOGS BUTTON -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/viewDebugLogsButton"
             style="@style/SignalGateButton"
