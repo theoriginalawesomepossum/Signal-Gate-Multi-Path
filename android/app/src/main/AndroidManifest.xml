@@ -1,3 +1,4 @@
+ 
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -10,6 +11,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Required for TYPE_APPLICATION_OVERLAY (the shield overlay) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name=".MainApplication"
@@ -25,7 +29,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:enableOnBackInvokedCallback="true">   <!-- Added for Predictive Back Gesture support -->
+            android:enableOnBackInvokedCallback="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,6 +50,11 @@
 
         </service>
 
+        <!-- Overlay Engine — Layer 1 prototype -->
+        <service
+            android:name=".overlay.OverlayManagerService"
+            android:exported="false" />
+
         <!-- Detect call state changes -->
         <receiver
             android:name=".PhoneStateReceiver"
@@ -62,10 +71,18 @@
             android:name=".CallActionReceiver"
             android:exported="false" />
 
-        <activity android:name=".CrashLogActivity"
+        <!-- Crash log viewer -->
+        <activity
+            android:name=".CrashLogActivity"
+            android:exported="false"
+            android:theme="@style/app_theme" />
+
+        <!-- Overlay debug log viewer -->
+        <activity
             android:name=".LogcatReaderActivity"
             android:exported="false"
             android:theme="@style/app_theme" />
-        </application>
+
+    </application>
 
 </manifest>
