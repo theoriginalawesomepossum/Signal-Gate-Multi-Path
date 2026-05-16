@@ -24,6 +24,81 @@
             android:layout_marginBottom="@dimen/space_xl"
             android:textAppearance="@style/TextAppearance.SignalGate.Headline" />
 
+        <!-- PERMISSIONS STATUS CARD -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_lg"
+            app:cardBackgroundColor="#1AFFFFFF"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="#33FFFFFF"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_md">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="System Permissions"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/space_sm" />
+
+                <!-- Overlay Permission Row -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_sm">
+                    
+                    <TextView
+                        android:id="@+id/overlayPermissionLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Transparent Shield Overlay"
+                        android:textColor="@color/text_secondary"
+                        android:layout_centerVertical="true" />
+                        
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/toggleOverlayPermission"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="CHECK"
+                        android:textColor="@color/color_accent" />
+                </RelativeLayout>
+
+                <!-- Call Screening Permission Row -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    
+                    <TextView
+                        android:id="@+id/screeningPermissionLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Call Screening Service"
+                        android:textColor="@color/text_secondary"
+                        android:layout_centerVertical="true" />
+                        
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/toggleScreeningPermission"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="CHECK"
+                        android:textColor="@color/color_accent" />
+                </RelativeLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- CRASH LOGS BUTTON -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/viewCrashLogsButton"
