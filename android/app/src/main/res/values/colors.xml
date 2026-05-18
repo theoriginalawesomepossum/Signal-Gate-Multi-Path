@@ -23,14 +23,14 @@
     <!-- BACKGROUNDS -->
     <!-- ========================================================= -->
 
-    <color name="background_primary">#121212</color>
-    <color name="background_secondary">#181818</color>
+    <color name="background_primary">#0A0E14</color>
+    <color name="background_secondary">#121A26</color>
 
     <!-- ========================================================= -->
     <!-- SURFACES -->
     <!-- ========================================================= -->
 
-    <color name="card_background">#1E1E1E</color>
+    <color name="card_background">#121A26</color>
     <color name="card_background_elevated">#252525</color>
 
     <!-- ========================================================= -->
@@ -71,6 +71,13 @@
     <!-- ========================================================= -->
 
     <color name="overlay_background">#80000000</color>
+    <!-- New Glassmorphic UI Colors -->
+    <color name="accent_primary">#00A3FF</color>
+    <color name="accent_secondary">#00D1FF</color>
+    <color name="status_high">#FF4D4D</color>
+    <color name="status_medium">#FFA500</color>
+    <color name="status_low">#00C853</color>
+    <color name="overlay_glass">#CC121A26</color>
     <color name="card_elevation">#1E000000</color>
     <color name="ripple_color">#33FFFFFF</color>
     <color name="accent_glow">#334285F4</color>
