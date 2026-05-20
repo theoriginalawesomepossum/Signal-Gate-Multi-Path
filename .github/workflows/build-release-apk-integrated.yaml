@@ -27,6 +27,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Clean Room schemas
+        run: rm -rf android/app/schemas/
+
       - name: Run Unit Tests
         run: |
           cd android
@@ -52,6 +55,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Clean Room schemas
+        run: rm -rf android/app/schemas/
 
       - name: Build release APK
         run: |
