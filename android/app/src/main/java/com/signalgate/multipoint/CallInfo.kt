@@ -12,5 +12,5 @@ data class CallInfo(
     val confidence: Int?,
     val riskLevel: String?,
     val matchedSources: List<String>,
-    val callDecision: CallDecision
+    val country: String? = null
 ) : Parcelable

@@ -12,10 +12,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.material3.MaterialTheme
 import com.signalgate.multipoint.ui.theme.SignalGateTheme
 
-const val ACTION_OVERLAY_ALLOW = "com.signalgate.multipoint.OVERLAY_ALLOW"
-const val ACTION_OVERLAY_SCREEN = "com.signalgate.multipoint.OVERLAY_SCREEN"
-const val ACTION_OVERLAY_BLOCK = "com.signalgate.multipoint.OVERLAY_BLOCK"
-
 class CallOverlayServiceCompose : Service() {
 
     private var windowManager: WindowManager? = null
