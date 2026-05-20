@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CallScreeningService : CallScreeningService() {
+class SignalGateCallScreeningService : CallScreeningService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
@@ -235,8 +235,7 @@ class CallScreeningService : CallScreeningService() {
     }
 
     enum class CallDecision {
-238	        ALLOW,
-239	        BLOCK,
-240	        SCREEN
-241	    }
+        ALLOW,
+        BLOCK
+    }
 }
