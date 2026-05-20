@@ -1,5 +1,6 @@
 package com.signalgate.multipoint
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -55,14 +57,27 @@ fun CallShieldOverlay() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // SG Shield Logo (Placeholder)
+            // SG Shield Logo with dynamic glow (Placeholder)
+            val infiniteTransition = rememberInfiniteTransition(label = "shieldGlow")
+            val glowAlpha by infiniteTransition.animateFloat(
+                initialValue = 0.2f,
+                targetValue = 0.6f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 1500, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "glowAlpha"
+            )
+
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .background(Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+                    .size(80.dp)
+                    .background(Color.Blue.copy(alpha = glowAlpha), RoundedCornerShape(12.dp))
+                    .padding(8.dp)
+                    .background(Color.DarkGray, RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("SG", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("SG", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Black)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -90,13 +105,40 @@ fun CallShieldOverlay() {
                     .clip(RoundedCornerShape(4.dp))
             )
 
-            // Risk Level (Placeholder)
-            Text(
-                text = "RISK LEVEL HIGH",
-                color = Color.Red,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            // Risk Level with Heartbeat Graphic (Placeholder)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "RISK LEVEL",
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "HIGH",
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .background(Color.Red.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                )
+                // Basic heartbeat animation placeholder
+                val heartbeatScale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "heartbeatScale"
+                )
+                Text(
+                    text = "❤️", // Placeholder for heartbeat graphic
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 4.dp).scale(heartbeatScale)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
