@@ -15,7 +15,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import com.signalgate.multipoint.CallScreeningService.CallDecision
+import com.signalgate.multipoint.SignalGateCallScreeningService.CallDecision
 import com.signalgate.multipoint.R
 
 const val ACTION_OVERLAY_ALLOW = "com.signalgate.multipoint.OVERLAY_ALLOW"
