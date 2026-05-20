@@ -1,340 +1,330 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent">
+    android:background="#80000000">
 
-    <!-- Semi-transparent overlay background -->
-    <View
+    <!-- Main Overlay Container -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#66000000" />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp">
 
-    <!-- Main glassmorphic card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/overlay_card_view"
-        style="@style/Widget.SignalGate.Card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_gravity="center_horizontal|center_vertical"
-        app:cardElevation="0dp">
-
-        <LinearLayout
+        <!-- Glassmorphic Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="#1A1A2E"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#33FFFFFF">
 
-            <!-- Incoming Call Label -->
-            <TextView
-                android:id="@+id/incoming_call_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Incoming call"
-                style="@style/TextAppearance.SignalGate.Muted"
-                android:layout_gravity="center_horizontal" />
-
-            <!-- Caller Number -->
-            <TextView
-                android:id="@+id/caller_number_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+1 (800) 555-0199"
-                style="@style/TextAppearance.SignalGate.Header"
-                android:textSize="32sp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Caller Country -->
-            <TextView
-                android:id="@+id/caller_country_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="United States"
-                style="@style/TextAppearance.SignalGate.Subtitle"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp" />
-
-            <!-- Shield and Spam Info Container -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical"
+                android:padding="24dp">
 
-                <!-- Shield Icon -->
-                <ImageView
-                    android:id="@+id/shield_icon"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:contentDescription="SignalGate Shield"
-                    android:scaleType="centerInside" />
-
-                <!-- Spam Status and Confidence -->
+                <!-- Shield Icon and Status -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="12dp">
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:id="@+id/shield_icon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_shield"
+                        android:contentDescription="Shield Icon"
+                        android:tint="#4285F4" />
 
                     <TextView
                         android:id="@+id/spam_status_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="LIKELY SPAM"
-                        style="@style/TextAppearance.SignalGate.Header"
-                        android:textColor="@color/status_medium"
-                        android:textSize="18sp" />
+                        android:textColor="#FF9800"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginStart="12dp" />
 
-                    <TextView
-                        android:id="@+id/spam_category_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Telemarketing"
-                        style="@style/TextAppearance.SignalGate.Subtitle"
-                        android:layout_marginTop="2dp" />
+                </LinearLayout>
 
-                    <!-- Confidence Section -->
+                <!-- Caller Number -->
+                <TextView
+                    android:id="@+id/caller_number_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="+1 (800) 555-0199"
+                    android:textColor="#FFFFFF"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Caller Location -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="United States"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Spam Category -->
+                <TextView
+                    android:id="@+id/spam_category_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Telemarketing"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Confidence Progress Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginTop="8dp">
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Confidence"
+                            android:textColor="#AAAAAA"
+                            android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/confidence_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Confidence: 92%"
-                            style="@style/TextAppearance.SignalGate.Body"
-                            android:textSize="12sp" />
-
-                        <ProgressBar
-                            android:id="@+id/confidence_progress_bar"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="0dp"
-                            android:layout_height="4dp"
-                            android:layout_weight="1"
-                            android:progress="92"
-                            android:progressTint="@color/status_medium"
-                            android:layout_marginStart="8dp" />
+                            android:text="92%"
+                            android:textColor="#FF9800"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/confidence_progress_bar"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:progress="92"
+                        android:progressDrawable="@drawable/progress_bar_drawable"
+                        android:layout_marginBottom="8dp" />
 
                 </LinearLayout>
 
-                <!-- Risk Level Card -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/status_high"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="0dp"
-                    android:layout_marginStart="12dp">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="RISK LEVEL"
-                            style="@style/TextAppearance.SignalGate.Muted"
-                            android:textSize="9sp"
-                            android:textColor="@color/text_primary" />
-
-                        <TextView
-                            android:id="@+id/risk_level_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="HIGH"
-                            style="@style/TextAppearance.SignalGate.Header"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:layout_marginTop="2dp" />
-
-                        <!-- Heartbeat Graphic Placeholder -->
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="12dp"
-                            android:src="@android:drawable/ic_media_play"
-                            android:tint="@color/text_primary"
-                            android:contentDescription="Risk Level Graphic"
-                            android:layout_marginTop="4dp"
-                            android:scaleType="fitCenter" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
-            <!-- Matched Sources Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="16dp">
-
+                <!-- Risk Level -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical|space_between">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
 
                     <TextView
-                        android:id="@+id/matched_sources_label"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Matched in 3 sources"
-                        style="@style/TextAppearance.SignalGate.Body"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/matched_sources_timestamp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Just now"
-                        style="@style/TextAppearance.SignalGate.Muted"
+                        android:layout_weight="1"
+                        android:text="Risk Level"
+                        android:textColor="#AAAAAA"
                         android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/risk_level_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HIGH"
+                        android:textColor="#F44336"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="@drawable/risk_level_badge"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp" />
 
                 </LinearLayout>
 
-                <!-- Source Tags Container (Horizontal Scrollable) -->
-                <HorizontalScrollView
+                <!-- Matched Sources -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:layout_marginTop="8dp">
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/matched_sources_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Matched in 3 sources"
+                        android:textColor="#AAAAAA"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="8dp" />
 
                     <LinearLayout
                         android:id="@+id/source_tags_container"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center"
+                        android:layout_marginBottom="8dp" />
 
-                        <!-- Source Tags will be added programmatically -->
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Community Feed"
-                            style="@style/TextAppearance.SignalGate.Muted"
-                            android:background="@drawable/tag_background"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="4dp"
-                            android:layout_marginEnd="8dp" />
+                </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Telemarketer DB"
-                            style="@style/TextAppearance.SignalGate.Muted"
-                            android:background="@drawable/tag_background"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="4dp"
-                            android:layout_marginEnd="8dp" />
+                <!-- More Details Section (Expandable) -->
+                <LinearLayout
+                    android:id="@+id/details_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="User Reports"
-                            style="@style/TextAppearance.SignalGate.Muted"
-                            android:background="@drawable/tag_background"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="4dp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#33FFFFFF"
+                        android:layout_marginBottom="12dp" />
 
-                    </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Call History"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
 
-                </HorizontalScrollView>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Just now • Blocked"
+                        android:textColor="#AAAAAA"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="12dp" />
+
+                </LinearLayout>
+
+                <!-- Action Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Allow Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/allow_button"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="ALLOW"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#4CAF50"
+                        app:cornerRadius="12dp" />
+
+                    <!-- Screen Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/screen_button"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:text="SCREEN"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#2196F3"
+                        app:cornerRadius="12dp" />
+
+                    <!-- Block Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/block_button"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="BLOCK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#F44336"
+                        app:cornerRadius="12dp" />
+
+                </LinearLayout>
+
+                <!-- More Details Toggle Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/more_details_button"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="More Details"
+                    android:textColor="#4285F4"
+                    android:textSize="12sp"
+                    app:strokeColor="#4285F4"
+                    app:cornerRadius="12dp" />
 
             </LinearLayout>
 
-            <!-- Action Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="16dp"
-                android:spacing="8dp">
+        </com.google.android.material.card.MaterialCardView>
 
-                <Button
-                    android:id="@+id/allow_button"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="ALLOW"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:backgroundTint="@color/status_low"
-                    android:drawableStart="@android:drawable/sym_action_call"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:layout_marginEnd="4dp" />
+        <!-- Call Control Buttons (Bottom) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
 
-                <Button
-                    android:id="@+id/screen_button"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="SCREEN"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:backgroundTint="@color/background_secondary"
-                    android:drawableStart="@android:drawable/ic_menu_view"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:layout_marginEnd="4dp" />
+            <!-- Accept Call -->
+            <ImageButton
+                android:id="@+id/accept_call_button"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_call_accept"
+                android:contentDescription="Accept Call"
+                android:background="@drawable/circular_button_green"
+                android:scaleType="centerInside" />
 
-                <Button
-                    android:id="@+id/block_button"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="BLOCK"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:backgroundTint="@color/status_high"
-                    android:drawableStart="@android:drawable/sym_action_call"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp" />
-
-            </LinearLayout>
-
-            <!-- More Details Button -->
-            <Button
-                android:id="@+id/more_details_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="More Details"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:textColor="@color/text_secondary"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
-                app:icon="@android:drawable/arrow_down_float"
-                app:iconTint="@color/text_secondary" />
+            <!-- Reject Call -->
+            <ImageButton
+                android:id="@+id/reject_call_button"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_call_reject"
+                android:contentDescription="Reject Call"
+                android:background="@drawable/circular_button_red"
+                android:scaleType="centerInside" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 </FrameLayout>

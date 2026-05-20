@@ -235,7 +235,8 @@ class CallScreeningService : CallScreeningService() {
     }
 
     enum class CallDecision {
-        ALLOW,
-        BLOCK
-    }
+238	        ALLOW,
+239	        BLOCK,
+240	        SCREEN
+241	    }
 }

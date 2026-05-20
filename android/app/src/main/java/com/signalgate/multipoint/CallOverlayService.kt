@@ -10,27 +10,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import com.signalgate.multipoint.CallScreeningService.CallDecision
 import com.signalgate.multipoint.R
 
-/**
- * CallOverlayService displays a transparent, glassmorphic overlay on incoming calls.
- * It dynamically populates UI elements based on CallInfo data and provides interactive buttons
- * for user actions (Allow, Screen, Block).
- */
+const val ACTION_OVERLAY_ALLOW = "com.signalgate.multipoint.OVERLAY_ALLOW"
+const val ACTION_OVERLAY_SCREEN = "com.signalgate.multipoint.OVERLAY_SCREEN"
+const val ACTION_OVERLAY_BLOCK = "com.signalgate.multipoint.OVERLAY_BLOCK"
+
 class CallOverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
     private var currentCallInfo: CallInfo? = null
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -38,12 +36,9 @@ class CallOverlayService : Service() {
         initializeOverlay()
     }
 
-    /**
-     * Initializes the overlay view and adds it to the window manager.
-     */
     private fun initializeOverlay() {
-        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        overlayView = layoutInflater.inflate(R.layout.call_shield_overlay, null)
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        overlayView = inflater.inflate(R.layout.call_shield_overlay, null)
 
         val params = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams(
@@ -72,129 +67,83 @@ class CallOverlayService : Service() {
         setupButtonListeners()
     }
 
-    /**
-     * Sets up click listeners for the action buttons.
-     */
     private fun setupButtonListeners() {
-        overlayView?.findViewById<Button>(R.id.allow_button)?.setOnClickListener {
-            handleAllowAction()
-        }
-
-        overlayView?.findViewById<Button>(R.id.screen_button)?.setOnClickListener {
-            handleScreenAction()
-        }
-
-        overlayView?.findViewById<Button>(R.id.block_button)?.setOnClickListener {
-            handleBlockAction()
-        }
-
-        overlayView?.findViewById<Button>(R.id.more_details_button)?.setOnClickListener {
-            toggleMoreDetails()
+        overlayView?.apply {
+            findViewById<Button>(R.id.allow_button)?.setOnClickListener { handleAllowAction() }
+            findViewById<Button>(R.id.screen_button)?.setOnClickListener { handleScreenAction() }
+            findViewById<Button>(R.id.block_button)?.setOnClickListener { handleBlockAction() }
+            findViewById<Button>(R.id.more_details_button)?.setOnClickListener { toggleMoreDetails() }
+            findViewById<ImageButton>(R.id.accept_call_button)?.setOnClickListener { handleAllowAction() }
+            findViewById<ImageButton>(R.id.reject_call_button)?.setOnClickListener { handleBlockAction() }
         }
     }
 
-    /**
-     * Handles the Allow action: allows the call to proceed.
-     */
     private fun handleAllowAction() {
-        // TODO: Implement logic to allow the call
-        // This would typically involve:
-        // 1. Sending a decision to the CallScreeningService
-        // 2. Logging the action to the database
-        // 3. Dismissing the overlay
+        currentCallInfo?.let { sendActionBroadcast(ACTION_OVERLAY_ALLOW, it) }
         removeOverlay()
     }
 
-    /**
-     * Handles the Screen action: screens the call (sends to voicemail or shows notification).
-     */
     private fun handleScreenAction() {
-        // TODO: Implement logic to screen the call
-        // This would typically involve:
-        // 1. Sending a decision to the CallScreeningService
-        // 2. Logging the action to the database
-        // 3. Dismissing the overlay
+        currentCallInfo?.let { sendActionBroadcast(ACTION_OVERLAY_SCREEN, it) }
         removeOverlay()
     }
 
-    /**
-     * Handles the Block action: blocks the call.
-     */
     private fun handleBlockAction() {
-        // TODO: Implement logic to block the call
-        // This would typically involve:
-        // 1. Sending a decision to the CallScreeningService
-        // 2. Logging the action to the database
-        // 3. Dismissing the overlay
+        currentCallInfo?.let { sendActionBroadcast(ACTION_OVERLAY_BLOCK, it) }
         removeOverlay()
     }
 
-    /**
-     * Toggles the visibility of the "More Details" section.
-     */
+    private fun sendActionBroadcast(action: String, callInfo: CallInfo) {
+        val intent = Intent(action)
+        intent.putExtra("call_info", callInfo)
+        sendBroadcast(intent)
+    }
+
     private fun toggleMoreDetails() {
-        // TODO: Implement expandable details section
-        // This would show additional information like:
-        // 1. Full list of matched sources
-        // 2. Call history with this number
-        // 3. Detailed risk analysis
+        overlayView?.findViewById<LinearLayout>(R.id.details_container)?.let {
+            it.visibility = if (it.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Extract CallInfo from the intent
-        val callInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        currentCallInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent?.getParcelableExtra("call_info", CallInfo::class.java)
         } else {
             @Suppress("DEPRECATION")
             intent?.getParcelableExtra("call_info")
         }
 
-        if (callInfo != null) {
-            currentCallInfo = callInfo
-            updateOverlayUI(callInfo)
-        } else {
-            // Fallback to legacy string-based data
-            val incomingNumber = intent?.getStringExtra("incoming_number") ?: "Unknown"
-            val spamStatus = intent?.getStringExtra("spam_status") ?: "Unknown Status"
-            updateOverlayUILegacy(incomingNumber, spamStatus)
-        }
+        currentCallInfo?.let { updateOverlayUI(it) }
+            ?: run {
+                val number = intent?.getStringExtra("incoming_number") ?: "Unknown"
+                updateOverlayUILegacy(number, "Unknown Status")
+            }
 
         return START_NOT_STICKY
     }
 
-    /**
-     * Updates the overlay UI with the provided CallInfo data.
-     */
     private fun updateOverlayUI(callInfo: CallInfo) {
         overlayView?.let { view ->
-            // Update caller information
             view.findViewById<TextView>(R.id.caller_number_text_view)?.text = callInfo.originalPhoneNumber
             view.findViewById<TextView>(R.id.spam_status_text_view)?.text = callInfo.spamStatus
             view.findViewById<TextView>(R.id.spam_category_text_view)?.text = callInfo.spamCategory ?: "Unknown"
 
-            // Update confidence
-            callInfo.confidence?.let { confidence ->
-                view.findViewById<TextView>(R.id.confidence_text_view)?.text = "Confidence: $confidence%"
-                view.findViewById<ProgressBar>(R.id.confidence_progress_bar)?.progress = confidence
+            callInfo.confidence?.let { conf ->
+                view.findViewById<TextView>(R.id.confidence_text_view)?.text = "Confidence: $conf%"
+                view.findViewById<ProgressBar>(R.id.confidence_progress_bar)?.progress = conf
             }
 
-            // Update risk level
-            callInfo.riskLevel?.let { riskLevel ->
-                view.findViewById<TextView>(R.id.risk_level_text_view)?.text = riskLevel
+            callInfo.riskLevel?.let { risk ->
+                view.findViewById<TextView>(R.id.risk_level_text_view)?.text = risk
             }
 
-            // Update matched sources
             val sourcesCount = callInfo.matchedSources.size
             view.findViewById<TextView>(R.id.matched_sources_label)?.text = "Matched in $sourcesCount sources"
 
-            // Populate source tags dynamically
             populateSourceTags(view, callInfo.matchedSources)
         }
     }
 
-    /**
-     * Updates the overlay UI with legacy string-based data (fallback).
-     */
     private fun updateOverlayUILegacy(incomingNumber: String, spamStatus: String) {
         overlayView?.let { view ->
             view.findViewById<TextView>(R.id.caller_number_text_view)?.text = incomingNumber
@@ -202,56 +151,37 @@ class CallOverlayService : Service() {
         }
     }
 
-    /**
-     * Dynamically populates the source tags container with tags for each matched source.
-     */
     private fun populateSourceTags(view: View, sources: List<String>) {
-        val sourceTagsContainer = view.findViewById<LinearLayout>(R.id.source_tags_container)
-        sourceTagsContainer?.removeAllViews()
+        val container = view.findViewById<LinearLayout>(R.id.source_tags_container) ?: return
+        container.removeAllViews()
 
         for (source in sources) {
-            val tagView = TextView(this)
-            tagView.text = source
-            tagView.setTextAppearance(R.style.TextAppearance_SignalGate_Muted)
-            tagView.setBackgroundResource(R.drawable.tag_background)
-            tagView.setPadding(
-                dpToPx(8),
-                dpToPx(4),
-                dpToPx(8),
-                dpToPx(4)
-            )
-
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            layoutParams.marginEnd = dpToPx(8)
-            tagView.layoutParams = layoutParams
-
-            sourceTagsContainer?.addView(tagView)
+            val tag = TextView(this).apply {
+                text = source
+                setTextAppearance(R.style.TextAppearance_SignalGate_Muted)
+                setBackgroundResource(R.drawable.tag_background)
+                setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { marginEnd = dpToPx(8) }
+            }
+            container.addView(tag)
         }
     }
 
-    /**
-     * Converts dp to pixels for use in UI layout calculations.
-     */
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
+    private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
-    /**
-     * Removes the overlay from the window manager.
-     */
     private fun removeOverlay() {
-        if (overlayView != null && windowManager != null) {
-            windowManager?.removeView(overlayView)
+        overlayView?.let {
+            windowManager?.removeView(it)
             overlayView = null
         }
         stopSelf()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         removeOverlay()
+        super.onDestroy()
     }
 }
