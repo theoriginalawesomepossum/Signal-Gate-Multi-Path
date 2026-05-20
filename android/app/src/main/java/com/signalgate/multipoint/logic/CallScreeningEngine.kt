@@ -2,7 +2,6 @@ package com.signalgate.multipoint.logic
 
 import android.util.Log
 import com.signalgate.multipoint.CallInfo
-import com.signalgate.multipoint.CallScreeningService
 import com.signalgate.multipoint.database.SignalGateDatabase
 import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 
@@ -41,8 +40,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
                 spamCategory = null,
                 confidence = 100,
                 riskLevel = "LOW",
-                matchedSources = listOf("Allow List"),
-                callDecision = CallScreeningService.CallDecision.ALLOW
+                matchedSources = listOf("Allow List")
             )
         }
 
@@ -57,8 +55,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
                 spamCategory = blockEntry.category,
                 confidence = 100,
                 riskLevel = "HIGH",
-                matchedSources = listOf("Manual Block List"),
-                callDecision = CallScreeningService.CallDecision.BLOCK
+                matchedSources = listOf("Manual Block List")
             )
         }
 
@@ -74,8 +71,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
                     spamCategory = pattern.category,
                     confidence = 95,
                     riskLevel = "HIGH",
-                    matchedSources = listOf("Pattern Rule"),
-                    callDecision = CallScreeningService.CallDecision.BLOCK
+                    matchedSources = listOf("Pattern Rule")
                 )
             }
         }
@@ -108,12 +104,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
                     spamCategory = entries.firstOrNull()?.category,
                     confidence = highestConfidence,
                     riskLevel = highestRiskLevel,
-                    matchedSources = matchedSources,
-                    callDecision = if (highestConfidence >= 70) {
-                        CallScreeningService.CallDecision.BLOCK
-                    } else {
-                        CallScreeningService.CallDecision.SCREEN
-                    }
+                    matchedSources = matchedSources
                 )
             }
         }
@@ -127,8 +118,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
             spamCategory = null,
             confidence = null,
             riskLevel = null,
-            matchedSources = emptyList(),
-            callDecision = CallScreeningService.CallDecision.ALLOW
+            matchedSources = emptyList()
         )
     }
 

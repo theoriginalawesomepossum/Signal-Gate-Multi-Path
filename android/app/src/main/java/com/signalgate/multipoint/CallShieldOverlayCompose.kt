@@ -1,15 +1,15 @@
 package com.signalgate.multipoint
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PhoneDisabled
-import androidx.compose.material.icons.filled.ScreenShare
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CallShieldOverlay(
     phoneNumber: String = "+1 (800) 555-0199",
@@ -203,7 +204,7 @@ fun CallShieldOverlay(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Blue.copy(alpha = 0.7f)),
                     modifier = Modifier.weight(1f).height(48.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.ScreenShare, contentDescription = "Screen", tint = Color.White)
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "Screen", tint = Color.White)
                     Spacer(Modifier.width(4.dp))
                     Text("SCREEN", color = Color.White)
                 }
@@ -213,7 +214,7 @@ fun CallShieldOverlay(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(alpha = 0.7f)),
                     modifier = Modifier.weight(1f).height(48.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.PhoneDisabled, contentDescription = "Block", tint = Color.White)
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Block", tint = Color.White)
                     Spacer(Modifier.width(4.dp))
                     Text("BLOCK", color = Color.White)
                 }
