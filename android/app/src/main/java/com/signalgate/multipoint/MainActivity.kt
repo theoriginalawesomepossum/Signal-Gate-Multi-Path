@@ -1,279 +1,102 @@
 package com.signalgate.multipoint
 
-import android.Manifest
-import android.app.role.RoleManager
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.telecom.TelecomManager
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
+import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.button.MaterialButton
-import com.signalgate.multipoint.ui.BlockedNumbersFragment
-import com.signalgate.multipoint.ui.RecentCallsFragment
-import com.signalgate.multipoint.ui.SettingsFragment
+import androidx.fragment.app.FragmentManager
+import com.google.android.material.navigation.NavigationView
+import com.signalgate.multipoint.fragments.DashboardFragment
+import com.signalgate.multipoint.fragments.SourcesFragment
+import com.signalgate.multipoint.fragments.CallLogFragment
+import com.signalgate.multipoint.fragments.BlockListFragment
+import com.signalgate.multipoint.fragments.SettingsFragment
+import com.signalgate.multipoint.fragments.AuditLogFragment
+import com.signalgate.multipoint.fragments.AboutFragment
 
-class MainActivity : AppCompatActivity() {
+/**
+ * MainActivity is the main entry point of the SignalGate Multi-Port application.
+ * It hosts the navigation drawer and manages fragment transitions between different sections.
+ */
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private lateinit var statusText: TextView
-    private lateinit var statusTextView: TextView
-
-    private lateinit var multiPointHubButton: MaterialButton
-    private lateinit var helpButton: MaterialButton
-    private lateinit var setDefaultButton: MaterialButton
-    private lateinit var requestPermissionsButton: MaterialButton
-    private lateinit var manageBlockedNumbersButton: MaterialButton
-
-    private lateinit var bottomNavigation: BottomNavigationView
-    private lateinit var footerLogo: ImageView
-
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var prefListener: SharedPreferences.OnSharedPreferenceChangeListener
-
-    private var listenerRegistered = false
-
-    private val requiredPermissions = mutableListOf(
-        Manifest.permission.READ_CONTACTS,
-        Manifest.permission.READ_PHONE_STATE,
-        Manifest.permission.READ_CALL_LOG
-    ).apply {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            add(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }.toTypedArray()
-
-    private val setDefaultCallScreenerResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            Toast.makeText(this, "Set as default call screener", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Failed to set as default call screener", Toast.LENGTH_SHORT).show()
-        }
-        checkPermissionsAndRoles()
-    }
-
-    private val permissionsResult = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val allGranted = permissions.entries.all { it.value }
-        if (allGranted) {
-            Toast.makeText(this, "All permissions granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Some permissions denied", Toast.LENGTH_SHORT).show()
-        }
-        checkPermissionsAndRoles()
-    }
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        initializeViews()
-        setupBottomNavigation()
-        setupButtons()
-        updateAllColors()
-        registerPreferenceListener()
-        checkPermissionsAndRoles()
+        // Initialize views
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.navigation_view)
+        toolbar = findViewById(R.id.toolbar)
 
-        if (savedInstanceState == null) {
-            showFragment(RecentCallsFragment())
-        }
-    }
+        // Set up toolbar
+        setSupportActionBar(toolbar)
 
-    override fun onResume() {
-        super.onResume()
-        checkPermissionsAndRoles()
-        updateAllColors()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (listenerRegistered) {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefListener)
-            listenerRegistered = false
-        }
-    }
-
-    private fun initializeViews() {
-        statusText = findViewById(R.id.statusText)
-        statusTextView = findViewById(R.id.statusTextView)
-        multiPointHubButton = findViewById(R.id.multiPointHubButton)
-        helpButton = findViewById(R.id.helpButton)
-        setDefaultButton = findViewById(R.id.setDefaultButton)
-        requestPermissionsButton = findViewById(R.id.requestContactsButton) // Reusing the same ID for simplicity
-        manageBlockedNumbersButton = findViewById(R.id.manageBlockedNumbersButton)
-        bottomNavigation = findViewById(R.id.bottom_navigation)
-        footerLogo = findViewById(R.id.footerLogo)
-    }
-
-    private fun setupBottomNavigation() {
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_blocked -> showFragment(BlockedNumbersFragment())
-                R.id.nav_recent -> showFragment(RecentCallsFragment())
-                R.id.nav_settings -> showFragment(SettingsFragment())
-            }
-            true
-        }
-    }
-
-    private fun setupButtons() {
-        multiPointHubButton.setOnClickListener {
-            Toast.makeText(this, "Multi-Point Hub coming soon!", Toast.LENGTH_SHORT).show()
-        }
-        helpButton.setOnClickListener {
-            Toast.makeText(this, "Help / Guide coming soon!", Toast.LENGTH_SHORT).show()
-        }
-        setDefaultButton.setOnClickListener {
-            requestSetDefaultCallScreener()
-        }
-        requestPermissionsButton.setOnClickListener {
-            requestRequiredPermissions()
-        }
-        manageBlockedNumbersButton.setOnClickListener {
-            showFragment(BlockedNumbersFragment())
-        }
-    }
-
-    private fun registerPreferenceListener() {
-        if (listenerRegistered) return
-        prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key?.startsWith("shield_") == true) {
-                updateAllColors()
-            }
-        }
-        sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener)
-        listenerRegistered = true
-    }
-
-    private fun updateAllColors() {
-        updateBottomNavColor()
-        updateGlobalButtonColors()
-        updateFooterLogoTint()
-    }
-
-    private fun updateBottomNavColor() {
-        val customColor = getThemeColor()
-        val colorStateList = ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf(-android.R.attr.state_checked)),
-            intArrayOf(customColor, Color.WHITE)
+        // Set up navigation drawer toggle
+        val toggle = ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
-        bottomNavigation.itemIconTintList = colorStateList
-        bottomNavigation.itemTextColor = colorStateList
-    }
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
 
-    private fun updateFooterLogoTint() {
-        val customColor = getThemeColor()
-        footerLogo.setColorFilter(customColor)
-    }
+        // Set up navigation view listener
+        navigationView.setNavigationItemSelectedListener(this)
 
-    private fun getThemeColor(): Int {
-        val red = sharedPreferences.getInt("shield_red", 66)
-        val green = sharedPreferences.getInt("shield_green", 133)
-        val blue = sharedPreferences.getInt("shield_blue", 244)
-        return Color.rgb(red, green, blue)
-    }
-
-    private fun updateGlobalButtonColors() {
-        val customColor = getThemeColor()
-        val root = findViewById<ViewGroup>(android.R.id.content)
-        applyThemeToView(root, customColor)
-    }
-
-    private fun applyThemeToView(view: View, color: Int) {
-        when (view) {
-            is MaterialButton -> {
-                view.backgroundTintList = ColorStateList.valueOf(color)
-                view.setTextColor(Color.WHITE)
-            }
-            is ImageButton -> {
-                view.setColorFilter(color)
-            }
-        }
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) {
-                applyThemeToView(view.getChildAt(i), color)
-            }
+        // Load the default fragment (Dashboard)
+        if (savedInstanceState == null) {
+            loadFragment(DashboardFragment(), "Dashboard")
+            navigationView.setCheckedItem(R.id.nav_dashboard)
         }
     }
 
-    private fun checkPermissionsAndRoles() {
-        val isDefaultCallScreener = isDefaultCallScreener()
-        val hasAllPermissions = hasAllRequiredPermissions()
-
-        if (isDefaultCallScreener && hasAllPermissions) {
-            statusText.text = "● Active"
-            statusText.setTextColor(Color.parseColor("#00C853"))
-            statusTextView.text = "SignalGate protection is fully active."
-            setDefaultButton.visibility = View.GONE
-            requestPermissionsButton.visibility = View.GONE
-            manageBlockedNumbersButton.visibility = View.GONE
-            bottomNavigation.visibility = View.VISIBLE
-        } else {
-            statusText.text = "● Setup Required"
-            statusText.setTextColor(Color.parseColor("#F44336"))
-            statusTextView.text = "Complete setup steps below to activate SignalGate."
-            setDefaultButton.visibility = if (!isDefaultCallScreener) View.VISIBLE else View.GONE
-            requestPermissionsButton.visibility = if (!hasAllPermissions) View.VISIBLE else View.GONE
-            requestPermissionsButton.text = "Request Permissions"
-            manageBlockedNumbersButton.visibility = View.VISIBLE
-            bottomNavigation.visibility = View.GONE
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        val fragment: Fragment? = when (item.itemId) {
+            R.id.nav_dashboard -> DashboardFragment()
+            R.id.nav_sources -> SourcesFragment()
+            R.id.nav_call_log -> CallLogFragment()
+            R.id.nav_block_list -> BlockListFragment()
+            R.id.nav_settings -> SettingsFragment()
+            R.id.nav_audit_log -> AuditLogFragment()
+            R.id.nav_about -> AboutFragment()
+            else -> null
         }
+
+        if (fragment != null) {
+            loadFragment(fragment, item.title.toString())
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START)
+        return true
     }
 
-    private fun showFragment(fragment: Fragment) {
+    /**
+     * Loads a fragment into the main container.
+     */
+    private fun loadFragment(fragment: Fragment, title: String) {
+        supportActionBar?.title = title
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
             .commit()
     }
 
-    private fun isDefaultCallScreener(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val roleManager = getSystemService(RoleManager::class.java)
-            roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            packageName == telecomManager.defaultDialerPackage
+            super.onBackPressed()
         }
-    }
-
-    private fun requestSetDefaultCallScreener() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val roleManager = getSystemService(RoleManager::class.java)
-            val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-            setDefaultCallScreenerResult.launch(intent)
-        } else {
-            val intent = Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
-            intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, packageName)
-            setDefaultCallScreenerResult.launch(intent)
-        }
-    }
-
-    private fun hasAllRequiredPermissions(): Boolean {
-        return requiredPermissions.all {
-            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    private fun requestRequiredPermissions() {
-        permissionsResult.launch(requiredPermissions)
     }
 }

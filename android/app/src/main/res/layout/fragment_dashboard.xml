@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_primary"
+    android:orientation="vertical">
+
+    <!-- Top Stats Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_secondary"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Shield Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="space_between"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shield Status"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/shield_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ACTIVE"
+                    style="@style/TextAppearance.SignalGate.Header"
+                    android:textColor="@color/status_low"
+                    android:textSize="18sp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <!-- Shield Icon -->
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_launcher"
+                android:contentDescription="Shield"
+                android:scaleType="centerInside"
+                android:tint="@color/accent_secondary" />
+
+        </LinearLayout>
+
+        <!-- Stats Grid -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:layout_marginTop="8dp">
+
+            <!-- Total Sources -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Sources"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/total_sources_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="8"
+                    style="@style/TextAppearance.SignalGate.Header"
+                    android:textSize="16sp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <!-- Total Entries -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Entries"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/total_entries_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="412,587"
+                    style="@style/TextAppearance.SignalGate.Header"
+                    android:textSize="16sp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <!-- Last Sync -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last Sync"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/last_sync_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2m ago"
+                    style="@style/TextAppearance.SignalGate.Header"
+                    android:textSize="16sp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <!-- Blocked Today -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Blocked Today"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/blocked_today_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="128"
+                    style="@style/TextAppearance.SignalGate.Header"
+                    android:textColor="@color/status_high"
+                    android:textSize="16sp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+        </GridLayout>
+
+    </LinearLayout>
+
+    <!-- Data Sources Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Section Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="space_between"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DATA SOURCES"
+                style="@style/TextAppearance.SignalGate.Muted"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:spacing="8dp">
+
+                <Button
+                    android:id="@+id/add_source_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="+ Add Source"
+                    android:textSize="12sp"
+                    android:backgroundTint="@color/accent_primary"
+                    android:textColor="@color/text_primary" />
+
+                <Button
+                    android:id="@+id/sync_all_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Sync All Now"
+                    android:textSize="12sp"
+                    android:backgroundTint="@color/accent_secondary"
+                    android:textColor="@color/text_primary" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Data Sources RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/data_sources_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

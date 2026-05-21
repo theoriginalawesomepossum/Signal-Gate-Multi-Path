@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.SignalGate.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Header with name and health icon -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="space_between"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/source_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Community Spam Feed"
+                    style="@style/TextAppearance.SignalGate.Header"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/source_type_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remote URL"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="11sp"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <!-- Health Icon -->
+            <ImageView
+                android:id="@+id/health_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:contentDescription="Health Status"
+                android:scaleType="centerInside"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Entries and Status Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="space_between"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/entries_count_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="127,854 Entries"
+                    style="@style/TextAppearance.SignalGate.Body"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/health_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Healthy"
+                    style="@style/TextAppearance.SignalGate.Body"
+                    android:textSize="12sp"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/last_synced_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last synced: 1m ago"
+                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textSize="11sp" />
+
+                <!-- Enable Switch -->
+                <Switch
+                    android:id="@+id/enable_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:spacing="4dp"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/sync_button"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="Sync"
+                android:textSize="11sp"
+                android:backgroundTint="@color/accent_primary"
+                android:textColor="@color/text_primary" />
+
+            <Button
+                android:id="@+id/more_button"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="⋮"
+                android:textSize="14sp"
+                android:backgroundTint="@color/background_secondary"
+                android:textColor="@color/text_primary"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
