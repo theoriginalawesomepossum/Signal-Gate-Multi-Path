@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_primary"
-    android:orientation="vertical">
+    android:background="@color/background_primary">
 
-    <!-- Top Stats Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background_secondary"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Shield Status -->
-        <LinearLayout
+        <!-- Header Row -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="space_between"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="24dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -30,8 +25,32 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="SIGNALGATE"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MULTI-PORT"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:letterSpacing="0.1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Shield Status"
-                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textColor="@color/text_muted"
                     android:textSize="12sp" />
 
                 <TextView
@@ -39,56 +58,46 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ACTIVE"
-                    style="@style/TextAppearance.SignalGate.Header"
                     android:textColor="@color/status_low"
-                    android:textSize="18sp"
-                    android:layout_marginTop="4dp" />
-
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+        </RelativeLayout>
 
-            <!-- Shield Icon -->
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@mipmap/ic_launcher"
-                android:contentDescription="Shield"
-                android:scaleType="centerInside"
-                android:tint="@color/accent_secondary" />
-
-        </LinearLayout>
-
-        <!-- Stats Grid -->
-        <GridLayout
+        <!-- Stats Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:rowCount="2"
-            android:layout_marginTop="8dp">
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="24dp">
 
             <!-- Total Sources -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="8dp">
-
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Sources"
-                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textColor="@color/text_muted"
                     android:textSize="11sp" />
-
                 <TextView
                     android:id="@+id/total_sources_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="8"
-                    style="@style/TextAppearance.SignalGate.Header"
-                    android:textSize="16sp"
-                    android:layout_marginTop="4dp" />
-
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enabled: 6"
+                    android:textColor="@color/text_muted"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <!-- Total Entries -->
@@ -96,25 +105,27 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="8dp">
-
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Entries"
-                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textColor="@color/text_muted"
                     android:textSize="11sp" />
-
                 <TextView
                     android:id="@+id/total_entries_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="412,587"
-                    style="@style/TextAppearance.SignalGate.Header"
-                    android:textSize="16sp"
-                    android:layout_marginTop="4dp" />
-
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Across all sources"
+                    android:textColor="@color/text_muted"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <!-- Last Sync -->
@@ -122,25 +133,27 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="8dp">
-
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Last Sync"
-                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textColor="@color/text_muted"
                     android:textSize="11sp" />
-
                 <TextView
                     android:id="@+id/last_sync_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2m ago"
-                    style="@style/TextAppearance.SignalGate.Header"
-                    android:textSize="16sp"
-                    android:layout_marginTop="4dp" />
-
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All sources OK"
+                    android:textColor="@color/text_muted"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <!-- Blocked Today -->
@@ -148,91 +161,210 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="8dp">
-
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Blocked Today"
-                    style="@style/TextAppearance.SignalGate.Muted"
+                    android:textColor="@color/text_muted"
                     android:textSize="11sp" />
-
                 <TextView
                     android:id="@+id/blocked_today_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="128"
-                    style="@style/TextAppearance.SignalGate.Header"
                     android:textColor="@color/status_high"
-                    android:textSize="16sp"
-                    android:layout_marginTop="4dp" />
-
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+12 vs yesterday"
+                    android:textColor="@color/text_muted"
+                    android:textSize="10sp" />
             </LinearLayout>
+        </LinearLayout>
 
-        </GridLayout>
-
-    </LinearLayout>
-
-    <!-- Data Sources Section -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <!-- Section Header -->
-        <LinearLayout
+        <!-- Data Sources Section Header -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="space_between"
-            android:orientation="horizontal"
             android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:text="DATA SOURCES"
-                style="@style/TextAppearance.SignalGate.Muted"
-                android:textSize="12sp" />
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:letterSpacing="0.1" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:spacing="8dp">
+                android:layout_alignParentEnd="true"
+                android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/add_source_button"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:text="+ Add Source"
-                    android:textSize="12sp"
-                    android:backgroundTint="@color/accent_primary"
-                    android:textColor="@color/text_primary" />
+                    android:textColor="@color/accent_primary"
+                    android:textSize="11sp"
+                    app:backgroundTint="#1A00A3FF" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/sync_all_button"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
                     android:text="Sync All Now"
-                    android:textSize="12sp"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:textColor="@color/text_primary" />
-
+                    android:textColor="@color/accent_secondary"
+                    android:textSize="11sp"
+                    app:backgroundTint="#1A00D1FF" />
             </LinearLayout>
+        </RelativeLayout>
 
-        </LinearLayout>
-
-        <!-- Data Sources RecyclerView -->
+        <!-- Data Sources List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/data_sources_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp" />
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
 
+        <!-- Footer Stats Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="24dp"
+            android:paddingTop="16dp"
+            android:background="@drawable/bg_footer_stats">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Benchmark Mode -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BENCHMARK MODE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CENTER-PORT"
+                        android:textColor="@color/status_medium"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Balanced Performance"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- Compatibility Mode -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="COMPATIBILITY MODE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BALANCED SHIELD"
+                        android:textColor="@color/accent_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Optimal for this device"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Sync Schedule -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SYNC SCHEDULE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Every 1 hour"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Next sync in 58m"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- Database Health -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DATABASE HEALTH"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Good"
+                        android:textColor="@color/status_low"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Optimized"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>
