@@ -3,14 +3,14 @@ package com.signalgate.multipoint.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.Switch
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.signalgate.multipoint.R
 import com.signalgate.multipoint.models.DataSource
+import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * DataSourceAdapter displays a list of data sources in a RecyclerView.
@@ -23,38 +23,47 @@ class DataSourceAdapter(private val dataSources: List<DataSource>) :
         private val sourceTypeText: TextView = itemView.findViewById(R.id.source_type_text)
         private val entriesCountText: TextView = itemView.findViewById(R.id.entries_count_text)
         private val healthStatusText: TextView = itemView.findViewById(R.id.health_status_text)
+        private val healthDetailText: TextView = itemView.findViewById(R.id.health_detail_text)
         private val lastSyncedText: TextView = itemView.findViewById(R.id.last_synced_text)
-        private val enableSwitch: Switch = itemView.findViewById(R.id.enable_switch)
-        private val syncButton: Button = itemView.findViewById(R.id.sync_button)
-        private val moreButton: Button = itemView.findViewById(R.id.more_button)
-        private val healthIcon: ImageView = itemView.findViewById(R.id.health_icon)
+        private val enableSwitch: SwitchMaterial = itemView.findViewById(R.id.enable_switch)
+        private val syncButton: ImageView = itemView.findViewById(R.id.sync_button)
+        private val moreButton: ImageView = itemView.findViewById(R.id.more_button)
+        private val sourceIcon: ImageView = itemView.findViewById(R.id.source_icon)
 
         fun bind(dataSource: DataSource) {
             sourceNameText.text = dataSource.name
             sourceTypeText.text = dataSource.type
-            entriesCountText.text = "${dataSource.entriesCount} Entries"
-            lastSyncedText.text = "Last synced: ${dataSource.lastSynced}"
+            
+            // Format entries count with commas
+            val formattedCount = NumberFormat.getNumberInstance(Locale.US).format(dataSource.entriesCount)
+            entriesCountText.text = formattedCount
+            
+            lastSyncedText.text = dataSource.lastSynced
             enableSwitch.isChecked = dataSource.isEnabled
+
+            // Set icon based on type
+            when (dataSource.type) {
+                "Remote URL" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_share)
+                "Local CSV" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_save)
+                else -> sourceIcon.setImageResource(android.R.drawable.ic_menu_help)
+            }
 
             // Set health status color and text
             when (dataSource.healthStatus) {
                 "Healthy" -> {
                     healthStatusText.text = "Healthy"
+                    healthDetailText.text = "Success"
                     healthStatusText.setTextColor(itemView.context.getColor(R.color.status_low))
-                    healthIcon.setImageResource(android.R.drawable.ic_menu_info_details)
-                    healthIcon.setColorFilter(itemView.context.getColor(R.color.status_low))
                 }
                 "Error" -> {
                     healthStatusText.text = "Error"
+                    healthDetailText.text = "Timeout"
                     healthStatusText.setTextColor(itemView.context.getColor(R.color.status_high))
-                    healthIcon.setImageResource(android.R.drawable.ic_dialog_alert)
-                    healthIcon.setColorFilter(itemView.context.getColor(R.color.status_high))
                 }
                 "Disabled" -> {
                     healthStatusText.text = "Disabled"
+                    healthDetailText.text = "Not in use"
                     healthStatusText.setTextColor(itemView.context.getColor(R.color.text_muted))
-                    healthIcon.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-                    healthIcon.setColorFilter(itemView.context.getColor(R.color.text_muted))
                 }
             }
 
