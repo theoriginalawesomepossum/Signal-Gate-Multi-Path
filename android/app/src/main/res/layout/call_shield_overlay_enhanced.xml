@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_gravity="center"
         app:cardElevation="0dp">
 
         <LinearLayout
@@ -192,12 +192,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical|space_between">
+                    android:gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/matched_sources_label"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Matched in 3 sources"
                         style="@style/TextAppearance.SignalGate.Body"
                         android:textSize="13sp" />
@@ -212,7 +213,7 @@
 
                 </LinearLayout>
 
-                <!-- Source Tags Container (Horizontal Scrollable) -->
+                <!-- Source Tags Container -->
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -226,7 +227,6 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
 
-                        <!-- Source Tags will be added programmatically -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -274,8 +274,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="16dp"
-                android:spacing="8dp">
+                android:layout_marginTop="16dp">
 
                 <Button
                     android:id="@+id/allow_button"
