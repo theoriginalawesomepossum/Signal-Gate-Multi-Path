@@ -70,4 +70,8 @@
 
     <dimen name="bottom_nav_height">64dp</dimen>
 
+    <dimen name="activity_horizontal_margin">@dimen/space_lg</dimen>
+    <dimen name="activity_vertical_margin">@dimen/space_lg</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+
 </resources>
