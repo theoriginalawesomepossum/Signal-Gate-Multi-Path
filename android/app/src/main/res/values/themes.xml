@@ -3,38 +3,44 @@
 
     <!-- Main App Theme -->
     <style name="Theme.SignalGate" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Color References (do NOT define colors here) -->
+
+        <!-- Material Colors -->
         <item name="colorPrimary">@color/accent_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/accent_secondary</item>
 
+        <!-- Backgrounds -->
         <item name="android:windowBackground">@color/background_primary</item>
         <item name="android:statusBarColor">@color/background_primary</item>
         <item name="android:navigationBarColor">@color/background_secondary</item>
+
+        <!-- Surface Colors -->
+        <item name="colorSurface">@color/card_background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
 
         <!-- Text Colors -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
 
-        <!-- Card / Surface -->
-        <item name="colorSurface">@color/card_background</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-
-        <!-- Custom attributes for your design system -->
+        <!-- Custom Design System Attributes -->
         <item name="background_primary">@color/background_primary</item>
         <item name="background_secondary">@color/background_secondary</item>
         <item name="card_background">@color/card_background</item>
         <item name="text_muted">@color/text_muted</item>
+
         <item name="accent_primary">@color/accent_primary</item>
         <item name="accent_secondary">@color/accent_secondary</item>
+
         <item name="overlay_glass">@color/overlay_glass</item>
         <item name="nav_selected">@color/nav_selected</item>
         <item name="divider_color">@color/divider_color</item>
+
         <item name="shield_active">@color/shield_active</item>
         <item name="shield_inactive">@color/shield_inactive</item>
+
     </style>
 
-    <!-- Optional: Dark theme variant -->
+    <!-- Optional Dark Theme Variant -->
     <style name="Theme.SignalGate.Dark" parent="Theme.SignalGate" />
 
 </resources>
