@@ -125,7 +125,6 @@ fun OperationalDashboard(
                 .padding(top = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FooterStatCard(label = "Benchmark Mode", value = "CENTER-PORT", modifier = Modifier.weight(1f))
             FooterStatCard(label = "Sync Schedule", value = "Every 1 hour", modifier = Modifier.weight(1f))
             FooterStatCard(label = "Database Health", value = "Good", modifier = Modifier.weight(1f))
         }
