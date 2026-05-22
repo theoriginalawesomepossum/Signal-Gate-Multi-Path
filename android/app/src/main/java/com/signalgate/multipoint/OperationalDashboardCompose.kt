@@ -53,7 +53,7 @@ fun OperationalDashboard(
             .padding(16.dp)
     ) {
         // Content container with minimum width to prevent jumbling
-        Column(modifier = Modifier.widthIn(min = 480.dp)) {
+        Column(modifier = Modifier.widthIn(min = 600.dp)) {
             // Header with title and action buttons
             Row(
                 modifier = Modifier
@@ -174,15 +174,16 @@ fun DataSourceCard(source: SourceEntity) {
             .clip(RoundedCornerShape(8.dp))
             .background(Color.White.copy(alpha = 0.05f))
             .padding(12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        // Name and Entries
+        Column(modifier = Modifier.width(160.dp)) {
             Text(
                 text = source.name,
                 color = Color.White,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
             Text(
                 text = "${source.entriesCount} entries",
@@ -190,7 +191,11 @@ fun DataSourceCard(source: SourceEntity) {
                 fontSize = 12.sp
             )
         }
-        Column(horizontalAlignment = Alignment.End) {
+        
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Health Status
+        Column(modifier = Modifier.width(100.dp)) {
             Text(
                 text = source.healthStatus,
                 color = if (source.healthStatus == "HEALTHY") Color.Green else Color.Yellow,
@@ -198,9 +203,46 @@ fun DataSourceCard(source: SourceEntity) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = formatLastSync(source.lastSynced),
+                text = "Status",
                 color = Color.White.copy(alpha = 0.7f),
-                fontSize = 12.sp
+                fontSize = 10.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Last Sync
+        Column(modifier = Modifier.width(100.dp)) {
+            Text(
+                text = formatLastSync(source.lastSynced),
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Last Synced",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 10.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Actions
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Simplified action placeholder for Compose
+            Box(
+                modifier = Modifier
+                    .size(40.dp, 24.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Green.copy(alpha = 0.3f))
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                tint = Color(0xFF00BCD4),
+                modifier = Modifier.size(20.dp)
             )
         }
     }
