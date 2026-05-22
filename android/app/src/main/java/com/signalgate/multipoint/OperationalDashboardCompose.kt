@@ -62,12 +62,28 @@ fun OperationalDashboard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-            Text(
-                text = "SIGNALGATE MULTI-PORT",
-                color = Color(0xFF00BCD4), // Cyan color
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.Shield_Logo),
+                    contentDescription = "Shield Logo",
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "SIGNALGATE",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "MULTI-PORT",
+                        color = Color(0xFF00BCD4), // Cyan color
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
