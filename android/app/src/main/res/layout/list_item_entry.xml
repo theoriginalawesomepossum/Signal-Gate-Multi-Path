@@ -54,7 +54,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="Delete entry"
-            app:icon="@android:drawable/ic_menu_delete"
+            app:icon="@drawable/ic_blocked"
             app:iconTint="@color/error"
             app:backgroundTint="@android:color/transparent"
             app:rippleColor="@color/surface_border"
