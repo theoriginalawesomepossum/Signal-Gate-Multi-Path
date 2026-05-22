@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background_primary">
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -19,6 +19,7 @@
             <include layout="@layout/toolbar_main" />
         </com.google.android.material.appbar.AppBarLayout>
 
+        <!-- Dashboard Content -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -43,7 +44,7 @@
                     <include layout="@layout/item_stat_card" android:id="@+id/stat_blocked_today" android:layout_weight="1" />
                 </LinearLayout>
 
-                <!-- Data Sources -->
+                <!-- Data Sources Section -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -75,13 +76,13 @@
         </androidx.core.widget.NestedScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- Navigation Drawer -->
+    <!-- Navigation Drawer - Using your existing files -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_menu" />
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
