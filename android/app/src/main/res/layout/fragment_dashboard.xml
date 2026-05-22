@@ -5,84 +5,85 @@
     android:layout_height="match_parent"
     android:background="@color/background_primary">
 
-    <LinearLayout
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:scrollbars="none">
 
-        <!-- Header Row -->
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp">
+            android:minWidth="480dp"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <!-- Header Row -->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="24dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SIGNALGATE"
-                    android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
 
-                <TextView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SIGNALGATE"
+                        android:textColor="@color/text_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MULTI-PORT"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:letterSpacing="0.1" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MULTI-PORT"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:letterSpacing="0.1" />
-            </LinearLayout>
+                    android:layout_alignParentEnd="true"
+                    android:gravity="end"
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Shield Status"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/shield_status_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ACTIVE"
+                        android:textColor="@color/status_low"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!-- Stats Row -->
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:gravity="end"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Shield Status"
-                    android:textColor="@color/text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/shield_status_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ACTIVE"
-                    android:textColor="@color/status_low"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <!-- Stats Row (Scrollable horizontally in portrait) -->
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:layout_marginBottom="24dp">
-            
-            <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:baselineAligned="false"
+                android:layout_marginBottom="24dp">
 
                 <!-- Total Sources -->
                 <LinearLayout
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingEnd="16dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -107,10 +108,10 @@
 
                 <!-- Total Entries -->
                 <LinearLayout
-                    android:layout_width="140dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingEnd="16dp">
+                    android:layout_weight="1.2"
+                    android:orientation="vertical">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -135,10 +136,10 @@
 
                 <!-- Last Sync -->
                 <LinearLayout
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingEnd="16dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -163,8 +164,9 @@
 
                 <!-- Blocked Today -->
                 <LinearLayout
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
                         android:layout_width="wrap_content"
@@ -188,111 +190,105 @@
                         android:textSize="10sp" />
                 </LinearLayout>
             </LinearLayout>
-        </HorizontalScrollView>
 
-        <!-- Data Sources Section Header -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Data Sources Section Header -->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="DATA SOURCES"
-                android:textColor="@color/text_muted"
-                android:textSize="12sp"
-                android:letterSpacing="0.1" />
+                android:layout_marginBottom="12dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="DATA SOURCES"
+                    android:textColor="@color/text_muted"
+                    android:textSize="12sp"
+                    android:letterSpacing="0.1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/add_source_button"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="+ Add Source"
+                        android:textColor="@color/accent_primary"
+                        android:textSize="11sp"
+                        app:backgroundTint="#1A00A3FF" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sync_all_button"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="8dp"
+                        android:text="Sync All Now"
+                        android:textColor="@color/accent_secondary"
+                        android:textSize="11sp"
+                        app:backgroundTint="#1A00D1FF" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!-- Data Sources List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/data_sources_recycler_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:orientation="horizontal">
+                android:nestedScrollingEnabled="false" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/add_source_button"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="+ Add Source"
-                    android:textColor="@color/accent_primary"
-                    android:textSize="11sp"
-                    app:backgroundTint="#1A00A3FF" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/sync_all_button"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="8dp"
-                    android:text="Sync All Now"
-                    android:textColor="@color/accent_secondary"
-                    android:textSize="11sp"
-                    app:backgroundTint="#1A00D1FF" />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <!-- Data Sources List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/data_sources_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
-
-        <!-- Footer Stats Section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="24dp"
-            android:paddingTop="16dp"
-            android:background="@drawable/bg_footer_stats">
-
-            <!-- Compatibility Mode -->
+            <!-- Footer Stats Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="COMPATIBILITY MODE"
-                    android:textColor="@color/text_muted"
-                    android:textSize="10sp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BALANCED SHIELD"
-                    android:textColor="@color/accent_primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Optimal for this device"
-                    android:textColor="@color/text_muted"
-                    android:textSize="10sp" />
-            </LinearLayout>
+                android:layout_marginTop="24dp"
+                android:paddingTop="16dp"
+                android:background="@drawable/bg_footer_stats">
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none">
-                
+                <!-- Compatibility Mode -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="COMPATIBILITY MODE"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BALANCED SHIELD"
+                        android:textColor="@color/accent_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Optimal for this device"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <!-- Sync Schedule -->
                     <LinearLayout
-                        android:layout_width="160dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingEnd="16dp">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -316,8 +312,9 @@
 
                     <!-- Database Health -->
                     <LinearLayout
-                        android:layout_width="160dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
@@ -340,7 +337,7 @@
                             android:textSize="10sp" />
                     </LinearLayout>
                 </LinearLayout>
-            </HorizontalScrollView>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </HorizontalScrollView>
 </androidx.core.widget.NestedScrollView>

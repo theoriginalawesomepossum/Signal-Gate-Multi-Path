@@ -43,20 +43,25 @@ fun OperationalDashboard(
 
     val lastSyncTime = if (dataSources.isEmpty()) "Never" else formatLastSync(dataSources.maxOfOrNull { it.lastSynced } ?: 0)
 
+    val horizontalScrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1a1a1a)) // Dark background
+            .horizontalScroll(horizontalScrollState)
             .padding(16.dp)
     ) {
-        // Header with title and action buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        // Content container with minimum width to prevent jumbling
+        Column(modifier = Modifier.widthIn(min = 480.dp)) {
+            // Header with title and action buttons
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             Text(
                 text = "SIGNALGATE MULTI-PORT",
                 color = Color(0xFF00BCD4), // Cyan color
@@ -87,19 +92,18 @@ fun OperationalDashboard(
             }
         }
 
-        // Stats Bar (Scrollable horizontally)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            StatCard(label = "Total Sources", value = totalSources.toString(), modifier = Modifier.width(120.dp))
-            StatCard(label = "Total Entries", value = totalEntries.toString(), modifier = Modifier.width(140.dp))
-            StatCard(label = "Last Sync", value = lastSyncTime, modifier = Modifier.width(120.dp))
-            StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.width(120.dp))
-        }
+            // Stats Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                StatCard(label = "Total Sources", value = totalSources.toString(), modifier = Modifier.weight(1f))
+                StatCard(label = "Total Entries", value = totalEntries.toString(), modifier = Modifier.weight(1.2f))
+                StatCard(label = "Last Sync", value = lastSyncTime, modifier = Modifier.weight(1f))
+                StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.weight(1f))
+            }
 
         // Data Sources Section
         Text(
@@ -121,16 +125,16 @@ fun OperationalDashboard(
             }
         }
 
-        // Footer Stats (Scrollable horizontally)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            FooterStatCard(label = "Sync Schedule", value = "Every 1 hour", modifier = Modifier.width(160.dp))
-            FooterStatCard(label = "Database Health", value = "Good", modifier = Modifier.width(160.dp))
+            // Footer Stats
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FooterStatCard(label = "Sync Schedule", value = "Every 1 hour", modifier = Modifier.weight(1f))
+                FooterStatCard(label = "Database Health", value = "Good", modifier = Modifier.weight(1f))
+            }
         }
     }
 }
