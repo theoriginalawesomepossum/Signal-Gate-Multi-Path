@@ -1,24 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
-    <style name="app_theme" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- ========================================================= -->
+    <!-- LEGACY NAMES (Required to fix build error) -->
+    <!-- ========================================================= -->
+    <color name="color_primary">#00A3FF</color>
+    <color name="color_primary_dark">#0066CC</color>
+    <color name="color_accent">#00D1FF</color>
 
-        <!-- Primary branding -->
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryVariant">@color/color_primary_dark</item>
-        <item name="colorSecondary">@color/color_accent</item>
+    <!-- Modern aliases -->
+    <color name="colorPrimary">@color/color_primary</color>
+    <color name="colorPrimaryDark">@color/color_primary_dark</color>
+    <color name="colorAccent">@color/color_accent</color>
 
-        <!-- Backgrounds -->
-        <item name="android:windowBackground">@color/background_primary</item>
-        <item name="colorSurface">@color/card_background</item>
+    <!-- ========================================================= -->
+    <!-- YOUR EXISTING DESIGN SYSTEM -->
+    <!-- ========================================================= -->
+    <color name="background_primary">#0A0E14</color>
+    <color name="background_secondary">#121A26</color>
+    <color name="card_background">#121A26</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A0AEC0</color>
+    <color name="text_muted">#718096</color>
 
-        <!-- Status/navigation bars -->
-        <item name="android:statusBarColor">@color/background_primary</item>
-        <item name="android:navigationBarColor">@color/background_primary</item>
+    <!-- New Glassmorphic UI Colors -->
+    <color name="accent_primary">#00A3FF</color>
+    <color name="accent_secondary">#00D1FF</color>
+    <color name="status_high">#FF4D4D</color>
+    <color name="status_medium">#FFA500</color>
+    <color name="status_low">#00C853</color>
+    <color name="overlay_glass">#CC121A26</color>
 
-        <!-- Text -->
-        <item name="android:textColor">@color/text_primary</item>
+    <!-- Additional Mockup Colors -->
+    <color name="nav_selected">#1A2B44</color>
+    <color name="divider_color">#1AFFFFFF</color>
+    <color name="shield_active">#00C853</color>
+    <color name="shield_inactive">#FF4D4D</color>
 
-    </style>
+    <!-- Neon extras for toolbar / highlights -->
+    <color name="neon_blue">#00D1FF</color>
+    <color name="neon_purple">#C084FC</color>
 
 </resources>
