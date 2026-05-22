@@ -10,28 +10,28 @@
     app:strokeColor="#1AFFFFFF"
     app:strokeWidth="1dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="450dp"
-        android:padding="12dp">
+        android:minWidth="600dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
         <!-- Icon -->
         <ImageView
             android:id="@+id/source_icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_centerVertical="true"
             android:src="@drawable/ic_multi_source"
             app:tint="@color/accent_primary" />
 
         <!-- Name and Type -->
         <LinearLayout
             android:id="@+id/name_container"
-            android:layout_width="wrap_content"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_toEndOf="@id/source_icon"
             android:orientation="vertical">
 
             <TextView
@@ -41,7 +41,9 @@
                 android:text="Community Spam Feed"
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/source_type_text"
@@ -55,10 +57,9 @@
         <!-- Entries Count -->
         <LinearLayout
             android:id="@+id/entries_container"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_toEndOf="@id/name_container"
+            android:layout_marginStart="16dp"
             android:orientation="vertical">
 
             <TextView
@@ -81,10 +82,9 @@
         <!-- Health Status -->
         <LinearLayout
             android:id="@+id/health_container"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_toEndOf="@id/entries_container"
+            android:layout_marginStart="16dp"
             android:orientation="vertical">
 
             <TextView
@@ -108,10 +108,9 @@
         <!-- Last Sync -->
         <LinearLayout
             android:id="@+id/sync_container"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_toEndOf="@id/health_container"
+            android:layout_marginStart="16dp"
             android:orientation="vertical">
 
             <TextView
@@ -131,12 +130,16 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
+        <!-- Spacer to push actions to the end -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
         <!-- Actions -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -150,21 +153,23 @@
 
             <ImageView
                 android:id="@+id/sync_button"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="8dp"
                 android:src="@drawable/ic_control"
+                android:padding="2dp"
                 app:tint="@color/accent_secondary" />
 
             <ImageView
                 android:id="@+id/more_button"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="8dp"
                 android:src="@drawable/ic_settings"
+                android:padding="2dp"
                 app:tint="@color/text_muted" />
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
