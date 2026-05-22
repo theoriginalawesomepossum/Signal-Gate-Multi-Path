@@ -16,7 +16,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:contentDescription="SignalGate Shield"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/shield_logo"
         android:scaleType="centerInside" />
 
     <!-- App Title -->

@@ -13,5 +13,6 @@
     app:titleTextColor="@color/neon_purple"
     app:subtitleTextColor="@color/text_secondary"
     app:navigationIconTint="@color/accent_primary"
+    app:logo="@drawable/shield_logo"
     app:menu="@menu/toolbar_menu"
     style="@style/Widget.Material3.Toolbar.Surface" />
