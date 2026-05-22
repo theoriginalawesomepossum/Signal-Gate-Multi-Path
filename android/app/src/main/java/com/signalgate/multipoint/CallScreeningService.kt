@@ -109,23 +109,24 @@ class CallScreeningService : CallScreeningService() {
      * Responds to the call with the specified decision.
      */
     private fun respondToCall(details: Call.Details, decision: CallDecision) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return
         val response = when (decision) {
             CallDecision.ALLOW -> {
-                Call.Details.CallScreeningCallResponse.Builder()
+                CallResponse.Builder()
                     .setDisallowCall(false)
                     .setSkipCallLog(false)
                     .setSkipNotification(false)
                     .build()
             }
             CallDecision.BLOCK -> {
-                Call.Details.CallScreeningCallResponse.Builder()
+                CallResponse.Builder()
                     .setDisallowCall(true)
                     .setSkipCallLog(true)
                     .setSkipNotification(true)
                     .build()
             }
             CallDecision.SCREEN -> {
-                Call.Details.CallScreeningCallResponse.Builder()
+                CallResponse.Builder()
                     .setDisallowCall(false)
                     .setSkipCallLog(false)
                     .setSkipNotification(false)
@@ -133,7 +134,7 @@ class CallScreeningService : CallScreeningService() {
             }
         }
 
-        respondToCall(details, response)
+        super.respondToCall(details, response)
     }
 
     /**

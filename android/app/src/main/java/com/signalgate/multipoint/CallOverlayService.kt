@@ -43,7 +43,7 @@ class CallOverlayService : Service() {
      */
     private fun initializeOverlay() {
         val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        overlayView = layoutInflater.inflate(R.layout.call_shield_overlay, null)
+        overlayView = layoutInflater.inflate(R.layout.call_shield_overlay_enhanced, null)
 
         val params = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams(
