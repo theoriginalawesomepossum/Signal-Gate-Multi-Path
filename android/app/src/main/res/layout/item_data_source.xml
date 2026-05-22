@@ -152,7 +152,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="8dp"
-                android:src="@android:drawable/ic_popup_sync"
+                android:src="@drawable/ic_control"
                 app:tint="@color/accent_secondary" />
 
             <ImageView
@@ -160,7 +160,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="8dp"
-                android:src="@android:drawable/ic_menu_more"
+                android:src="@drawable/ic_settings"
                 app:tint="@color/text_muted" />
         </LinearLayout>
 
