@@ -30,7 +30,7 @@ import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
         SyncHistoryEntry::class
     ],
     version = 1,
-    exportSchema = true
+    exportSchema = false
 )
 abstract class SignalGateDatabase : RoomDatabase() {
     abstract fun sourceDao(): SourceDao
