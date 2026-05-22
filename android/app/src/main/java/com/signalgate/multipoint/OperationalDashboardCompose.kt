@@ -64,7 +64,7 @@ fun OperationalDashboard(
             ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = R.drawable.Shield_Logo),
+                    painter = painterResource(id = R.drawable.shield_logo),
                     contentDescription = "Shield Logo",
                     modifier = Modifier.size(48.dp)
                 )
