@@ -55,4 +55,9 @@
     <color name="neon_blue">#00D1FF</color>
     <color name="neon_purple">#C084FC</color>
 
+    <!-- Compatibility Status Colors -->
+    <color name="error">#FF4D4D</color>
+    <color name="success">#00C853</color>
+    <color name="warning">#FFA500</color>
+
 </resources>
