@@ -72,4 +72,13 @@
     <item name="android:textColor">@android:color/white</item>
 
 </style>
+
+
+    <style name="TextAppearance.SignalGate.Caption"
+    parent="TextAppearance.Material3.BodySmall">
+
+    <item name="android:textColor">@color/text_secondary</item>
+
+</style>
+    
 </resources>
