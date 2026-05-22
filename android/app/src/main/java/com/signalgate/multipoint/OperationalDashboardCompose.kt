@@ -1,7 +1,9 @@
 package com.signalgate.multipoint
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -85,17 +87,18 @@ fun OperationalDashboard(
             }
         }
 
-        // Stats Bar
+        // Stats Bar (Scrollable horizontally)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            StatCard(label = "Total Sources", value = totalSources.toString(), modifier = Modifier.weight(1f))
-            StatCard(label = "Total Entries", value = totalEntries.toString(), modifier = Modifier.weight(1f))
-            StatCard(label = "Last Sync", value = lastSyncTime, modifier = Modifier.weight(1f))
-            StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.weight(1f))
+            StatCard(label = "Total Sources", value = totalSources.toString(), modifier = Modifier.width(120.dp))
+            StatCard(label = "Total Entries", value = totalEntries.toString(), modifier = Modifier.width(140.dp))
+            StatCard(label = "Last Sync", value = lastSyncTime, modifier = Modifier.width(120.dp))
+            StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.width(120.dp))
         }
 
         // Data Sources Section
@@ -118,15 +121,16 @@ fun OperationalDashboard(
             }
         }
 
-        // Footer Stats
+        // Footer Stats (Scrollable horizontally)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp),
+                .padding(top = 16.dp)
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FooterStatCard(label = "Sync Schedule", value = "Every 1 hour", modifier = Modifier.weight(1f))
-            FooterStatCard(label = "Database Health", value = "Good", modifier = Modifier.weight(1f))
+            FooterStatCard(label = "Sync Schedule", value = "Every 1 hour", modifier = Modifier.width(160.dp))
+            FooterStatCard(label = "Database Health", value = "Good", modifier = Modifier.width(160.dp))
         }
     }
 }
