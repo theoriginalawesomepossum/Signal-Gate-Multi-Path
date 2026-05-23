@@ -29,6 +29,7 @@ class DataSourceAdapter(private val dataSources: List<DataSource>) :
         private val syncButton: ImageView = itemView.findViewById(R.id.sync_button)
         private val moreButton: ImageView = itemView.findViewById(R.id.more_button)
         private val sourceIcon: ImageView = itemView.findViewById(R.id.source_icon)
+        private val ledIndicator: View = itemView.findViewById(R.id.source_led_indicator)
 
         fun bind(dataSource: DataSource) {
             sourceNameText.text = dataSource.name
@@ -39,32 +40,23 @@ class DataSourceAdapter(private val dataSources: List<DataSource>) :
             entriesCountText.text = formattedCount
             
             lastSyncedText.text = dataSource.lastSynced
+            
+            // Initial state
+            updateUiState(dataSource.isEnabled)
+            
+            // Set up switch listener
+            enableSwitch.setOnCheckedChangeListener(null) // Clear listener to avoid recursive calls
             enableSwitch.isChecked = dataSource.isEnabled
+            enableSwitch.setOnCheckedChangeListener { _, isChecked ->
+                updateUiState(isChecked)
+                // TODO: Persist this state to DB if needed
+            }
 
             // Set icon based on type
             when (dataSource.type) {
                 "Remote URL" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_share)
                 "Local CSV" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_save)
                 else -> sourceIcon.setImageResource(android.R.drawable.ic_menu_help)
-            }
-
-            // Set health status color and text
-            when (dataSource.healthStatus) {
-                "Healthy" -> {
-                    healthStatusText.text = "Healthy"
-                    healthDetailText.text = "Success"
-                    healthStatusText.setTextColor(itemView.context.getColor(R.color.status_low))
-                }
-                "Error" -> {
-                    healthStatusText.text = "Error"
-                    healthDetailText.text = "Timeout"
-                    healthStatusText.setTextColor(itemView.context.getColor(R.color.status_high))
-                }
-                "Disabled" -> {
-                    healthStatusText.text = "Disabled"
-                    healthDetailText.text = "Not in use"
-                    healthStatusText.setTextColor(itemView.context.getColor(R.color.text_muted))
-                }
             }
 
             // Set up button listeners
@@ -75,9 +67,21 @@ class DataSourceAdapter(private val dataSources: List<DataSource>) :
             moreButton.setOnClickListener {
                 // TODO: Show more options (edit, delete, etc.)
             }
+        }
 
-            enableSwitch.setOnCheckedChangeListener { _, isChecked ->
-                // TODO: Update source enabled status in database
+        private fun updateUiState(isEnabled: Boolean) {
+            if (isEnabled) {
+                ledIndicator.setBackgroundResource(R.drawable.bg_led_indicator)
+                ledIndicator.background.setTint(itemView.context.getColor(R.color.neon_blue))
+                healthStatusText.text = "Healthy"
+                healthDetailText.text = "Active"
+                healthStatusText.setTextColor(itemView.context.getColor(R.color.status_low))
+            } else {
+                ledIndicator.setBackgroundResource(R.drawable.bg_led_indicator)
+                ledIndicator.background.setTint(itemView.context.getColor(R.color.text_muted))
+                healthStatusText.text = "Disabled"
+                healthDetailText.text = "Inactive"
+                healthStatusText.setTextColor(itemView.context.getColor(R.color.text_muted))
             }
         }
     }

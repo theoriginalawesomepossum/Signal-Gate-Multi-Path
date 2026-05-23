@@ -11,12 +11,19 @@
     app:strokeWidth="1dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minWidth="600dp"
         android:orientation="horizontal"
         android:padding="12dp"
         android:gravity="center_vertical">
+
+        <!-- LED Indicator (Blue when active) -->
+        <View
+            android:id="@+id/source_led_indicator"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_led_indicator" />
 
         <!-- Icon -->
         <ImageView
@@ -29,9 +36,10 @@
         <!-- Name and Type -->
         <LinearLayout
             android:id="@+id/name_container"
-            android:layout_width="160dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_weight="1.5"
             android:orientation="vertical">
 
             <TextView
@@ -57,9 +65,10 @@
         <!-- Entries Count -->
         <LinearLayout
             android:id="@+id/entries_container"
-            android:layout_width="100dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -82,9 +91,10 @@
         <!-- Health Status -->
         <LinearLayout
             android:id="@+id/health_container"
-            android:layout_width="100dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -108,9 +118,10 @@
         <!-- Last Sync -->
         <LinearLayout
             android:id="@+id/sync_container"
-            android:layout_width="100dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -130,18 +141,13 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Spacer to push actions to the end -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
         <!-- Actions -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginStart="16dp">
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/enable_switch"
