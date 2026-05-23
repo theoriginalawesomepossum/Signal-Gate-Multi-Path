@@ -45,3 +45,22 @@
     <string name="blocked_number">Blocked: %s</string>
     <string name="whitelisted_number">Whitelisted: %s</string>
 </resources>
+
+    <!-- Data Sources -->
+    <string name="data_sources_title">DATA SOURCES</string>
+    <string name="add_source">+ Add Source</string>
+    <string name="sync_all">Sync All Now</string>
+    <string name="source_whitelist">App Whitelist</string>
+    <string name="source_blocklist">App Blocklist</string>
+    <string name="source_github_blocklist">GitHub Community Blocklist</string>
+    <string name="source_local_file_1">Local File 1</string>
+    <string name="source_local_file_2">Local File 2</string>
+    <string name="source_archived">Archived Spamlist</string>
+    <string name="source_remote_url_1">User Remote URL 1</string>
+    <string name="source_remote_url_2">User Remote URL 2</string>
+    <string name="source_status_active">Active</string>
+    <string name="source_status_inactive">Inactive</string>
+    <string name="source_status_enabled">Enabled</string>
+    <string name="source_status_disabled">Disabled</string>
+    <string name="led_indicator_on">LED On</string>
+    <string name="led_indicator_off">LED Off</string>

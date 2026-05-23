@@ -69,7 +69,7 @@
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/shield_status_text"
+                        android:id="@+id/active_shield_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ACTIVE"

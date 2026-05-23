@@ -6,17 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
 import com.signalgate.multipoint.adapters.DataSourceAdapter
 import com.signalgate.multipoint.models.DataSource
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
+import kotlinx.coroutines.launch
 
 /**
  * DashboardFragment displays the main operational overview of the app.
+ * Integrates with DashboardViewModel for state management and data persistence.
  */
 class DashboardFragment : Fragment() {
 
+    private val viewModel: DashboardViewModel by viewModels()
     private lateinit var dataSourceAdapter: DataSourceAdapter
     private val dataSources = mutableListOf<DataSource>()
 
@@ -33,7 +39,19 @@ class DashboardFragment : Fragment() {
 
         // Set up Data Sources RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.data_sources_recycler_view)
-        dataSourceAdapter = DataSourceAdapter(dataSources)
+        dataSourceAdapter = DataSourceAdapter(
+            dataSources,
+            viewModel,
+            onSourceToggled = { sourceId, isEnabled ->
+                // LED will update automatically via the ViewModel
+            },
+            onSyncClicked = { sourceId ->
+                // Sync is handled by ViewModel
+            },
+            onSettingsClicked = { sourceId ->
+                // TODO: Show settings dialog for this source
+            }
+        )
         recyclerView.adapter = dataSourceAdapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -42,6 +60,56 @@ class DashboardFragment : Fragment() {
         
         // Update top stats
         updateStats(view)
+        
+        // Observe ViewModel flows for real-time updates
+        observeViewModel(view)
+    }
+
+    /**
+     * Observes ViewModel flows for real-time updates to the UI.
+     */
+    private fun observeViewModel(view: View) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Observe total sources count
+            viewModel.totalSources.collect { count ->
+                val totalSourcesText = view.findViewById<TextView>(R.id.total_sources_text)
+                totalSourcesText?.text = count.toString()
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Observe total entries count
+            viewModel.totalEntries.collect { count ->
+                val totalEntriesText = view.findViewById<TextView>(R.id.total_entries_text)
+                totalEntriesText?.text = String.format("%,d", count)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Observe enabled sources count
+            viewModel.enabledSourcesCount.collect { count ->
+                val totalSourcesText = view.findViewById<TextView>(R.id.total_sources_text)
+                val subtitle = view.findViewById<TextView>(R.id.total_sources_text)?.parent?.let {
+                    (it as? android.view.ViewGroup)?.findViewWithTag<TextView>("enabled_count")
+                }
+                // Update enabled count in the stats section
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Observe blocked today
+            viewModel.blockedToday.collect { count ->
+                val blockedTodayText = view.findViewById<TextView>(R.id.blocked_today_text)
+                blockedTodayText?.text = count.toString()
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Observe LED states
+            viewModel.ledStates.collect { ledStates ->
+                // LED states are automatically handled by the adapter
+            }
+        }
     }
 
     /**

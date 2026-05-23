@@ -9,14 +9,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.signalgate.multipoint.R
 import com.signalgate.multipoint.models.DataSource
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
 /**
  * DataSourceAdapter displays a list of data sources in a RecyclerView.
+ * Integrates with DashboardViewModel for state management and LED indicator logic.
  */
-class DataSourceAdapter(private val dataSources: List<DataSource>) :
-    RecyclerView.Adapter<DataSourceAdapter.DataSourceViewHolder>() {
+class DataSourceAdapter(
+    private val dataSources: List<DataSource>,
+    private val viewModel: DashboardViewModel? = null,
+    private val onSourceToggled: ((sourceId: Int, isEnabled: Boolean) -> Unit)? = null,
+    private val onSyncClicked: ((sourceId: Int) -> Unit)? = null,
+    private val onSettingsClicked: ((sourceId: Int) -> Unit)? = null
+) : RecyclerView.Adapter<DataSourceAdapter.DataSourceViewHolder>() {
 
     inner class DataSourceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sourceNameText: TextView = itemView.findViewById(R.id.source_name_text)
@@ -41,6 +48,14 @@ class DataSourceAdapter(private val dataSources: List<DataSource>) :
             
             lastSyncedText.text = dataSource.lastSynced
             
+            // Set icon based on type
+            when (dataSource.type) {
+                "Remote URL" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_share)
+                "Local CSV" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_save)
+                "Local XLSX" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_save)
+                else -> sourceIcon.setImageResource(android.R.drawable.ic_menu_help)
+            }
+
             // Initial state
             updateUiState(dataSource.isEnabled)
             
@@ -49,38 +64,36 @@ class DataSourceAdapter(private val dataSources: List<DataSource>) :
             enableSwitch.isChecked = dataSource.isEnabled
             enableSwitch.setOnCheckedChangeListener { _, isChecked ->
                 updateUiState(isChecked)
-                // TODO: Persist this state to DB if needed
-            }
-
-            // Set icon based on type
-            when (dataSource.type) {
-                "Remote URL" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_share)
-                "Local CSV" -> sourceIcon.setImageResource(android.R.drawable.ic_menu_save)
-                else -> sourceIcon.setImageResource(android.R.drawable.ic_menu_help)
+                onSourceToggled?.invoke(dataSource.id, isChecked)
+                viewModel?.toggleSourceEnabled(dataSource.id, isChecked)
             }
 
             // Set up button listeners
             syncButton.setOnClickListener {
-                // TODO: Implement sync logic for this source
+                onSyncClicked?.invoke(dataSource.id)
+                viewModel?.syncSource(dataSource.id)
             }
 
             moreButton.setOnClickListener {
-                // TODO: Show more options (edit, delete, etc.)
+                onSettingsClicked?.invoke(dataSource.id)
+                // TODO: Show settings dialog or bottom sheet
             }
         }
 
         private fun updateUiState(isEnabled: Boolean) {
             if (isEnabled) {
+                // LED ON - Blue color
                 ledIndicator.setBackgroundResource(R.drawable.bg_led_indicator)
                 ledIndicator.background.setTint(itemView.context.getColor(R.color.neon_blue))
-                healthStatusText.text = "Healthy"
-                healthDetailText.text = "Active"
+                healthStatusText.text = "Active"
+                healthDetailText.text = "Enabled"
                 healthStatusText.setTextColor(itemView.context.getColor(R.color.status_low))
             } else {
+                // LED OFF - Gray/muted color
                 ledIndicator.setBackgroundResource(R.drawable.bg_led_indicator)
                 ledIndicator.background.setTint(itemView.context.getColor(R.color.text_muted))
-                healthStatusText.text = "Disabled"
-                healthDetailText.text = "Inactive"
+                healthStatusText.text = "Inactive"
+                healthDetailText.text = "Disabled"
                 healthStatusText.setTextColor(itemView.context.getColor(R.color.text_muted))
             }
         }
