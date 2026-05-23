@@ -44,7 +44,6 @@
     <string name="block_rule_added">Block rule added: %s</string>
     <string name="blocked_number">Blocked: %s</string>
     <string name="whitelisted_number">Whitelisted: %s</string>
-</resources>
 
     <!-- Data Sources -->
     <string name="data_sources_title">DATA SOURCES</string>
@@ -64,3 +63,5 @@
     <string name="source_status_disabled">Disabled</string>
     <string name="led_indicator_on">LED On</string>
     <string name="led_indicator_off">LED Off</string>
+
+</resources>
