@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.signalgate.multipoint.database.SignalGateDatabase
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import com.signalgate.multipoint.database.entities.SourceEntity
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -11,35 +12,39 @@ import java.util.Calendar
 
 /**
  * ViewModel for the Operational Dashboard.
- * Manages data flow between the SignalGateDatabase and the UI.
+ * Manages data flow between the repository and the UI.
  * Handles state management for data sources with toggle and LED logic.
  */
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = SignalGateDatabase.getInstance(application)
-    private val sourceDao = database.sourceDao()
-    private val entryDao = database.unifiedEntryDao()
+    private val repository = DataSourceRepository(
+        database.sourceDao(),
+        database.unifiedEntryDao()
+    )
     private val callLogDao = database.callLogDao()
 
     // Dashboard Stats
-    val totalSources: Flow<Int> = sourceDao.getSourceCount()
-    val totalEntries: Flow<Int> = entryDao.getTotalEntryCount()
+    val totalSources: Flow<Int> = repository.getSourceCount()
+    val totalEntries: Flow<Int> = repository.getTotalEntryCount()
     
     private val _blockedToday = MutableStateFlow(0)
     val blockedToday: StateFlow<Int> = _blockedToday.asStateFlow()
 
-    // Data Sources - flows directly from database
-    val dataSources: Flow<List<SourceEntity>> = sourceDao.getAllSources()
+    // Data Sources - flows directly from repository
+    val dataSources: Flow<List<SourceEntity>> = repository.getAllSources()
     
     // Enabled sources count for stats
-    val enabledSourcesCount: Flow<Int> = sourceDao.getAllSources()
-        .map { sources -> sources.count { it.isEnabled } }
+    val enabledSourcesCount: Flow<Int> = repository.getEnabledSourceCount()
+    
+    // Enabled sources entry count
+    val enabledSourcesEntryCount: Flow<Int> = repository.getEnabledSourcesEntryCount()
 
     // Sync Status
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
     
-    // LED state tracking - maps source ID to whether its LED should be on
+    // LED state tracking - maps source ID to whether its LED should be on (blue)
     private val _ledStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
     val ledStates: StateFlow<Map<Int, Boolean>> = _ledStates.asStateFlow()
 
@@ -50,12 +55,14 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     /**
      * Observes data sources and updates LED states based on enabled status.
+     * When a source is enabled, its LED will be blue. When disabled, it will be gray.
      */
     private fun observeDataSources() {
         viewModelScope.launch {
             dataSources.collect { sources ->
                 val newLedStates = mutableMapOf<Int, Boolean>()
                 sources.forEach { source ->
+                    // LED is ON (blue) when source is enabled
                     newLedStates[source.id] = source.isEnabled
                 }
                 _ledStates.value = newLedStates
@@ -82,10 +89,11 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     /**
      * Toggles the enabled state of a data source.
      * This will automatically update the LED indicator via the ledStates flow.
+     * The green slider (switch) controls whether the blue LED is on or off.
      */
     fun toggleSourceEnabled(sourceId: Int, isEnabled: Boolean) {
         viewModelScope.launch {
-            sourceDao.updateSourceEnabled(sourceId, isEnabled)
+            repository.toggleSourceEnabled(sourceId, isEnabled)
             // LED state will be updated automatically via the dataSources flow
         }
     }
@@ -99,10 +107,11 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             try {
                 // TODO: Implement actual sync logic via DataSyncEngine
                 // For now, we'll simulate a sync update
-                sourceDao.updateSourceSyncStatus(
-                    id = sourceId,
+                val entriesCount = repository.getEntryCountBySourceId(sourceId)
+                repository.updateSourceSyncStatus(
+                    sourceId = sourceId,
                     timestamp = System.currentTimeMillis(),
-                    entriesCount = entryDao.getEntryCountBySourceId(sourceId),
+                    entriesCount = entriesCount,
                     healthStatus = "HEALTHY"
                 )
             } finally {
@@ -121,10 +130,11 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                 // TODO: Implement actual sync all logic via DataSyncEngine
                 dataSources.first().forEach { source ->
                     if (source.isEnabled) {
-                        sourceDao.updateSourceSyncStatus(
-                            id = source.id,
+                        val entriesCount = repository.getEntryCountBySourceId(source.id)
+                        repository.updateSourceSyncStatus(
+                            sourceId = source.id,
                             timestamp = System.currentTimeMillis(),
-                            entriesCount = entryDao.getEntryCountBySourceId(source.id),
+                            entriesCount = entriesCount,
                             healthStatus = "HEALTHY"
                         )
                     }
@@ -137,6 +147,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     /**
      * Gets the LED state for a specific source.
+     * Returns true if the LED should be blue (source is enabled).
+     * Returns false if the LED should be gray (source is disabled).
      */
     fun getLedState(sourceId: Int): Boolean {
         return _ledStates.value[sourceId] ?: false
