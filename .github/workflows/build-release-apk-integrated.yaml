@@ -36,8 +36,8 @@ jobs:
   build:
     name: Build Release APK
     needs: test
-    runs-on: ubuntu-latest
-    
+    runs-on: macos-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,10 +50,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Get build timestamp
+        id: ts
+        run: echo "ts=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       - name: Build release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           cd android
           chmod +x gradlew
@@ -62,7 +67,6 @@ jobs:
       - name: Find APK Path
         id: find_apk
         run: |
-          # Dynamically find the APK to avoid naming mismatches (unsigned vs signed)
           APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
           if [ -z "$APK_PATH" ]; then
             echo "ERROR: No APK found!"
@@ -79,7 +83,7 @@ jobs:
           retention-days: 30
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: success()
         with:
           files: ${{ steps.find_apk.outputs.apk_path }}
@@ -87,7 +91,7 @@ jobs:
           body: |
             # Release APK Build #${{ github.run_number }}
             
-            **Build Date:** ${{ github.event.head_commit.timestamp }}
+            **Build Date:** ${{ steps.ts.outputs.ts }}
             **Branch:** ${{ github.event.inputs.branch || 'main' }}
             **Commit:** ${{ github.sha }}
             
