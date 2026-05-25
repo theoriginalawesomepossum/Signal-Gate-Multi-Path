@@ -31,7 +31,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew test --no-daemon
+          ./gradlew testDebugUnitTest --stacktrace --no-daemon
 
   build:
     name: Build Release APK
@@ -62,7 +62,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --stacktrace --info
 
       - name: Find APK Path
         id: find_apk
