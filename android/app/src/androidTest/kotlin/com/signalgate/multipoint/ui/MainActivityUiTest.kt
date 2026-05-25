@@ -21,10 +21,10 @@ class MainActivityUiTest {
     @Test
     fun mainActivity_launches_without_crashing() {
 
-        onView(withId(R.id.headerContainer))
+        onView(withId(R.id.drawer_layout))
             .check(matches(isDisplayed()))
 
-        onView(withId(R.id.bottom_navigation))
+        onView(withId(R.id.toolbar))
             .check(matches(isDisplayed()))
     }
 }

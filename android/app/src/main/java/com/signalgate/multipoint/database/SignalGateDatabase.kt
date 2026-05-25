@@ -74,7 +74,7 @@ abstract class SignalGateDatabase : RoomDatabase() {
  * This is a placeholder for database migrations.
  */
 val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // Example migration: add a new column
         // database.execSQL("ALTER TABLE sources ADD COLUMN new_column TEXT DEFAULT NULL")
     }

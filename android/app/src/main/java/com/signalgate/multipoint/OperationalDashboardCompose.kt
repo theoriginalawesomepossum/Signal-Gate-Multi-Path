@@ -35,13 +35,13 @@ import java.util.*
 fun OperationalDashboard(
     viewModel: DashboardViewModel = viewModel(),
     onAddSource: () -> Unit = {},
-    onSettingsClick: () -> Unit = {}
+    @Suppress("UNUSED_PARAMETER") onSettingsClick: () -> Unit = {}
 ) {
     val totalSources by viewModel.totalSources.collectAsState(initial = 0)
     val totalEntries by viewModel.totalEntries.collectAsState(initial = 0)
     val blockedToday by viewModel.blockedToday.collectAsState()
     val dataSources by viewModel.dataSources.collectAsState(initial = emptyList())
-    val isSyncing by viewModel.isSyncing.collectAsState()
+    @Suppress("UNUSED_VARIABLE") val isSyncing by viewModel.isSyncing.collectAsState()
 
     val lastSyncTime = if (dataSources.isEmpty()) "Never" else formatLastSync(dataSources.maxOfOrNull { it.lastSynced } ?: 0)
 

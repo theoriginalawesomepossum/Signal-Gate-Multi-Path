@@ -81,7 +81,7 @@ class CallScreeningService : CallScreeningService() {
     /**
      * Determines the call decision based on the Priority Hierarchy.
      */
-    private fun determineCallDecision(callInfo: CallInfo): CallDecision {
+    private fun determineCallDecision(@Suppress("UNUSED_PARAMETER") callInfo: CallInfo): CallDecision {
         // Priority 1: Check Manual Allow-list (Whitelist)
         // TODO: Query database for manual allow entries
 

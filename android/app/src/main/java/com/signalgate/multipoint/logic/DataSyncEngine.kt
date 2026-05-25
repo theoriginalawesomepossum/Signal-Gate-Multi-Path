@@ -163,7 +163,7 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
      * Parses an XLSX file and returns a list of UnifiedEntryEntity objects.
      * Note: This is a placeholder. Full XLSX parsing requires Apache POI library.
      */
-    private suspend fun parseXLSXFile(filePath: String): List<UnifiedEntryEntity> {
+    private suspend fun parseXLSXFile(@Suppress("UNUSED_PARAMETER") filePath: String): List<UnifiedEntryEntity> {
         return withContext(Dispatchers.IO) {
             // TODO: Implement XLSX parsing using Apache POI
             // For now, return empty list

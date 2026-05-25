@@ -1,6 +1,7 @@
 package com.signalgate.multipoint.ui
 
 import com.signalgate.multipoint.MainActivity
+import com.signalgate.multipoint.fragments.SettingsFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.signalgate.multipoint.R
@@ -14,7 +15,7 @@ class SettingsFragmentUiTest {
     fun settingsFragment_launches_without_crash() {
 
         launchFragmentInContainer<SettingsFragment>(
-            themeResId = R.style.Theme_AppCompat
+            themeResId = R.style.AppTheme
         )
     }
 }

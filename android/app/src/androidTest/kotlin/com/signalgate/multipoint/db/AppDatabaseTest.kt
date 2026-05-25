@@ -15,8 +15,8 @@ import java.io.IOException
 class AppDatabaseTest {
 
     private lateinit var db: AppDatabase
-    private lateinit var blockDao: BlockEntryDao
-    private lateinit var allowDao: AllowEntryDao
+    private lateinit var blockDao: BlockDao
+    private lateinit var allowDao: AllowDao
 
     @Before
     fun createDb() {
@@ -24,8 +24,8 @@ class AppDatabaseTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries() // for tests only
             .build()
-        blockDao = db.blockEntryDao()
-        allowDao = db.allowEntryDao()
+        blockDao = db.blockDao()
+        allowDao = db.allowDao()
     }
 
     @After
@@ -36,7 +36,7 @@ class AppDatabaseTest {
 
     @Test
     fun `insert and retrieve blocked number`() = runBlocking {
-        val block = BlockEntry(phoneNumber = "+18005551212", reason = "spam")
+        val block = BlockEntry(phoneNumber = "+18005551212", label = "spam")
         blockDao.insert(block)
 
         val allBlocks = blockDao.getAll()
