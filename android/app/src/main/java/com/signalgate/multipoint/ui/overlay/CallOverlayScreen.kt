@@ -2,6 +2,7 @@ package com.signalgate.multipoint.ui.overlay
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,12 +23,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.signalgate.multipoint.CallInfo
+import com.signalgate.multipoint.R
 import com.signalgate.multipoint.ui.theme.*
 
 @Composable
@@ -49,19 +52,43 @@ fun CallOverlayScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f)) // Semi-transparent background
-            .clickable(enabled = false) { } // Prevent clicks from passing through
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(enabled = false) { }
     ) {
         callInfo?.let { info ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center)
-                    .padding(24.dp)
+                    .padding(20.dp)
                     .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Top "Incoming call" label
+                Text(
+                    text = "Incoming call",
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                // Phone Number
+                Text(
+                    text = info.originalPhoneNumber,
+                    color = Color.White,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                
+                // Location/Country
+                Text(
+                    text = "United States", // Defaulting as shown in design
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
                 GlassmorphicCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -69,50 +96,111 @@ fun CallOverlayScreen(
                         modifier = Modifier.padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Caller Info
-                        Text(
-                            text = info.originalPhoneNumber,
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Incoming Call",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Risk Level and Heartbeat
-                        RiskIndicator(riskLevel = info.riskLevel ?: "UNKNOWN")
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Spam Status
-                        Text(
-                            text = info.spamStatus,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = getStatusColor(info.riskLevel),
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                        if (info.spamCategory != null) {
-                            Text(
-                                text = info.spamCategory,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary
-                            )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Shield Logo and Identity
+                            Box(
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color.White.copy(alpha = 0.05f))
+                                    .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.shield_logo),
+                                    contentDescription = null,
+                                    tint = getStatusColor(info.riskLevel),
+                                    modifier = Modifier.size(50.dp)
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.width(16.dp))
+                            
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = info.spamStatus,
+                                    color = getStatusColor(info.riskLevel),
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                                Text(
+                                    text = info.spamCategory ?: "Unknown",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Confidence: ${info.confidence ?: 0}%",
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontSize = 12.sp
+                                )
+                                LinearProgressIndicator(
+                                    progress = (info.confidence ?: 0) / 100f,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(4.dp)
+                                        .clip(CircleShape),
+                                    color = getStatusColor(info.riskLevel),
+                                    trackColor = Color.White.copy(alpha = 0.1f)
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.width(12.dp))
+                            
+                            // Risk Level Badge
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Box(
+                                    modifier = Modifier
+                                        .border(1.dp, getStatusColor(info.riskLevel).copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("RISK LEVEL", fontSize = 8.sp, color = getStatusColor(info.riskLevel))
+                                        Text(info.riskLevel ?: "LOW", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = getStatusColor(info.riskLevel))
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                HeartbeatGraphic(color = getStatusColor(info.riskLevel))
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(24.dp))
+                        Divider(color = Color.White.copy(alpha = 0.1f))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        // Confidence Progress
-                        ConfidenceSection(confidence = info.confidence ?: 0)
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Matched Sources Tags
-                        SourceTagsSection(sources = info.matchedSources)
+                        // Matched Sources Section
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Matched in ${info.matchedSources.size} sources",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Just now •",
+                                color = Color.Green,
+                                fontSize = 12.sp
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            info.matchedSources.forEach { source ->
+                                SourceTag(source)
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(24.dp))
 
@@ -122,22 +210,22 @@ fun CallOverlayScreen(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             ActionButton(
-                                text = "Allow",
-                                icon = Icons.Default.Check,
+                                text = "ALLOW",
+                                icon = Icons.Default.Call,
                                 color = StatusLow,
                                 modifier = Modifier.weight(1f),
                                 onClick = { viewModel.onAllowClicked() }
                             )
                             ActionButton(
-                                text = "Screen",
-                                icon = Icons.Default.Shield,
-                                color = AccentSecondary,
+                                text = "SCREEN",
+                                icon = Icons.Default.CastConnected,
+                                color = Color.Gray,
                                 modifier = Modifier.weight(1f),
                                 onClick = { viewModel.onScreenClicked() }
                             )
                             ActionButton(
-                                text = "Block",
-                                icon = Icons.Default.Block,
+                                text = "BLOCK",
+                                icon = Icons.Default.CallEnd,
                                 color = StatusHigh,
                                 modifier = Modifier.weight(1f),
                                 onClick = { viewModel.onBlockClicked() }
@@ -147,46 +235,86 @@ fun CallOverlayScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // More Details Toggle
-                        TextButton(onClick = { viewModel.toggleExpanded() }) {
-                            Text(
-                                text = if (isExpanded) "Less Details" else "More Details",
-                                color = AccentPrimary,
-                                fontWeight = FontWeight.Medium
-                            )
+                        Row(
+                            modifier = Modifier
+                                .clickable { viewModel.toggleExpanded() }
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Icon(
                                 imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                                 contentDescription = null,
-                                tint = AccentPrimary
+                                tint = Color.White.copy(alpha = 0.6f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "More Details",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = 14.sp
                             )
                         }
 
                         AnimatedVisibility(visible = isExpanded) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp)
-                            ) {
-                                Divider(color = Color.White.copy(alpha = 0.1f))
-                                Spacer(modifier = Modifier.height(16.dp))
+                            Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
                                 Text(
-                                    text = "Detailed Analysis",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "This number was flagged based on multiple reports from community feeds and telemarketer databases. Our AI engine detected high-frequency calling patterns consistent with robocalls.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = TextSecondary,
-                                    textAlign = TextAlign.Start
+                                    text = "Detailed threat intelligence from aggregated sources confirms high risk of fraudulent activity.",
+                                    color = Color.White.copy(alpha = 0.5f),
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
                     }
                 }
+                
+                Spacer(modifier = Modifier.height(40.dp))
+                
+                // Bottom Dial Buttons (Simulated)
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    DialButton(icon = Icons.Default.Call, color = Color.Green)
+                    DialButton(icon = Icons.Default.Message, color = Color.White)
+                    DialButton(icon = Icons.Default.CallEnd, color = Color.Red)
+                }
             }
         }
+    }
+}
+
+@Composable
+fun HeartbeatGraphic(color: Color) {
+    val infiniteTransition = rememberInfiniteTransition(label = "heartbeat")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
+    
+    Icon(
+        imageVector = Icons.Default.ShowChart,
+        contentDescription = null,
+        tint = color,
+        modifier = Modifier.size(24.dp).scale(scaleX = 1f, scaleY = scale)
+    )
+}
+
+@Composable
+fun DialButton(icon: ImageVector, color: Color) {
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .clip(CircleShape)
+            .background(if (color == Color.White) Color.White.copy(alpha = 0.2f) else color),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(imageVector = icon, contentDescription = null, tint = if (color == Color.White) Color.White else Color.White, modifier = Modifier.size(32.dp))
     }
 }
 
@@ -197,12 +325,12 @@ fun GlassmorphicCard(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(32.dp))
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color.White.copy(alpha = 0.15f),
-                        Color.White.copy(alpha = 0.05f)
+                        Color.White.copy(alpha = 0.12f),
+                        Color.White.copy(alpha = 0.04f)
                     )
                 )
             )
@@ -215,112 +343,10 @@ fun GlassmorphicCard(
                         Color.White.copy(alpha = 0.1f)
                     )
                 ),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(32.dp)
             )
-            .blur(0.dp) // Real-time blur is expensive, using semi-transparent background for now
     ) {
         content()
-    }
-}
-
-@Composable
-fun RiskIndicator(riskLevel: String) {
-    val infiniteTransition = rememberInfiniteTransition(label = "heartbeat")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scale"
-    )
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .clip(CircleShape)
-            .background(getStatusColor(riskLevel).copy(alpha = 0.1f))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Favorite,
-            contentDescription = null,
-            tint = getStatusColor(riskLevel),
-            modifier = Modifier
-                .size(16.dp)
-                .scale(if (riskLevel == "HIGH") scale else 1f)
-        )
-        Text(
-            text = "RISK LEVEL: $riskLevel",
-            style = MaterialTheme.typography.labelSmall,
-            color = getStatusColor(riskLevel),
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun ConfidenceSection(confidence: Int) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Text(
-                text = "Shield Confidence",
-                style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary
-            )
-            Text(
-                text = "$confidence%",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        LinearProgressIndicator(
-            progress = confidence / 100f,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .clip(CircleShape),
-            color = AccentPrimary,
-            trackColor = Color.White.copy(alpha = 0.1f)
-        )
-    }
-}
-
-@Composable
-fun SourceTagsSection(sources: List<String>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "MATCHED SOURCES",
-            style = MaterialTheme.typography.labelSmall,
-            color = TextMuted,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        // Simple FlowRow equivalent for Compose 1.5+
-        // If FlowRow is not available in the version, we use a Row with scroll
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (sources.isEmpty()) {
-                Text("None", color = TextMuted, style = MaterialTheme.typography.bodySmall)
-            } else {
-                sources.take(3).forEach { source ->
-                    SourceTag(source)
-                }
-                if (sources.size > 3) {
-                    SourceTag("+${sources.size - 3}")
-                }
-            }
-        }
     }
 }
 
@@ -328,14 +354,14 @@ fun SourceTagsSection(sources: List<String>) {
 fun SourceTag(text: String) {
     Surface(
         shape = RoundedCornerShape(8.dp),
-        color = Color.White.copy(alpha = 0.05f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        color = Color.White.copy(alpha = 0.08f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f))
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             style = MaterialTheme.typography.labelSmall,
-            color = TextSecondary
+            color = Color.White.copy(alpha = 0.9f)
         )
     }
 }
@@ -348,24 +374,18 @@ fun ActionButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = color.copy(alpha = 0.2f),
-            contentColor = color
-        ),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.4f)),
-        contentPadding = PaddingValues(0.dp)
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White.copy(alpha = 0.05f))
+            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(18.dp))
-            Text(text = text, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-        }
+        Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = text, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = color)
     }
 }
 
@@ -374,6 +394,6 @@ private fun getStatusColor(riskLevel: String?): Color {
         "HIGH" -> StatusHigh
         "MEDIUM" -> StatusMedium
         "LOW" -> StatusLow
-        else -> TextMuted
+        else -> AccentSecondary
     }
 }
