@@ -26,7 +26,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
+          cache: gradle
+          
       - name: Run Unit Tests
         run: |
           cd android
@@ -49,6 +50,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: gradle
 
       - name: Get build timestamp
         id: ts
