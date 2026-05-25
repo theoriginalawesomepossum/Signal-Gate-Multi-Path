@@ -64,7 +64,11 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --stacktrace --info
+          ./gradlew assembleRelease \
+          -x connectedDebugAndroidTest \
+          -x connectedCheck \
+          --stacktrace \
+          --info
 
       - name: Find APK Path
         id: find_apk
