@@ -33,12 +33,14 @@ class CallOverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, Saved
     private val viewModel = CallOverlayViewModel()
 
     private val lifecycleRegistry = LifecycleRegistry(this)
-    private val viewModelStore = ViewModelStore()
+    override val viewModelStore: ViewModelStore = ViewModelStore()
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
 
-    override val lifecycle: Lifecycle get() = lifecycleRegistry
-    override val viewModelStore: ViewModelStore get() = viewModelStore
-    override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
+    override val lifecycle: Lifecycle
+    get() = lifecycleRegistry
+
+    override val savedStateRegistry: SavedStateRegistry
+    get() = savedStateRegistryController.savedStateRegistry
 
     override fun onBind(intent: Intent?): IBinder? = null
 
