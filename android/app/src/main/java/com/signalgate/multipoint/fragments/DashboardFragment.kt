@@ -42,13 +42,13 @@ class DashboardFragment : Fragment() {
         dataSourceAdapter = DataSourceAdapter(
             dataSources,
             viewModel,
-            onSourceToggled = { @Suppress("UNUSED_PARAMETER") sourceId, @Suppress("UNUSED_PARAMETER") isEnabled ->
+            onSourceToggled = { _, _ ->
                 // LED will update automatically via the ViewModel
             },
-            onSyncClicked = { @Suppress("UNUSED_PARAMETER") sourceId ->
+            onSyncClicked = { _ ->
                 // Sync is handled by ViewModel
             },
-            onSettingsClicked = { @Suppress("UNUSED_PARAMETER") sourceId ->
+            onSettingsClicked = { _ ->
                 // TODO: Show settings dialog for this source
             }
         )
@@ -87,7 +87,7 @@ class DashboardFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             // Observe enabled sources count
-            viewModel.enabledSourcesCount.collect { @Suppress("UNUSED_PARAMETER") count ->
+            viewModel.enabledSourcesCount.collect { _ ->
                 @Suppress("UNUSED_VARIABLE") val totalSourcesText = view.findViewById<TextView>(R.id.total_sources_text)
                 @Suppress("UNUSED_VARIABLE") val subtitle = view.findViewById<TextView>(R.id.total_sources_text)?.parent?.let {
                     (it as? android.view.ViewGroup)?.findViewWithTag<TextView>("enabled_count")
@@ -106,7 +106,7 @@ class DashboardFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             // Observe LED states
-            viewModel.ledStates.collect { @Suppress("UNUSED_PARAMETER") ledStates ->
+            viewModel.ledStates.collect { _ ->
                 // LED states are automatically handled by the adapter
             }
         }

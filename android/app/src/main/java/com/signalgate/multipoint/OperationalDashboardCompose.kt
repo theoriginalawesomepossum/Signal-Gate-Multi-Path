@@ -31,17 +31,18 @@ import com.signalgate.multipoint.database.entities.SourceEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
 @Composable
 fun OperationalDashboard(
     viewModel: DashboardViewModel = viewModel(),
     onAddSource: () -> Unit = {},
-    @Suppress("UNUSED_PARAMETER") onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {}
 ) {
     val totalSources by viewModel.totalSources.collectAsState(initial = 0)
     val totalEntries by viewModel.totalEntries.collectAsState(initial = 0)
     val blockedToday by viewModel.blockedToday.collectAsState()
     val dataSources by viewModel.dataSources.collectAsState(initial = emptyList())
-    @Suppress("UNUSED_VARIABLE") val isSyncing by viewModel.isSyncing.collectAsState()
+    val isSyncing by viewModel.isSyncing.collectAsState()
 
     val lastSyncTime = if (dataSources.isEmpty()) "Never" else formatLastSync(dataSources.maxOfOrNull { it.lastSynced } ?: 0)
 
