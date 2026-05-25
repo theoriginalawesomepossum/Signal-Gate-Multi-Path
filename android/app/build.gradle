@@ -69,6 +69,17 @@ android {
     }
 }
 
+asks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir.absolutePath + "/compose_metrics",
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
+        ]
+    }
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
