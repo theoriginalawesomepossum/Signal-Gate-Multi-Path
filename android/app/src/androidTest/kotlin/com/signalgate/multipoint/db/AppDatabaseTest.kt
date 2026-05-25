@@ -35,7 +35,7 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun `insert and retrieve blocked number`() = runBlocking {
+    fun insertAndRetrieveBlockedNumber() = runBlocking {
         val block = BlockEntry(phoneNumber = "+18005551212", label = "spam")
         blockDao.insert(block)
 
@@ -45,7 +45,7 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun `allow list works independently`() = runBlocking {
+    fun allowListWorksIndependently() = runBlocking {
         val allow = AllowEntry(phoneNumber = "+13105551212")
         allowDao.insert(allow)
 

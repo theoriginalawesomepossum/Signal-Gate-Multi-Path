@@ -19,19 +19,19 @@ class CallScreeningServiceTest {
     }
 
     @Test
-    fun `blocks known spam number`() {
+    fun blocksKnownSpamNumber() {
         val blocked = listOf(BlockEntry(phoneNumber = "+18005551212", label = "spam"))
         assertTrue(shouldBlockCall("+1-800-555-1212", blocked))
     }
 
     @Test
-    fun `does not block safe number`() {
+    fun doesNotBlockSafeNumber() {
         val blocked = listOf(BlockEntry(phoneNumber = "+18005551212", label = "spam"))
         assertFalse(shouldBlockCall("+13105551212", blocked))
     }
 
     @Test
-    fun `handles null number gracefully`() {
+    fun handlesNullNumberGracefully() {
         val blocked = listOf<BlockEntry>()
         assertFalse(shouldBlockCall(null, blocked))
     }
