@@ -2,7 +2,6 @@ package com.signalgate.multipoint.ui.overlay
 
 import androidx.lifecycle.ViewModel
 import com.signalgate.multipoint.CallInfo
-import com.signalgate.multipoint.CallScreeningService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,8 +39,7 @@ class CallOverlayViewModel : ViewModel() {
      * Handles the Allow action.
      */
     fun onAllowClicked() {
-        // In a real implementation, this would communicate with the service or repository
-        // to record the decision and allow the call.
+        // Business logic to allow call would go here
         dismiss()
     }
 
@@ -49,8 +47,7 @@ class CallOverlayViewModel : ViewModel() {
      * Handles the Screen action.
      */
     fun onScreenClicked() {
-        // In a real implementation, this would communicate with the service or repository
-        // to record the decision and screen the call.
+        // Business logic to screen call would go here
         dismiss()
     }
 
@@ -58,8 +55,7 @@ class CallOverlayViewModel : ViewModel() {
      * Handles the Block action.
      */
     fun onBlockClicked() {
-        // In a real implementation, this would communicate with the service or repository
-        // to record the decision and block the call.
+        // Business logic to block call would go here
         dismiss()
     }
 

@@ -12,44 +12,40 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Color definitions based on colors.xml
-val BackgroundPrimary = Color(0xFF0A0E14)
-val BackgroundSecondary = Color(0xFF121A26)
+/**
+ * Custom Colors for SignalGate Multi-Port
+ * Based on the glassmorphic dark theme prototype.
+ */
+val BackgroundDark = Color(0xFF0A0E14)
+val SurfaceDark = Color(0xFF121A26)
+val GlassSurface = Color(0xCC121A26)
+val GlassBorder = Color(0x33FFFFFF)
+val GlassGlow = Color(0x1A00A3FF)
+
 val TextPrimary = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xFFA0AEC0)
 val TextMuted = Color(0xFF718096)
-val AccentPrimary = Color(0xFF00A3FF)
-val AccentSecondary = Color(0xFF00D1FF)
-val StatusHigh = Color(0xFFFF4D4D)
-val StatusMedium = Color(0xFFFFA500)
-val StatusLow = Color(0xFF00C853)
-val OverlayGlass = Color(0xCC121A26)
+
+val AccentPrimary = Color(0xFF00A3FF) // Electric Blue
+val AccentSecondary = Color(0xFF00D1FF) // Cyan
+
+// Status Colors
+val StatusHigh = Color(0xFFFF4D4D) // Red
+val StatusMedium = Color(0xFFFFA500) // Orange
+val StatusLow = Color(0xFF00C853) // Green
+val StatusActive = Color(0xFF00FF94) // Neon Green
 
 private val DarkColorScheme = darkColorScheme(
     primary = AccentPrimary,
     secondary = AccentSecondary,
     tertiary = StatusLow,
-    background = BackgroundPrimary,
-    surface = BackgroundSecondary,
+    background = BackgroundDark,
+    surface = SurfaceDark,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = TextPrimary,
     onSurface = TextPrimary,
-    error = StatusHigh
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = AccentPrimary,
-    secondary = AccentSecondary,
-    tertiary = StatusLow,
-    background = Color.White,
-    surface = Color(0xFFF7FAFC),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1A202C),
-    onSurface = Color(0xFF1A202C),
     error = StatusHigh
 )
 
@@ -68,6 +64,13 @@ val SignalGateTypography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.1.sp
+    ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
@@ -81,6 +84,13 @@ val SignalGateTypography = Typography(
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp
     ),
     labelSmall = TextStyle(
         fontFamily = FontFamily.Default,
@@ -96,7 +106,8 @@ fun SignalGateTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    // Force dark theme for now as per prototype design
+    val colorScheme = DarkColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
