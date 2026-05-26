@@ -65,6 +65,21 @@ class CallScreeningService : CallScreeningService() {
      */
     private suspend fun analyzeIncomingCall(phoneNumber: String): CallInfo {
         // TODO: Implement multi-source matching logic
+        
+        // For testing purposes, simulate a spam call for the number in the prototype
+        if (phoneNumber.contains("8005550199")) {
+            return CallInfo(
+                originalPhoneNumber = phoneNumber,
+                normalizedPhoneNumber = normalizePhoneNumber(phoneNumber),
+                spamStatus = "LIKELY SPAM",
+                spamCategory = "Telemarketing",
+                confidence = 92,
+                riskLevel = "HIGH",
+                matchedSources = listOf("Community Feed", "Telemarketer DB", "User Reports"),
+                callDecision = CallDecision.ALLOW
+            )
+        }
+
         // For now, return a placeholder CallInfo
         return CallInfo(
             originalPhoneNumber = phoneNumber,
