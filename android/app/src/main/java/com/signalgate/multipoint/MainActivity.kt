@@ -65,7 +65,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val fragment: Fragment? = when (item.itemId) {
             R.id.nav_dashboard -> DashboardFragment()
-            // Add other fragments here...
+            R.id.nav_settings -> {
+                val dash = DashboardFragment()
+                dash.arguments = Bundle().apply { putBoolean("show_permissions", true) }
+                dash
+            }
+            R.id.nav_sources -> DashboardFragment()
+            R.id.nav_call_log -> com.signalgate.multipoint.fragments.CallLogFragment()
+            R.id.nav_block_list -> com.signalgate.multipoint.fragments.BlockListFragment()
             else -> null
         }
 
