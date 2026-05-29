@@ -5,9 +5,12 @@ import com.signalgate.multipoint.db.PhoneEntryDao
 import com.signalgate.multipoint.db.SourceDao
 import javax.inject.Inject
 
+import dagger.hilt.android.qualifiers.ApplicationContext
+// ... existing imports
+
 class DataSourceRepository @Inject constructor(
-    private val phoneDao: PhoneEntryDao,
-    private val sourceDao: SourceDao
+    private val phoneDao: PhoneEntryDao
+    // private val sourceDao: SourceDao  // Comment out for now
 ) {
 
     private fun normalizePhoneNumber(raw: String): String {
