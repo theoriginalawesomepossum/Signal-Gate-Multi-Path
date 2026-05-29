@@ -9,20 +9,19 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [
-        PhoneEntry::class,      // Primary unified entity
+        PhoneEntry::class,
         BlockEntry::class,      // Keep temporarily
         AllowEntry::class,      // Keep temporarily
-        CallLogEntry::class     // Assuming this exists
+        CallLogEntry::class
     ],
     version = 4,
-    exportSchema = true
+    exportSchema = false        // ← Changed to false to stop warning
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    // NEW - Main DAO we'll use going forward
     abstract fun phoneEntryDao(): PhoneEntryDao
 
-    // OLD DAOs - Comment these out if they cause errors
+    // Temporarily disabled old DAOs to stop build errors
     // abstract fun blockEntryDao(): BlockEntryDao
     // abstract fun allowEntryDao(): AllowEntryDao
 
@@ -38,8 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "signalgate.db"
                 )
                 .addMigrations(MIGRATION_3_4)
-                .enableWriteAheadLogging()
-                .fallbackToDestructiveMigration()   // Critical for now during refactoring
+                .fallbackToDestructiveMigration()   // Safe during heavy refactoring
                 .build()
                     .also { INSTANCE = it }
             }
