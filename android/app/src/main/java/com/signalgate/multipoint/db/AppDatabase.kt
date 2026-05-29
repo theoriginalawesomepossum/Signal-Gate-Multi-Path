@@ -4,24 +4,24 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [
-        PhoneEntry::class,
-        // Keep BlockEntry temporarily for migration if needed
-        BlockEntry::class
+        PhoneEntry::class,      // New unified entity
+        BlockEntry::class,      // Keep temporarily for migration
+        AllowEntry::class,      // Keep temporarily
+        CallLogEntry::class
     ],
-    version = 3,           // ← Increment from current version
+    version = 4,                // Increment version
     exportSchema = true
 )
-@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun phoneEntryDao(): PhoneEntryDao
-    abstract fun blockEntryDao(): BlockEntryDao  // Keep temporarily
+    abstract fun blockEntryDao(): BlockEntryDao     // Keep for now
+    abstract fun allowEntryDao(): AllowEntryDao     // Keep for now
 
     companion object {
         @Volatile
@@ -34,9 +34,9 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "signalgate.db"
                 )
-                .addMigrations(MIGRATION_2_3)
-                .enableWriteAheadLogging()           // Performance
-                .fallbackToDestructiveMigration()    // TEMP for development
+                .addMigrations(MIGRATION_3_4)
+                .enableWriteAheadLogging()
+                .fallbackToDestructiveMigration()   // Safe for development phase
                 .build()
                     .also { INSTANCE = it }
             }
@@ -44,29 +44,13 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-// Migration from v2 to v3: Create unified table
-val MIGRATION_2_3 = object : Migration(2, 3) {
+// Migration example
+val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        // Create new unified table
+        // New table already created via PhoneEntry entity
         db.execSQL("""
-            CREATE TABLE IF NOT EXISTS phone_entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                phoneNumber TEXT NOT NULL,
-                action TEXT NOT NULL,
-                sourceId INTEGER,
-                isPattern INTEGER NOT NULL DEFAULT 0,
-                confidence INTEGER NOT NULL DEFAULT 0,
-                addedAt INTEGER NOT NULL DEFAULT 0,
-                metadata TEXT
-            )
+            CREATE INDEX IF NOT EXISTS index_phone_entries_phoneNumber 
+            ON phone_entries(phoneNumber)
         """)
-
-        // Create indexes
-        db.execSQL("CREATE INDEX IF NOT EXISTS index_phone_entries_phoneNumber ON phone_entries(phoneNumber)")
-        db.execSQL("CREATE INDEX IF NOT EXISTS index_phone_entries_phoneNumber_action ON phone_entries(phoneNumber, action)")
-        db.execSQL("CREATE INDEX IF NOT EXISTS index_phone_entries_sourceId ON phone_entries(sourceId)")
-
-        // TODO: Later migration script to copy data from BlockEntry/AllowEntry
-        // For now we use fallbackToDestructiveMigration during dev
     }
 }
