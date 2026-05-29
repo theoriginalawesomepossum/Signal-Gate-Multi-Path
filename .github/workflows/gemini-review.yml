@@ -7,6 +7,7 @@ on:
     types:
       - completed
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   issue_comment:
     types: [created]
 
@@ -42,14 +43,15 @@ jobs:
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: |
-            Review the generated Compose compiler metrics and summarize:
+            Review the generated Compose compiler metrics in compose-metrics-output/.
+
+            Summarize:
             1. Regressions compared to the previous baseline.
             2. Unstable or newly unstable composables.
             3. Likely causes of instability or recomposition growth.
             4. Files or patterns that likely need refactoring.
-            5. A short priority list of recommended fixes.
+            5. A short prioritized list of recommended fixes.
 
-            Use the following context:
-            - Compose metrics output is in compose-metrics-output/
-            - The repo contains a Compose metrics analysis workflow
-            - Focus on actionable feedback for Android/Jetpack Compose performance
+            Also compare the metrics findings against the repository's existing Android/Compose architecture and point out mismatches, suspicious patterns, or opportunities to reduce recomposition.
+
+            Keep the review concise, actionable, and specific to this repository.
