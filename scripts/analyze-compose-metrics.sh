@@ -1,6 +1,6 @@
 #!/bin/bash
 ##############################################################################
-# Compose Metrics Analyzer for SignalGate Multi-Port
+# Compose Metrics Analyzer Script - Improved for SignalGate
 ##############################################################################
 
 set -e  # Exit on error
@@ -8,7 +8,8 @@ set -e  # Exit on error
 SCRIPT_DIR="\( (cd " \)(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 ANDROID_DIR="$PROJECT_ROOT/android"
-METRICS_DIR="$ANDROID_DIR/app/build/compose_metrics"
+APP_BUILD_DIR="$ANDROID_DIR/app/build"
+METRICS_DIR="$APP_BUILD_DIR/compose_metrics"
 REPORTS_DIR="$PROJECT_ROOT/compose_metrics/reports"
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 REPORT_DIR="$REPORTS_DIR/metrics_$TIMESTAMP"
@@ -33,43 +34,43 @@ print_info()    { echo -e "${BLUE}ℹ️  $1${NC}"; }
 
 show_help() {
     cat << EOF
-Compose Metrics Analyzer for SignalGate
+Compose Metrics Analyzer for SignalGate Multi-Port
 
 USAGE:
     bash scripts/analyze-compose-metrics.sh [OPTIONS]
 
 OPTIONS:
-    --debug             Use Debug build (faster, default)
-    --release           Use Release build (slower)
+    --debug             Use Debug build (faster - RECOMMENDED)
+    --release           Use Release build (slower, more accurate)
     --clean             Clean before building
     --open              Open report directory after analysis
-    --help              Show this help
+    --help              Show this help message
 
 EXAMPLES:
     bash scripts/analyze-compose-metrics.sh --debug --open
-    bash scripts/analyze-compose-metrics.sh --clean
+    bash scripts/analyze-compose-metrics.sh --clean --debug
 EOF
 }
 
 check_prerequisites() {
     print_info "Checking prerequisites..."
     if [ ! -f "$ANDROID_DIR/gradlew" ]; then
-        print_error "Gradle wrapper not found!"
+        print_error "Gradle wrapper not found at $ANDROID_DIR/gradlew"
         exit 1
     fi
-    print_success "Prerequisites OK"
+    print_success "Gradle wrapper found"
 }
 
 clean_build() {
-    print_info "Cleaning previous build..."
+    print_info "Cleaning build..."
     cd "$ANDROID_DIR"
     ./gradlew clean --quiet
-    print_success "Clean completed"
+    print_success "Build cleaned"
 }
 
 build_with_metrics() {
     local variant=${1:-Debug}
-    print_info "Building :app:assemble$variant with Compose metrics..."
+    print_info "Building with Compose metrics ($variant variant)..."
     cd "$ANDROID_DIR"
     
     ./gradlew :app:assemble$variant \
@@ -77,47 +78,38 @@ build_with_metrics() {
         -PcomposeCompilerMetrics=true \
         --quiet
 
-    print_success "Build completed ($variant variant)"
+    print_success "Build completed successfully"
 }
 
 copy_metrics() {
-    print_info "Copying metrics files..."
+    print_info "Copying metrics to report directory..."
+    
     if [ ! -d "$METRICS_DIR" ]; then
         print_error "Metrics directory not found: $METRICS_DIR"
-        print_info "Tip: Make sure build.gradle has the compiler options enabled."
+        print_info "Tip: Ensure composeCompilerReports is enabled in build.gradle"
         exit 1
     fi
 
     mkdir -p "$REPORT_DIR"
-    cp -r "$METRICS_DIR"/* "$REPORT_DIR/" 2>/dev/null || true
+    cp "$METRICS_DIR"/*.txt "$REPORT_DIR/" 2>/dev/null || true
     print_success "Metrics copied to: $REPORT_DIR"
 }
 
-print_summary() {
-    print_header "COMPOSE METRICS SUMMARY"
-    echo "📁 Report Directory: $REPORT_DIR"
-    echo ""
-    if [ -f "$REPORT_DIR/classes.txt" ]; then
-        local unstable=$(grep -c "UNSTABLE" "$REPORT_DIR/classes.txt" || echo "0")
-        echo "🔍 Unstable Classes: $unstable"
-    fi
-    echo "💡 Next: Review *-composables.txt and *-classes.txt files"
-    echo ""
-}
+# ... (keep your existing generate_report, print_summary, open_directory functions)
 
-#############################################################################
-# Main
-#############################################################################
+##############################################################################
+# Main Script
+##############################################################################
 
-CLEAN=false
 VARIANT="Debug"
+CLEAN_BUILD=false
 OPEN_DIR=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --release) VARIANT="Release"; shift ;;
         --debug)   VARIANT="Debug"; shift ;;
-        --clean)   CLEAN=true; shift ;;
+        --release) VARIANT="Release"; shift ;;
+        --clean)   CLEAN_BUILD=true; shift ;;
         --open)    OPEN_DIR=true; shift ;;
         --help)    show_help; exit 0 ;;
         *)         print_error "Unknown option: $1"; show_help; exit 1 ;;
@@ -128,15 +120,25 @@ print_header "SIGNALGATE COMPOSE METRICS ANALYZER"
 
 check_prerequisites
 
-[ "$CLEAN" = true ] && clean_build
+if [ "$CLEAN_BUILD" = true ]; then
+    clean_build
+fi
 
 build_with_metrics "$VARIANT"
 copy_metrics
+
+# Run Python analyzer if available
+if [ -f "$PROJECT_ROOT/tools/metrics-analysis/analyze_metrics.py" ]; then
+    print_info "Running advanced Python analysis..."
+    python3 "$PROJECT_ROOT/tools/metrics-analysis/analyze_metrics.py" "$REPORT_DIR"
+else
+    print_warning "Python analyzer not found"
+fi
+
 print_summary
 
 if [ "$OPEN_DIR" = true ]; then
-    print_info "Opening report directory..."
-    if command -v open >/dev/null; then open "$REPORT_DIR"; fi
+    open_directory
 fi
 
 print_success "Analysis complete!"
