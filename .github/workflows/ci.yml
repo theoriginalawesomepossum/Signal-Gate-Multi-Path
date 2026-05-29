@@ -8,6 +8,9 @@ on:
       - develop
       - feature/compose-metrics-analysis
 
+permissions:
+  contents: read
+
 jobs:
   compose-metrics:
     runs-on: ubuntu-latest
@@ -33,10 +36,12 @@ jobs:
           chmod +x tools/metrics-analysis/analyze_metrics.py
 
       - name: Run Compose metrics analysis
+        shell: bash
         run: |
+          set -o pipefail
           mkdir -p compose-metrics-output
-          ./scripts/analyze-compose-metrics.sh > compose-metrics-output/script.log 2>&1 || true
-          python3 tools/metrics-analysis/analyze_metrics.py > compose-metrics-output/analyze_metrics.txt 2>&1 || true
+          ./scripts/analyze-compose-metrics.sh > compose-metrics-output/script.log 2>&1
+          python3 tools/metrics-analysis/analyze_metrics.py > compose-metrics-output/analyze_metrics.txt 2>&1
 
       - name: Upload Compose metrics artifacts
         uses: actions/upload-artifact@v4
