@@ -35,7 +35,7 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun insertAndRetrieveBlockedNumber() = runBlocking {
+    fun `insert and retrieve blocked number`() = runBlocking {
         val block = BlockEntry(phoneNumber = "+18005551212", label = "spam")
         blockDao.insert(block)
 
