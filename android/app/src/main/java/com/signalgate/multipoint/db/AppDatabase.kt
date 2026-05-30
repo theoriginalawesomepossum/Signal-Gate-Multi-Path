@@ -10,20 +10,18 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 @Database(
     entities = [
         PhoneEntry::class,
-        BlockEntry::class,      // Keep temporarily
-        AllowEntry::class,      // Keep temporarily
+        BlockEntry::class,
+        AllowEntry::class,
         CallLogEntry::class
     ],
     version = 4,
-    exportSchema = false        // ← Changed to false to stop warning
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun phoneEntryDao(): PhoneEntryDao
-
-    // Temporarily disabled old DAOs to stop build errors
-    // abstract fun blockEntryDao(): BlockEntryDao
-    // abstract fun allowEntryDao(): AllowEntryDao
+    abstract fun blockEntryDao(): BlockEntryDao
+    abstract fun allowEntryDao(): AllowEntryDao
 
     companion object {
         @Volatile
@@ -37,7 +35,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "signalgate.db"
                 )
                 .addMigrations(MIGRATION_3_4)
-                .fallbackToDestructiveMigration()   // Safe during heavy refactoring
+                .fallbackToDestructiveMigration()
                 .build()
                     .also { INSTANCE = it }
             }
@@ -45,7 +43,6 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-// Migration
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("""
