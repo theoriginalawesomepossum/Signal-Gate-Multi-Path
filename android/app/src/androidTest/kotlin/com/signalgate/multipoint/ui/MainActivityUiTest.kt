@@ -20,11 +20,10 @@ class MainActivityUiTest {
 
     @Test
     fun mainActivity_launches_without_crashing() {
-
         onView(withId(R.id.drawer_layout))
             .check(matches(isDisplayed()))
 
-        onView(withId(R.id.toolbar))
+        onView(withId(R.id.navigation_view))
             .check(matches(isDisplayed()))
     }
 }

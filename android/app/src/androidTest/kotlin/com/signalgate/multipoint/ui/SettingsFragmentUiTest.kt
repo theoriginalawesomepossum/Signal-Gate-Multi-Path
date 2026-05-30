@@ -15,7 +15,7 @@ class SettingsFragmentUiTest {
     fun settingsFragment_launches_without_crash() {
 
         launchFragmentInContainer<SettingsFragment>(
-            themeResId = com.google.android.material.R.style.Theme_MaterialComponents
+            themeResId = R.style.Theme_SignalGate
         )
     }
 }
