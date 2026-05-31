@@ -24,7 +24,9 @@ class DashboardFragment : Fragment() {
 
     private val viewModel: DashboardViewModel by viewModels()
     private lateinit var dataSourceAdapter: DataSourceAdapter
+    private lateinit var permissionsAdapter: PermissionsAdapter
     private val dataSources = mutableListOf<DataSource>()
+    private val permissions = mutableListOf<com.signalgate.multipoint.models.PermissionItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,32 +39,81 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set up Data Sources RecyclerView
+        // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.data_sources_recycler_view)
-        dataSourceAdapter = DataSourceAdapter(
-            dataSources,
-            viewModel,
-            onSourceToggled = { _, _ ->
-                // LED will update automatically via the ViewModel
-            },
-            onSyncClicked = { _ ->
-                // Sync is handled by ViewModel
-            },
-            onSettingsClicked = { _ ->
-                // TODO: Show settings dialog for this source
-            }
-        )
-        recyclerView.adapter = dataSourceAdapter
         recyclerView.layoutManager = LinearLayoutManager(context)
+        
+        // Initialize Adapters
+        dataSourceAdapter = DataSourceAdapter(dataSources, viewModel)
+        permissionsAdapter = PermissionsAdapter(permissions) { permission, _ ->
+            handlePermissionToggle(permission)
+        }
 
-        // Load sample data
-        loadSampleDataSources()
+        // Check if we should show Permissions or Data Sources
+        val showPermissions = arguments?.getBoolean("show_permissions", false) ?: false
+        if (showPermissions) {
+            view.findViewById<TextView>(R.id.section_header_text)?.text = "SYSTEM PERMISSIONS"
+            view.findViewById<View>(R.id.add_source_button)?.visibility = View.GONE
+            view.findViewById<View>(R.id.sync_all_button)?.visibility = View.GONE
+            
+            loadPermissions()
+            recyclerView.adapter = permissionsAdapter
+        } else {
+            loadSampleDataSources()
+            recyclerView.adapter = dataSourceAdapter
+        }
         
         // Update top stats
         updateStats(view)
         
         // Observe ViewModel flows for real-time updates
         observeViewModel(view)
+    }
+
+    private fun loadPermissions() {
+        permissions.clear()
+        val context = requireContext()
+        
+        permissions.add(com.signalgate.multipoint.models.PermissionItem(
+            1, "Overlay Permission", "Display over other apps for call shield", 
+            null, android.provider.Settings.canDrawOverlays(context), true
+        ))
+        
+        permissions.add(com.signalgate.multipoint.models.PermissionItem(
+            2, "Phone State", "Detect incoming calls", 
+            android.Manifest.permission.READ_PHONE_STATE,
+            androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        ))
+        
+        permissions.add(com.signalgate.multipoint.models.PermissionItem(
+            3, "Call Log", "Analyze call history for spam patterns", 
+            android.Manifest.permission.READ_CALL_LOG,
+            androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CALL_LOG) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        ))
+        
+        permissions.add(com.signalgate.multipoint.models.PermissionItem(
+            4, "Contacts", "Identify known callers to avoid false positives", 
+            android.Manifest.permission.READ_CONTACTS,
+            androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        ))
+        
+        permissionsAdapter.notifyDataSetChanged()
+    }
+
+    private fun handlePermissionToggle(permission: com.signalgate.multipoint.models.PermissionItem) {
+        if (permission.isSpecialSetting) {
+            if (permission.name == "Overlay Permission") {
+                val intent = android.content.Intent(
+                    android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    android.net.Uri.parse("package:${requireContext().packageName}")
+                )
+                startActivity(intent)
+            }
+        } else {
+            permission.androidPermission?.let {
+                requestPermissions(arrayOf(it), 100)
+            }
+        }
     }
 
     /**

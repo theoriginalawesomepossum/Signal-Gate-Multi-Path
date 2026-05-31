@@ -1,0 +1,29 @@
+review:
+  enabled: true
+  pull_request_open_review: true
+  comment_on_findings: true
+  minimum_severity: medium
+
+behavior:
+  prefer_repository_context: true
+  check_related_files: true
+  focus_on_build_breakers: true
+  focus_on_android_resource_consistency: true
+  allow_repetitive_repo_tasks: true
+
+ignore_paths:
+  - "**/build/**"
+  - "**/.gradle/**"
+  - "**/out/**"
+  - "**/generated/**"
+  - "**/*.keystore"
+  - "**/*.jks"
+  - "**/*.png"
+  - "**/*.jpg"
+  - "**/*.jpeg"
+  - "**/*.webp"
+
+prompting:
+  use_styleguide: true
+  use_repo_context: true
+  ask_before_large_refactors: true
