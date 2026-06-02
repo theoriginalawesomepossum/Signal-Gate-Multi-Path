@@ -1,95 +1,49 @@
 package com.signalgate.multipoint
 
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
-import android.view.MenuItem
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.navigation.NavigationView
-import com.signalgate.multipoint.fragments.DashboardFragment
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import com.signalgate.multipoint.ui.theme.SignalGateTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.signalgate.multipoint.OperationalDashboardCompose
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
+import org.koin.androidx.compose.koinViewModel
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var navigationView: NavigationView
-    private lateinit var toolbar: MaterialToolbar
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Handle back button press
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
+        super.onCreate(savedInstanceState)
+        setContent {
+            SignalGateTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainScreen()
                 }
             }
-        })
-
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        // Initialize views
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navigationView = findViewById(R.id.navigation_view)
-        toolbar = findViewById(R.id.toolbar)
-
-        // Set up toolbar
-        setSupportActionBar(toolbar)
-
-        // Drawer Toggle
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        navigationView.setNavigationItemSelectedListener(this)
-
-        // Load default Dashboard
-        if (savedInstanceState == null) {
-            loadFragment(DashboardFragment(), "Dashboard")
-            navigationView.setCheckedItem(R.id.nav_dashboard)
         }
     }
+}
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val fragment: Fragment? = when (item.itemId) {
-            R.id.nav_dashboard -> DashboardFragment()
-            R.id.nav_settings -> {
-                val dash = DashboardFragment()
-                dash.arguments = Bundle().apply { putBoolean("show_permissions", true) }
-                dash
-            }
-            R.id.nav_sources -> DashboardFragment()
-            R.id.nav_call_log -> com.signalgate.multipoint.fragments.CallLogFragment()
-            R.id.nav_block_list -> com.signalgate.multipoint.fragments.BlockListFragment()
-            else -> null
-        }
+@Composable
+fun MainScreen(viewModel: DashboardViewModel = koinViewModel()) {
+    val dataSources by viewModel.dataSources.collectAsState(initial = emptyList())
+    val totalSources by viewModel.totalSources.collectAsState(initial = 0)
+    val totalEntries by viewModel.totalEntries.collectAsState(initial = 0)
+    val blockedToday by viewModel.blockedToday.collectAsState(initial = 0)
 
-        if (fragment != null) {
-            loadFragment(fragment, item.title.toString())
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    private fun loadFragment(fragment: Fragment, title: String) {
-        supportActionBar?.title = title
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-    }
-
-
+    OperationalDashboardCompose(
+        dataSources = dataSources,
+        totalSources = totalSources,
+        totalEntries = totalEntries,
+        blockedToday = blockedToday,
+        onSyncAll = { viewModel.syncAllSources() },
+        onAddSource = { /* TODO */ }
+    )
 }
