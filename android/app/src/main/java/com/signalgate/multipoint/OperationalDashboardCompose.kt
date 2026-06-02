@@ -1,3 +1,4 @@
+import androidx.compose.runtime.Composable
 package com.signalgate.multipoint
 
 import androidx.compose.foundation.Image
