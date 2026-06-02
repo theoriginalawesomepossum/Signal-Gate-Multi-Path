@@ -26,6 +26,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.signalgate.multipoint.ui.overlay.CallOverlayScreen
 import com.signalgate.multipoint.ui.overlay.CallOverlayViewModel
 import com.signalgate.multipoint.ui.theme.SignalGateTheme
+import org.koin.android.ext.android.inject
 
 /**
  * CallOverlayService displays a transparent, glassmorphic overlay on incoming calls using Jetpack Compose.
@@ -35,7 +36,7 @@ class CallOverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, Saved
 
     private var windowManager: WindowManager? = null
     private var composeView: ComposeView? = null
-    private val viewModel = CallOverlayViewModel()
+    private val viewModel: CallOverlayViewModel by inject()
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     override val viewModelStore: ViewModelStore = ViewModelStore()

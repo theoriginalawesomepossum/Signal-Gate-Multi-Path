@@ -33,7 +33,7 @@ import com.signalgate.multipoint.ui.theme.*
 
 @Composable
 fun CallOverlayScreen(
-    viewModel: CallOverlayViewModel = viewModel(),
+    viewModel: CallOverlayViewModel = org.koin.androidx.compose.koinViewModel(),
     onDismiss: () -> Unit = {}
 ) {
     val callInfo by viewModel.callInfo.collectAsState()

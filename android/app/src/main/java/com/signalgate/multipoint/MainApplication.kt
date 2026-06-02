@@ -1,26 +1,18 @@
 package com.signalgate.multipoint
 
 import android.app.Application
-import android.os.Process
-import android.util.Log
+import com.signalgate.multipoint.di.appModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
-
     override fun onCreate() {
         super.onCreate()
-
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-
-            Log.e(
-                "SIGNALGATE_CRASH",
-                "Uncaught exception in thread: ${thread.name}",
-                throwable
-            )
-
-            throwable.printStackTrace()
-
-            Process.killProcess(Process.myPid())
-            System.exit(1)
+        startKoin {
+            androidLogger()
+            androidContext(this@MainApplication)
+            modules(appModule)
         }
     }
 }

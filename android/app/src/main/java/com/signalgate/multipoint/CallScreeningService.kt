@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Build
 import android.telecom.Call
 import android.telecom.CallScreeningService
+import org.koin.android.ext.android.inject
+import com.signalgate.multipoint.logic.CallScreeningEngine
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +21,7 @@ import kotlinx.coroutines.launch
  * 5. Default (Allow)
  */
 class CallScreeningService : CallScreeningService() {
+    private val screeningEngine: CallScreeningEngine by inject()
 
     companion object {
         private const val TAG = "SignalGateCallScreening"
@@ -64,53 +67,13 @@ class CallScreeningService : CallScreeningService() {
      * Analyzes an incoming call and returns a CallInfo object with spam status, confidence, etc.
      */
     private suspend fun analyzeIncomingCall(phoneNumber: String): CallInfo {
-        // TODO: Implement multi-source matching logic
-        
-        // For testing purposes, simulate a spam call for the number in the prototype
-        if (phoneNumber.contains("8005550199")) {
-            return CallInfo(
-                originalPhoneNumber = phoneNumber,
-                normalizedPhoneNumber = normalizePhoneNumber(phoneNumber),
-                spamStatus = "LIKELY SPAM",
-                spamCategory = "Telemarketing",
-                confidence = 92,
-                riskLevel = "HIGH",
-                matchedSources = listOf("Community Feed", "Telemarketer DB", "User Reports"),
-                callDecision = CallDecision.ALLOW
-            )
-        }
-
-        // For now, return a placeholder CallInfo
-        return CallInfo(
-            originalPhoneNumber = phoneNumber,
-            normalizedPhoneNumber = normalizePhoneNumber(phoneNumber),
-            spamStatus = "UNKNOWN",
-            spamCategory = null,
-            confidence = null,
-            riskLevel = null,
-            matchedSources = emptyList(),
-            callDecision = CallDecision.ALLOW
-        )
     }
 
     /**
      * Determines the call decision based on the Priority Hierarchy.
      */
-    private fun determineCallDecision(@Suppress("UNUSED_PARAMETER") callInfo: CallInfo): CallDecision {
-        // Priority 1: Check Manual Allow-list (Whitelist)
-        // TODO: Query database for manual allow entries
-
-        // Priority 2: Check Manual Block-list
-        // TODO: Query database for manual block entries
-
-        // Priority 3: Check Pattern/Prefix Rules
-        // TODO: Check for blocked prefixes (e.g., +1800, +44)
-
-        // Priority 4: Check Aggregated Data Sources
-        // TODO: Query database for entries from external sources
-
-        // Priority 5: Default to Allow
-        return CallDecision.ALLOW
+    private fun determineCallDecision(callInfo: CallInfo): CallDecision {
+        return callInfo.callDecision
     }
 
     /**
