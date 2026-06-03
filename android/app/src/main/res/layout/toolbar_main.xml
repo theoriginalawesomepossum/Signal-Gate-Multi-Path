@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.MaterialToolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background_primary"
+    android:minHeight="64dp"
+    android:elevation="8dp"
+    app:title="SIGNALGATE MULTI-PORT"
+    app:subtitle="BEST-IN-CLASS SECURITY CALL BLOCKING"
+    app:titleTextColor="@color/text_primary"
+    app:subtitleTextColor="@color/text_secondary"
+    app:navigationIconTint="@color/accent_primary"
+    app:menu="@menu/toolbar_menu"
+    style="@style/Widget.Material3.Toolbar.Surface" />
