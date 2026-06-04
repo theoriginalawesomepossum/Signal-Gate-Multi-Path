@@ -1,6 +1,6 @@
 #!/bin/bash
 ##############################################################################
-# SignalGate Multi-Port - Compose Metrics Analyzer (Enhanced)
+# SignalGate Multi-Port - Compose Metrics Analyzer (with Bootstrapper)
 ##############################################################################
 
 set -e
@@ -31,21 +31,11 @@ print_error()   { echo -e "${RED}❌ $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 print_info()    { echo -e "${BLUE}ℹ️  $1${NC}"; }
 
-show_help() {
-    cat << EOF
-SignalGate Compose Metrics Analyzer
-
-USAGE:
-    bash scripts/analyze-compose-metrics.sh [OPTIONS]
-
-OPTIONS:
-    --debug             Use Debug build (faster - RECOMMENDED)
-    --release           Use Release build
-    --clean             Clean before building
-    --open              Open report directory
-    --help              Show help
-EOF
-}
+# Use bootstrapper if available
+GRADLE_CMD="./gradlew"
+if [ -f "$PROJECT_ROOT/scripts/ensure-gradle.py" ]; then
+    GRADLE_CMD="$PROJECT_ROOT/scripts/ensure-gradle.py"
+fi
 
 check_prerequisites() {
     print_info "Checking prerequisites..."
@@ -59,16 +49,16 @@ check_prerequisites() {
 clean_build() {
     print_info "Cleaning build..."
     cd "$ANDROID_DIR"
-    ./gradlew clean --quiet
+    $GRADLE_CMD clean --quiet
     print_success "Clean completed"
 }
 
 build_with_metrics() {
     local variant=${1:-Debug}
-    print_info "Building :app:assemble$variant with metrics..."
+    print_info "Building with Compose metrics ($variant variant)..."
     cd "$ANDROID_DIR"
     
-    ./gradlew :app:assemble$variant \
+    $GRADLE_CMD :app:assemble$variant \
         -PcomposeCompilerReports=true \
         -PcomposeCompilerMetrics=true \
         --quiet
@@ -79,7 +69,7 @@ build_with_metrics() {
 copy_metrics() {
     print_info "Copying metrics..."
     if [ ! -d "$METRICS_DIR" ]; then
-        print_error "Metrics not found. Check build.gradle configuration."
+        print_error "Metrics directory not found. Check build configuration."
         exit 1
     fi
     mkdir -p "$REPORT_DIR"
@@ -89,7 +79,7 @@ copy_metrics() {
 
 print_summary() {
     print_header "ANALYSIS SUMMARY"
-    echo "📁 Report: $REPORT_DIR"
+    echo "📁 Report Directory: $REPORT_DIR"
     if [ -f "$REPORT_DIR/classes.txt" ]; then
         local unstable=$(grep -c "UNSTABLE" "$REPORT_DIR/classes.txt" || echo "0")
         echo "🔍 Unstable Classes: $unstable"
@@ -104,17 +94,18 @@ OPEN_DIR=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         --release) VARIANT="Release"; shift ;;
-        --debug) VARIANT="Debug"; shift ;;
-        --clean) CLEAN=true; shift ;;
-        --open) OPEN_DIR=true; shift ;;
-        --help) show_help; exit 0 ;;
-        *) print_error "Unknown option"; show_help; exit 1 ;;
+        --debug)   VARIANT="Debug"; shift ;;
+        --clean)   CLEAN=true; shift ;;
+        --open)    OPEN_DIR=true; shift ;;
+        --help)    echo "See help in script"; exit 0 ;;
+        *)         print_error "Unknown option: $1"; exit 1 ;;
     esac
 done
 
 print_header "SIGNALGATE COMPOSE METRICS ANALYZER"
 
 check_prerequisites
+
 [ "$CLEAN" = true ] && clean_build
 
 build_with_metrics "$VARIANT"
@@ -123,6 +114,8 @@ copy_metrics
 if [ -f "$PROJECT_ROOT/tools/metrics-analysis/analyze_metrics.py" ]; then
     print_info "Running Python analyzer..."
     python3 "$PROJECT_ROOT/tools/metrics-analysis/analyze_metrics.py" "$REPORT_DIR"
+else
+    print_warning "Python analyzer not found"
 fi
 
 print_summary
