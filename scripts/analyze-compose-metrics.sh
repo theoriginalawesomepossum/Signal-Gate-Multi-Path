@@ -5,7 +5,7 @@
 
 set -e
 
-SCRIPT_DIR="\( (cd " \)(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 ANDROID_DIR="$PROJECT_ROOT/android"
 METRICS_DIR="$ANDROID_DIR/app/build/compose_metrics"
@@ -14,16 +14,16 @@ TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 REPORT_DIR="$REPORTS_DIR/metrics_$TIMESTAMP"
 
 # Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+RED='\u001B[0;31m'
+GREEN='\u001B[0;32m'
+YELLOW='\u001B[1;33m'
+BLUE='\u001B[0;34m'
+NC='\u001B[0m'
 
 print_header() {
-    echo -e "\( {BLUE}======================================== \){NC}"
+    echo -e "${BLUE}========================================${NC}"
     echo -e "${BLUE}$1${NC}"
-    echo -e "\( {BLUE}======================================== \){NC}"
+    echo -e "${BLUE}========================================${NC}"
 }
 
 print_success() { echo -e "${GREEN}✅ $1${NC}"; }
