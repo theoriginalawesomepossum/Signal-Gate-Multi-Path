@@ -1,4 +1,4 @@
-name: Build Release APK
+nameless: Build Release APK
 
 on:
   workflow_dispatch:
@@ -40,6 +40,27 @@ jobs:
     runs-on: macos-latest
 
     steps:
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096M -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -48,27 +69,50 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Run Unit Tests
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew testDebugUnitTest --stacktrace --no-daemon
+
+  build:
+    name: Build Release APK
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
           java-version: '17'
           cache: gradle
 
       - name: Get build timestamp
         id: ts
-        run: echo "ts=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+        run: echo "ts=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
       - name: Build release APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        working-directory: android
         run: |
-          cd android
           chmod +x gradlew
           ./gradlew assembleRelease \
-          -x connectedDebugAndroidTest \
-          -x connectedCheck \
-          --stacktrace \
-          --info
+            -x connectedDebugAndroidTest \
+            -x connectedCheck \
+            --stacktrace \
+            --info
 
       - name: Find APK Path
         id: find_apk
@@ -78,7 +122,7 @@ jobs:
             echo "ERROR: No APK found!"
             exit 1
           fi
-          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
           echo "Found APK at: $APK_PATH"
 
       - name: Upload release APK to artifacts
@@ -91,48 +135,24 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: ${{ steps.find_apk.outputs.apk_path }}
           tag_name: release-${{ github.run_number }}
           body: |
             # Release APK Build #${{ github.run_number }}
-            
+
             **Build Date:** ${{ steps.ts.outputs.ts }}
             **Branch:** ${{ github.event.inputs.branch || 'main' }}
             **Commit:** ${{ github.sha }}
-            
+
             ## Status
-            - Unit Tests Passed
-            - Native Android Build Complete
-            
-            ## Installation Instructions
-            
-            1. Download the APK from this release
-            2. Transfer to your Android device
-            3. Enable "Unknown Sources" in Settings > Security
-            4. Open file manager and tap the APK to install
-            5. Grant permissions when prompted
-            
-            ## Notes
-            - Pure Native Android (Kotlin) build
-            - Optimized for distribution
-            - Not signed for Play Store (can be added later)
-            - Suitable for testing on devices
-            
-            ## For Play Store Submission
-            
-            To prepare for Play Store submission, you'll need to:
-            1. Create a keystore file for signing
-            2. Configure signing in build.gradle
-            3. Build a signed AAB (Android App Bundle)
-            4. Submit to Google Play Console
-            
-            Contact the developer for signing setup instructions.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - Unit tests passed
+            - Android release build complete
 
       - name: Print APK location
         run: |
           echo "Release APK built successfully!"
           echo "Location: ${{ steps.find_apk.outputs.apk_path }}"
-          echo "Size: $(du -h ${{ steps.find_apk.outputs.apk_path }} | cut -f1)"
+          echo "Size: $(du -h "${{ steps.find_apk.outputs.apk_path }}" | cut -f1)"
