@@ -1,10 +1,12 @@
 // Top-level build file
 buildscript {
     ext {
-        compileSdkVersion = 34
-        targetSdkVersion = 34
-        minSdkVersion = 21
-        buildToolsVersion = "34.0.0"
+        compileSdkVersion = 35
+        targetSdkVersion = 35
+        minSdkVersion = 24          // Raised for better security/modern features
+        buildToolsVersion = "35.0.0"
+        kotlinVersion = "1.9.24"
+        kspVersion = "1.9.24-1.0.20"
     }
 
     repositories {
@@ -13,9 +15,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.0'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24'
-        classpath 'com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.9.24-1.0.20'
+        classpath 'com.android.tools.build:gradle:8.5.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:$kspVersion"
     }
 }
 
@@ -26,7 +28,7 @@ allprojects {
     }
 }
 
-// Force consistent JVM target
+// Consistent Kotlin JVM target across all modules
 subprojects {
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {
@@ -35,6 +37,6 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
