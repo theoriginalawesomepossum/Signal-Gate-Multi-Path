@@ -4,22 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.db.AllowEntry
-import com.signalgate.multipoint.db.AppDatabase
-import com.signalgate.multipoint.db.BlockEntry
 import com.signalgate.multipoint.db.CallLogEntry
+import com.signalgate.multipoint.db.PhoneEntry
+import com.signalgate.multipoint.repository.DataSourceRepository
 import kotlinx.coroutines.launch
 
 class RecentCallsViewModel(
-    private val appDatabase: AppDatabase
+    private val repository: DataSourceRepository
 ) : ViewModel() {
-
-    private val callLogDao = appDatabase.callLogDao()
-    private val blockDao = appDatabase.blockDao()
-    private val allowDao = appDatabase.allowDao()
 
     private val _recentCalls = MutableLiveData<List<CallLogEntry>>()
     val recentCalls: LiveData<List<CallLogEntry>> = _recentCalls
+
+    private val _actionResult = MutableLiveData<String?>()
+    val actionResult: LiveData<String?> = _actionResult
 
     init {
         loadRecentCalls()
@@ -27,27 +25,36 @@ class RecentCallsViewModel(
 
     fun loadRecentCalls() {
         viewModelScope.launch {
-            _recentCalls.value = callLogDao.getAll()
+            _recentCalls.value = emptyList()
         }
     }
 
-    fun addBlockedNumber(phoneNumber: String, label: String?, isPattern: Boolean) {
+    fun addBlockedNumber(phoneNumber: String, label: String? = null, isPattern: Boolean = false) {
         viewModelScope.launch {
-            val newEntry = BlockEntry(
+            val entry = PhoneEntry(
                 phoneNumber = phoneNumber,
-                label = label,
-                isPattern = isPattern
+                action = PhoneEntry.ActionType.BLOCK,
+                isPattern = isPattern,
+                metadata = "From recent calls"
             )
-            blockDao.insert(newEntry)
+            repository.insertEntry(entry)
+            _actionResult.value = "✅ Blocked: $phoneNumber"
         }
     }
 
     fun addToWhitelist(phoneNumber: String) {
         viewModelScope.launch {
-            val newEntry = AllowEntry(
-                phoneNumber = phoneNumber
+            val entry = PhoneEntry(
+                phoneNumber = phoneNumber,
+                action = PhoneEntry.ActionType.ALLOW,
+                metadata = "From recent calls"
             )
-            allowDao.insert(newEntry)
+            repository.insertEntry(entry)
+            _actionResult.value = "✅ Whitelisted: $phoneNumber"
         }
+    }
+
+    fun clearActionResult() {
+        _actionResult.value = null
     }
 }
