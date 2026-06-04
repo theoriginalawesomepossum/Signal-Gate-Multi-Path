@@ -1,45 +1,3 @@
-nameless: Build Release APK
-
-on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to build'
-        required: false
-        default: 'main'
-
-permissions:
-  contents: write # Required for creating releases and uploading assets
-
-jobs:
-  test:
-    name: Run Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: gradle
-          
-      - name: Run Unit Tests
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew testDebugUnitTest --stacktrace --no-daemon
-
-  build:
-    name: Build Release APK
-    needs: test
-    runs-on: macos-latest
-
-    steps:
 name: Build Release APK
 
 on:
@@ -52,9 +10,6 @@ on:
 
 permissions:
   contents: write
-
-env:
-  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096M -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
 
 jobs:
   test:
@@ -101,11 +56,11 @@ jobs:
         run: echo "ts=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
       - name: Build release APK
+        working-directory: android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease \
@@ -146,10 +101,6 @@ jobs:
             **Build Date:** ${{ steps.ts.outputs.ts }}
             **Branch:** ${{ github.event.inputs.branch || 'main' }}
             **Commit:** ${{ github.sha }}
-
-            ## Status
-            - Unit tests passed
-            - Android release build complete
 
       - name: Print APK location
         run: |
