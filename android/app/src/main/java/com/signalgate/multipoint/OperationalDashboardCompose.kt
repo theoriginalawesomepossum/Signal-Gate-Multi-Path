@@ -1,6 +1,6 @@
-import androidx.compose.runtime.Composable
 package com.signalgate.multipoint
 
+import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
