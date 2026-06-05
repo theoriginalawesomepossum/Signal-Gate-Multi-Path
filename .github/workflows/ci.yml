@@ -1,6 +1,7 @@
 name: Compose Metrics CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
@@ -40,8 +41,19 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p compose-metrics-output
+          # Run the bash script which handles the build and initial analysis
           ./scripts/analyze-compose-metrics.sh > compose-metrics-output/script.log 2>&1
-          python3 tools/metrics-analysis/analyze_metrics.py > compose-metrics-output/analyze_metrics.txt 2>&1
+          
+          # Find the latest report directory created by the script
+          REPORT_DIR=$(ls -td compose_metrics/reports/metrics_* 2>/dev/null | head -n 1)
+          
+          if [ -n "$REPORT_DIR" ]; then
+            echo "Analyzing report in $REPORT_DIR"
+            python3 tools/metrics-analysis/analyze_metrics.py "$REPORT_DIR" --json compose-metrics-output/analysis.json > compose-metrics-output/analyze_metrics.txt 2>&1
+          else
+            echo "No report directory found in compose_metrics/reports/" >> compose-metrics-output/analyze_metrics.txt
+            exit 1
+          fi
 
       - name: Upload Compose metrics artifacts
         uses: actions/upload-artifact@v4

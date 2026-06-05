@@ -178,6 +178,24 @@ class ComposeMetricsAnalyzer:
             json.dump(analysis, f, indent=2, ensure_ascii=False)
         print(f"💾 JSON report saved: {output_file}")
 
+    def analyze(self) -> Dict[str, Any]:
+        """Perform full analysis of the metrics."""
+        if not self.validate():
+            return {}
+
+        classes = self.parse_classes()
+        composables = self.parse_composables()
+        metrics = self.calculate_metrics(classes, composables)
+        recommendations = self._get_recommendations(classes, composables, metrics)
+
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "metrics": metrics,
+            "classes": classes,
+            "composables": composables,
+            "recommendations": recommendations
+        }
+
 
 def main():
     if len(sys.argv) < 2:

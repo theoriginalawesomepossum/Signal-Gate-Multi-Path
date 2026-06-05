@@ -6,7 +6,7 @@ on:
       branch:
         description: 'Branch to build'
         required: false
-        default: 'main'
+        default: 'develop'
 
 permissions:
   contents: write  # Required for creating releases and uploading assets
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
+          ref: ${{ github.event.inputs.branch || github.ref_name }}
           
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
+          ref: ${{ github.event.inputs.branch || github.ref_name }}
           
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -102,7 +102,7 @@ jobs:
             # Release APK Build #${{ github.run_number }}
             
             **Build Date:** ${{ steps.ts.outputs.ts }}
-            **Branch:** ${{ github.event.inputs.branch || 'main' }}
+            **Branch:** ${{ github.event.inputs.branch || github.ref_name }}
             **Commit:** ${{ github.sha }}
             
             ## Status
