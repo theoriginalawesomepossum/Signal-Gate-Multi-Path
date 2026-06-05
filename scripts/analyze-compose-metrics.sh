@@ -6,7 +6,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ANDROID_DIR="$PROJECT_ROOT/android"
 METRICS_DIR="$ANDROID_DIR/app/build/compose_metrics"
 REPORTS_DIR="$PROJECT_ROOT/compose_metrics/reports"
