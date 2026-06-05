@@ -10,12 +10,12 @@ import zipfile
 import urllib.request
 from pathlib import Path
 
-GRADLE_VERSION = "8.5.0"
+GRADLE_VERSION = "8.5"
 GRADLE_URL = f"https://services.gradle.org/distributions/gradle-{GRADLE_VERSION}-bin.zip"
 
 def ensure_gradle() -> str:
     """Ensure Gradle is available and return binary path."""
-    gradle_home = Path(os.environ.get("GRADLE_USER_HOME", "\~/.gradle")).expanduser()
+    gradle_home = Path(os.environ.get("GRADLE_USER_HOME", "~/.gradle")).expanduser()
     gradle_dist = gradle_home / "wrapper" / "dists" / f"gradle-{GRADLE_VERSION}-bin"
     gradle_bin = gradle_dist / f"gradle-{GRADLE_VERSION}" / "bin" / "gradle"
 
