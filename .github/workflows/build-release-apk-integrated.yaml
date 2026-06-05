@@ -34,9 +34,54 @@ jobs:
           chmod +x gradlew
           ./gradlew testDebugUnitTest --stacktrace --no-daemon
 
+  compose-metrics:
+    name: Compose Metrics Analysis
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Run Compose metrics analysis
+        working-directory: android
+        run: |
+          set -o pipefail
+          mkdir -p compose-metrics-output
+          
+          # Run scripts and show output for debugging
+          if [ -f "scripts/analyze-compose-metrics.sh" ]; then
+            chmod +x scripts/analyze-compose-metrics.sh
+            ./scripts/analyze-compose-metrics.sh
+          else
+            echo "⚠️ Warning: scripts/analyze-compose-metrics.sh not found, skipping"
+          fi
+          
+          if [ -f "tools/metrics-analysis/analyze_metrics.py" ]; then
+            python3 tools/metrics-analysis/analyze_metrics.py
+          else
+            echo "⚠️ Warning: tools/metrics-analysis/analyze_metrics.py not found, skipping"
+          fi
+
+      - name: Upload metrics report
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if metrics fail
+        with:
+          name: compose-metrics-report
+          path: android/compose-metrics-output/
+          retention-days: 14
+
   build:
     name: Build Release APK
-    needs: test
+    needs: [test, compose-metrics]  # Wait for BOTH test and metrics
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -101,9 +146,3 @@ jobs:
             **Build Date:** ${{ steps.ts.outputs.ts }}
             **Branch:** ${{ github.event.inputs.branch || 'main' }}
             **Commit:** ${{ github.sha }}
-
-      - name: Print APK location
-        run: |
-          echo "Release APK built successfully!"
-          echo "Location: ${{ steps.find_apk.outputs.apk_path }}"
-          echo "Size: $(du -h "${{ steps.find_apk.outputs.apk_path }}" | cut -f1)"
