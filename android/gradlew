@@ -10,7 +10,7 @@ import zipfile
 import urllib.request
 from pathlib import Path
 
-GRADLE_VERSION = "8.5"
+GRADLE_VERSION = "8.9"
 GRADLE_URL = f"https://services.gradle.org/distributions/gradle-{GRADLE_VERSION}-bin.zip"
 
 def ensure_gradle() -> str:
