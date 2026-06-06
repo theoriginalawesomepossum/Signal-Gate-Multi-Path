@@ -1,11 +1,10 @@
 package com.signalgate.multipoint.repository
 
-import com.signalgate.multipoint.db.PhoneEntry
-import com.signalgate.multipoint.db.PhoneEntryDao
-import com.signalgate.multipoint.db.SourceDao
+import com.signalgate.multipoint.database.daos.UnifiedEntryDao
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 
 class DataSourceRepository(
-    private val phoneDao: PhoneEntryDao
+    private val unifiedEntryDao: UnifiedEntryDao
 ) {
 
     private fun normalizePhoneNumber(raw: String): String {
@@ -24,40 +23,44 @@ class DataSourceRepository(
     suspend fun getCallDecision(rawNumber: String): CallDecision {
         val normalized = normalizePhoneNumber(rawNumber)
         if (normalized.isBlank()) {
-            return CallDecision(PhoneEntry.ActionType.ALLOW, "Invalid number", 0, "default")
+            return CallDecision("ALLOW", "Invalid number", 0, "default")
         }
 
         // 1. Manual Allow (Absolute Highest Priority)
-        phoneDao.findByNumberAndAction(normalized, PhoneEntry.ActionType.ALLOW)?.let {
-            return CallDecision(PhoneEntry.ActionType.ALLOW, "Manual Allow List", it.confidence, "manual_allow")
+        unifiedEntryDao.findAllowEntry(normalized)?.let {
+            return CallDecision("ALLOW", "Manual Allow List", it.confidence, "manual_allow")
         }
 
         // 2. Manual Block
-        phoneDao.findByNumberAndAction(normalized, PhoneEntry.ActionType.BLOCK)?.let {
-            return CallDecision(PhoneEntry.ActionType.BLOCK, "Manual Block List", it.confidence, "manual_block")
+        unifiedEntryDao.findBlockEntry(normalized)?.let {
+            return CallDecision("BLOCK", "Manual Block List", it.confidence, "manual_block")
         }
 
         // 3. Pattern Rules
-        phoneDao.findMatchingPattern(normalized)?.let {
-            return CallDecision(PhoneEntry.ActionType.BLOCK, "Pattern: ${it.phoneNumber}", it.confidence, "pattern")
+        // Note: The DAO currently doesn't have a direct pattern matching query for a specific number, 
+        // but it has getAllBlockPatterns(). For now, we'll keep the logic simple or use a placeholder.
+        val patterns = unifiedEntryDao.getAllBlockPatterns()
+        patterns.find { normalized.startsWith(it.phoneNumber) }?.let {
+            return CallDecision("BLOCK", "Pattern: ${it.phoneNumber}", it.confidence, "pattern")
         }
 
         // 4. Aggregated Sources
-        phoneDao.findInEnabledSources(normalized)?.let {
-            return CallDecision(PhoneEntry.ActionType.BLOCK, it.metadata ?: "External Source", it.confidence, "aggregated")
+        // Logic depends on how 'enabled sources' are handled. For now, check if any entry exists.
+        unifiedEntryDao.findEntriesByPhoneNumber(normalized).firstOrNull { it.action == "BLOCK" }?.let {
+            return CallDecision("BLOCK", it.metadata ?: "External Source", it.confidence, "aggregated")
         }
 
         // 5. Default
-        return CallDecision(PhoneEntry.ActionType.ALLOW, "No rule matched", 0, "default")
+        return CallDecision("ALLOW", "No rule matched", 0, "default")
     }
 
-    suspend fun insertEntry(entry: PhoneEntry) {
+    suspend fun insertEntry(entry: UnifiedEntryEntity) {
         val sanitized = entry.copy(phoneNumber = normalizePhoneNumber(entry.phoneNumber))
-        phoneDao.insert(sanitized)
+        unifiedEntryDao.insertEntry(sanitized)
     }
 
     data class CallDecision(
-        val action: PhoneEntry.ActionType,
+        val action: String,
         val reason: String,
         val confidence: Int,
         val source: String
