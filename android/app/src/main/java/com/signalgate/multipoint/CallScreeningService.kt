@@ -40,7 +40,10 @@ class CallScreeningService : CallScreeningService() {
         Log.d(TAG, "Screening call from: ${details.handle?.schemeSpecificPart}")
 
         // Extract phone number from the incoming call
-        val phoneNumber = details.handle?.schemeSpecificPart ?: return
+        val phoneNumber = details.handle?.schemeSpecificPart ?: run {
+            super.onScreenCall(details)
+            return
+        }
 
         // Process the call screening asynchronously
         CoroutineScope(Dispatchers.Default).launch {
@@ -67,6 +70,8 @@ class CallScreeningService : CallScreeningService() {
      * Analyzes an incoming call and returns a CallInfo object with spam status, confidence, etc.
      */
     private suspend fun analyzeIncomingCall(phoneNumber: String): CallInfo {
+        // Use the screening engine to analyze the call
+        return screeningEngine.screenCall(phoneNumber)
     }
 
     /**
