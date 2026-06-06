@@ -21,7 +21,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.signalgate.multipoint.ui.dashboard.DashboardScreen
+import com.signalgate.multipoint.OperationalDashboard
 import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
 import com.signalgate.multipoint.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
@@ -55,9 +55,9 @@ fun AppNavigation() {
         NavHost(navController = navController, startDestination = Routes.DASHBOARD) {
             composable(Routes.DASHBOARD) {
                 val dashboardViewModel: DashboardViewModel = koinViewModel()
-                DashboardScreen(
+                OperationalDashboard(
                     viewModel = dashboardViewModel,
-                    onMenuClick = { scope.launch { drawerState.open() } }
+                    onSettingsClick = { scope.launch { drawerState.open() } }
                 )
             }
             composable(Routes.SOURCES) { TextScreen("Sources Screen") }

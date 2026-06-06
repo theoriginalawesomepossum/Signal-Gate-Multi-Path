@@ -143,7 +143,7 @@ fun SettingsScreen() {
 }
 
 @Composable
-fun ColorSlider(label: String, value: Float, onValueChange: (Float) -> subdivision, color: Color) {
+fun ColorSlider(label: String, value: Float, onValueChange: (Float) -> Unit, color: Color) {
     Column {
         Text(label, style = MaterialTheme.typography.bodyMedium)
         Slider(
