@@ -9,6 +9,10 @@ import com.signalgate.multipoint.logic.CallScreeningEngine
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import com.signalgate.multipoint.db.AppDatabase
+import com.signalgate.multipoint.ui.BlockedNumbersViewModel
+import com.signalgate.multipoint.ui.RecentCallsViewModel
+import com.signalgate.multipoint.repository.DataSourceRepository as LegacyRepository
 
 val databaseModule = module {
     single {
@@ -38,4 +42,12 @@ val viewModelModule = module {
     viewModel { DashboardViewModel(get()) }
 }
 
-val appModule = listOf(databaseModule, repositoryModule, logicModule, viewModelModule)
+val legacyModule = module {
+    single { AppDatabase.getDatabase(androidContext()) }
+    single { get<AppDatabase>().phoneEntryDao() }
+    single { LegacyRepository(get()) }
+    viewModel { BlockedNumbersViewModel(get()) }
+    viewModel { RecentCallsViewModel(get()) }
+}
+
+val appModule = listOf(databaseModule, repositoryModule, logicModule, viewModelModule, legacyModule)
