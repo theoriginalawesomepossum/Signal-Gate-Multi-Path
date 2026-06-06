@@ -40,10 +40,7 @@ class CallScreeningService : CallScreeningService() {
         Log.d(TAG, "Screening call from: ${details.handle?.schemeSpecificPart}")
 
         // Extract phone number from the incoming call
-        val phoneNumber = details.handle?.schemeSpecificPart ?: run {
-            super.onScreenCall(details)
-            return
-        }
+        val phoneNumber = details.handle?.schemeSpecificPart ?: return
 
         // Process the call screening asynchronously
         CoroutineScope(Dispatchers.Default).launch {
