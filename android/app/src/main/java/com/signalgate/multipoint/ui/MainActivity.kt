@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.signalgate.multipoint.ui.components.GlassmorphicDrawerContent
+import com.signalgate.multipoint.ui.navigation.Screen
 import com.signalgate.multipoint.ui.navigation.SignalGateNavGraph
 import com.signalgate.multipoint.ui.theme.SignalGateTheme
 import kotlinx.coroutines.launch
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     drawerContent = {
                         GlassmorphicDrawerContent(
                             currentRoute = currentRoute,
-                            onDestinationSelected = { screen ->
+                            onDestinationSelected = { screen: Screen ->
                                 scope.launch { drawerState.close() }
                                 if (currentRoute != screen.route) {
                                     navController.navigate(screen.route) {
