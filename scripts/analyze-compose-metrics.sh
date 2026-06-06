@@ -88,7 +88,7 @@ print_summary() {
 
 # Main
 VARIANT="Debug"
-CLEAN=false
+CLEAN=True
 OPEN_DIR=false
 
 while [[ $# -gt 0 ]]; do
