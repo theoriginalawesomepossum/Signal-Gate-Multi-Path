@@ -71,7 +71,21 @@ class CallScreeningService : CallScreeningService() {
      */
     private suspend fun analyzeIncomingCall(phoneNumber: String): CallInfo {
         // Use the screening engine to analyze the call
-        return screeningEngine.screenCall(phoneNumber)
+        return try {
+            screeningEngine.screenCall(phoneNumber)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error analyzing call", e)
+            CallInfo(
+                originalPhoneNumber = phoneNumber,
+                normalizedPhoneNumber = normalizePhoneNumber(phoneNumber),
+                spamStatus = "UNKNOWN",
+                spamCategory = null,
+                confidence = null,
+                riskLevel = null,
+                matchedSources = emptyList(),
+                callDecision = CallDecision.ALLOW
+            )
+        }
     }
 
     /**
