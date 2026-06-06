@@ -22,8 +22,7 @@ val GlassSurface = Color(0xCC121A26)
 val GlassBorder = Color(0x33FFFFFF)
 val GlassGlow = Color(0x1A00A3FF)
 
-val TextPrimary = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFFA0AEC0)
+// Text colors are defined in Color.kt
 val TextMuted = Color(0xFF718096)
 
 val AccentPrimary = Color(0xFF00A3FF) // Electric Blue
