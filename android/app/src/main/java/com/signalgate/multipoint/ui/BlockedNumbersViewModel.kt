@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.db.PhoneEntry
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 import com.signalgate.multipoint.repository.DataSourceRepository
 import kotlinx.coroutines.launch
 
@@ -12,8 +12,8 @@ class BlockedNumbersViewModel(
     private val repository: DataSourceRepository
 ) : ViewModel() {
 
-    private val _blockedNumbers = MutableLiveData<List<PhoneEntry>>()
-    val blockedNumbers: LiveData<List<PhoneEntry>> = _blockedNumbers
+    private val _blockedNumbers = MutableLiveData<List<UnifiedEntryEntity>>()
+    val blockedNumbers: LiveData<List<UnifiedEntryEntity>> = _blockedNumbers
 
     private val _actionResult = MutableLiveData<String?>()
     val actionResult: LiveData<String?> = _actionResult
@@ -24,15 +24,16 @@ class BlockedNumbersViewModel(
 
     private fun loadBlockedNumbers() {
         viewModelScope.launch {
-            _blockedNumbers.value = emptyList() // TODO: Add DAO query later
+            _blockedNumbers.value = repository.getAllEntries().filter { it.action == "BLOCK" }
         }
     }
 
     fun addBlockedNumber(phoneNumber: String, label: String? = null, isPattern: Boolean = false) {
         viewModelScope.launch {
-            val entry = PhoneEntry(
+            val entry = UnifiedEntryEntity(
                 phoneNumber = phoneNumber,
-                action = PhoneEntry.ActionType.BLOCK,
+                action = "BLOCK",
+                sourceId = 0, // Manual entries use sourceId 0 or a dedicated manual source
                 isPattern = isPattern,
                 metadata = label?.let { "Label: $it" } ?: "Manual block"
             )
@@ -44,9 +45,10 @@ class BlockedNumbersViewModel(
 
     fun addToWhitelist(phoneNumber: String) {
         viewModelScope.launch {
-            val entry = PhoneEntry(
+            val entry = UnifiedEntryEntity(
                 phoneNumber = phoneNumber,
-                action = PhoneEntry.ActionType.ALLOW,
+                action = "ALLOW",
+                sourceId = 0,
                 metadata = "Manual whitelist"
             )
             repository.insertEntry(entry)
@@ -55,10 +57,10 @@ class BlockedNumbersViewModel(
         }
     }
 
-    fun deleteBlockedNumber(phoneNumber: String) {
+    fun deleteBlockedNumber(entry: UnifiedEntryEntity) {
         viewModelScope.launch {
-            // TODO: Implement delete in PhoneEntryDao
-            _actionResult.value = "🗑️ Removed: $phoneNumber"
+            repository.deleteEntry(entry)
+            _actionResult.value = "🗑️ Removed: ${entry.phoneNumber}"
             loadBlockedNumbers()
         }
     }

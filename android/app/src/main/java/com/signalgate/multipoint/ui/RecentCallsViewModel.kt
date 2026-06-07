@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.db.CallLogEntry
-import com.signalgate.multipoint.db.PhoneEntry
+import com.signalgate.multipoint.database.entities.CallLogEntry
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 import com.signalgate.multipoint.repository.DataSourceRepository
 import kotlinx.coroutines.launch
 
@@ -25,15 +25,16 @@ class RecentCallsViewModel(
 
     fun loadRecentCalls() {
         viewModelScope.launch {
-            _recentCalls.value = emptyList()
+            _recentCalls.value = emptyList() // TODO: Implement call log retrieval from repository
         }
     }
 
     fun addBlockedNumber(phoneNumber: String, label: String? = null, isPattern: Boolean = false) {
         viewModelScope.launch {
-            val entry = PhoneEntry(
+            val entry = UnifiedEntryEntity(
                 phoneNumber = phoneNumber,
-                action = PhoneEntry.ActionType.BLOCK,
+                action = "BLOCK",
+                sourceId = 0,
                 isPattern = isPattern,
                 metadata = "From recent calls"
             )
@@ -44,9 +45,10 @@ class RecentCallsViewModel(
 
     fun addToWhitelist(phoneNumber: String) {
         viewModelScope.launch {
-            val entry = PhoneEntry(
+            val entry = UnifiedEntryEntity(
                 phoneNumber = phoneNumber,
-                action = PhoneEntry.ActionType.ALLOW,
+                action = "ALLOW",
+                sourceId = 0,
                 metadata = "From recent calls"
             )
             repository.insertEntry(entry)

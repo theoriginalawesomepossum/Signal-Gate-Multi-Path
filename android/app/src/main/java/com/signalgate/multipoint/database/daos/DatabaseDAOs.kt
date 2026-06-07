@@ -85,6 +85,9 @@ interface UnifiedEntryDao {
 
     @Query("SELECT COUNT(*) FROM unified_entries")
     fun getTotalEntryCount(): Flow<Int>
+
+    @Query("SELECT * FROM unified_entries")
+    suspend fun getAllEntries(): List<UnifiedEntryEntity>
 }
 
 /**

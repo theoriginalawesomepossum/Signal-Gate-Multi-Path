@@ -45,7 +45,7 @@ val viewModelModule = module {
 val legacyModule = module {
     single { AppDatabase.getDatabase(androidContext()) }
     single { get<AppDatabase>().phoneEntryDao() }
-    single { LegacyRepository(get()) }
+    single { LegacyRepository(get<SignalGateDatabase>().unifiedEntryDao()) }
     viewModel { BlockedNumbersViewModel(get()) }
     viewModel { RecentCallsViewModel(get()) }
 }
