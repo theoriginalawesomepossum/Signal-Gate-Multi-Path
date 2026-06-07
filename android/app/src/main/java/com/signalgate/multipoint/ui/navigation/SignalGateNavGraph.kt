@@ -7,6 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.signalgate.multipoint.ui.screens.SourcesScreen
+import com.signalgate.multipoint.ui.screens.CallLogScreen
+import com.signalgate.multipoint.ui.screens.SettingsScreen
 
 @Composable
 fun SignalGateNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -16,19 +19,20 @@ fun SignalGateNavGraph(navController: NavHostController, modifier: Modifier = Mo
         modifier = modifier.fillMaxSize()
     ) {
         composable(Screen.Dashboard.route) {
+            // Replace with your migrated OperationalDashboardCompose implementation
             Text(text = "Dashboard Content Placeholder", color = androidx.compose.ui.graphics.Color.White)
         }
         composable(Screen.Sources.route) {
-            Text(text = "Data Sources Screen Placeholder", color = androidx.compose.ui.graphics.Color.White)
+            SourcesScreen()
         }
         composable(Screen.CallLog.route) {
-            Text(text = "Call Log Screen Placeholder", color = androidx.compose.ui.graphics.Color.White)
+            CallLogScreen()
         }
         composable(Screen.BlockAllowList.route) {
             Text(text = "Block / Allow List Screen Placeholder", color = androidx.compose.ui.graphics.Color.White)
         }
         composable(Screen.Settings.route) {
-            Text(text = "Settings Screen Placeholder", color = androidx.compose.ui.graphics.Color.White)
+            SettingsScreen()
         }
     }
 }
