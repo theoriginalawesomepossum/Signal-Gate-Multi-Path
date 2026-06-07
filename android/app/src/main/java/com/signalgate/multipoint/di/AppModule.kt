@@ -13,6 +13,11 @@ import com.signalgate.multipoint.db.AppDatabase
 import com.signalgate.multipoint.ui.BlockedNumbersViewModel
 import com.signalgate.multipoint.ui.RecentCallsViewModel
 import com.signalgate.multipoint.repository.DataSourceRepository as LegacyRepository
+import com.signalgate.multipoint.data.security.BloomFilterEngine
+import com.signalgate.multipoint.data.security.PrecedenceEngine
+import com.signalgate.multipoint.data.security.SecureCsvParser
+import com.signalgate.multipoint.data.security.SanitizationEngine
+import com.signalgate.multipoint.ui.viewmodels.TelemetryViewModel
 
 val databaseModule = module {
     single {
@@ -34,10 +39,14 @@ val repositoryModule = module {
 }
 
 val logicModule = module {
+    single { BloomFilterEngine() }
+    single { SecureCsvParser() }
+    single { PrecedenceEngine(get(), hashSetOf(), hashSetOf()) }
     single { CallScreeningEngine(get()) }
 }
 
 val viewModelModule = module {
+    viewModel { TelemetryViewModel() }
     viewModel { CallOverlayViewModel() }
     viewModel { DashboardViewModel(get()) }
 }
