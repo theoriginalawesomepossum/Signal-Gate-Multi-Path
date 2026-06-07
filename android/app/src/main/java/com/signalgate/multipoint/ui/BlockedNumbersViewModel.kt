@@ -2,7 +2,7 @@ package com.signalgate.multipoint.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.database.UnifiedEntryEntity
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 import com.signalgate.multipoint.repository.DataSourceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +19,7 @@ class BlockedNumbersViewModel(private val repository: DataSourceRepository) : Vi
 
     fun loadBlockedNumbers() {
         viewModelScope.launch {
-            _blockedNumbers.value = repository.getAllEntries().filter { it.isBlocked == true }
+            _blockedNumbers.value = repository.getAllEntries().filter { it.action == "BLOCK" }
         }
     }
 

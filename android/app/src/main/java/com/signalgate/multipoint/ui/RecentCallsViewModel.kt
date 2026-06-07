@@ -2,7 +2,7 @@ package com.signalgate.multipoint.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.database.UnifiedEntryEntity
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 import com.signalgate.multipoint.repository.DataSourceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
