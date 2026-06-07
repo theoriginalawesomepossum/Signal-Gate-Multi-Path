@@ -1,23 +1,17 @@
 package com.signalgate.multipoint.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.database.entities.CallLogEntry
-import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
+import com.signalgate.multipoint.database.UnifiedEntryEntity
 import com.signalgate.multipoint.repository.DataSourceRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class RecentCallsViewModel(
-    private val repository: DataSourceRepository
-) : ViewModel() {
+class RecentCallsViewModel(private val repository: DataSourceRepository) : ViewModel() {
 
-    private val _recentCalls = MutableLiveData<List<CallLogEntry>>()
-    val recentCalls: LiveData<List<CallLogEntry>> = _recentCalls
-
-    private val _actionResult = MutableLiveData<String?>()
-    val actionResult: LiveData<String?> = _actionResult
+    private val _recentCalls = MutableStateFlow<List<UnifiedEntryEntity>>(emptyList())
+    val recentCalls: StateFlow<List<UnifiedEntryEntity>> = _recentCalls
 
     init {
         loadRecentCalls()
@@ -25,38 +19,23 @@ class RecentCallsViewModel(
 
     fun loadRecentCalls() {
         viewModelScope.launch {
-            _recentCalls.value = emptyList() // TODO: Implement call log retrieval from repository
+            _recentCalls.value = repository.getAllEntries()
         }
     }
 
-    fun addBlockedNumber(phoneNumber: String, label: String? = null, isPattern: Boolean = false) {
+    // Fixed: Accepted type updated from PhoneEntry to UnifiedEntryEntity
+    fun removeLog(entry: UnifiedEntryEntity) {
         viewModelScope.launch {
-            val entry = UnifiedEntryEntity(
-                phoneNumber = phoneNumber,
-                action = "BLOCK",
-                sourceId = 0,
-                isPattern = isPattern,
-                metadata = "From recent calls"
-            )
-            repository.insertEntry(entry)
-            _actionResult.value = "✅ Blocked: $phoneNumber"
+            repository.deleteEntry(entry)
+            loadRecentCalls()
         }
     }
 
-    fun addToWhitelist(phoneNumber: String) {
+    // Fixed: Accepted type updated from PhoneEntry to UnifiedEntryEntity
+    fun addLog(entry: UnifiedEntryEntity) {
         viewModelScope.launch {
-            val entry = UnifiedEntryEntity(
-                phoneNumber = phoneNumber,
-                action = "ALLOW",
-                sourceId = 0,
-                metadata = "From recent calls"
-            )
             repository.insertEntry(entry)
-            _actionResult.value = "✅ Whitelisted: $phoneNumber"
+            loadRecentCalls()
         }
-    }
-
-    fun clearActionResult() {
-        _actionResult.value = null
     }
 }
