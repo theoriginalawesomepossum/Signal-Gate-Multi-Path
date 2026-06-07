@@ -1,11 +1,16 @@
 package com.signalgate.multipoint.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.signalgate.multipoint.OperationalDashboard
+import com.signalgate.multipoint.ui.screens.SourcesScreen
+import com.signalgate.multipoint.ui.screens.CallLogScreen
+import com.signalgate.multipoint.ui.screens.SettingsScreen
 
 @Composable
 fun SignalGateNavGraph(
@@ -15,16 +20,22 @@ fun SignalGateNavGraph(
     NavHost(
         navController = navController,
         startDestination = Screen.Dashboard.route,
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     ) {
         composable(Screen.Dashboard.route) {
             OperationalDashboard()
         }
         composable(Screen.Sources.route) {
-            // SourcesScreen() // Placeholder as the actual screen implementation is missing
+            SourcesScreen()
         }
         composable(Screen.CallLog.route) {
-            // CallLogScreen() // Placeholder as the actual screen implementation is missing
+            CallLogScreen()
+        }
+        composable(Screen.BlockAllowList.route) {
+            Text(text = "Block / Allow List Screen Placeholder", color = androidx.compose.ui.graphics.Color.White)
+        }
+        composable(Screen.Settings.route) {
+            SettingsScreen()
         }
     }
 }
