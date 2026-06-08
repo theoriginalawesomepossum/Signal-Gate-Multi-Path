@@ -16,9 +16,10 @@ A native Android application built with Kotlin for high-performance call screeni
 │   │           │   ├── CallScreeningService.kt  # Core blocking logic
 │   │           │   ├── MainActivity.kt         # Entry point
 │   │           │   ├── MainApplication.kt      # App initialization
-│   │           │   └── db
-│   │           │       ├── AppDatabase.kt      # Room Database definition
-│   │           │       └── BlockEntry.kt       # Entity & DAO for blocklist
+│   │           │   ├── database
+20	│   │           │   │   ├── SignalGateDatabase.kt # Unified Room Database
+21	│   │           │   │   ├── entities/          # UnifiedEntryEntity & others
+22	│   │           │   │   └── daos/              # Modern DAOs
 │   │           └── res/            # Resources (icons, strings, themes)
 │   └── build.gradle                # Project-level config
 └── README.md
