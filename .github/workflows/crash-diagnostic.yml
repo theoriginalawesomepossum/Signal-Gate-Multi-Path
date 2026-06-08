@@ -1,7 +1,7 @@
 name: Crash Diagnostic
 
 on:
-  workflow_dispatch:  # Manual trigger only — run this when you need a crash log
+  workflow_dispatch:
 
 jobs:
   crash-diagnostic:
@@ -44,41 +44,19 @@ jobs:
           disable-animations: true
           script: |
             echo "=== Emulator ready ==="
-
-            # Clear any existing logcat buffer
             adb logcat -c
-
-            # Install the APK
             echo "=== Installing APK ==="
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-
-            # Start capturing logcat in background immediately
             adb logcat -v threadtime > /tmp/full_logcat.txt &
             LOGCAT_PID=$!
-
-            # Launch the app
             echo "=== Launching app ==="
             adb shell am start -n com.signalgate.multipoint/.MainActivity
-
-            # Wait long enough for the crash to occur and be logged
             sleep 15
-
-            # Stop logcat capture
             kill $LOGCAT_PID 2>/dev/null || true
-
-            # Extract just the crash-relevant lines into a focused file
-            echo "=== Extracting crash info ==="
-            grep -E "AndroidRuntime|FATAL|crash|signalgate|koin|Koin|onCreate|Exception|Error|Caused by" \
-              /tmp/full_logcat.txt > /tmp/crash_focused.txt || true
-
-            # Print focused crash to Actions console so you can see it inline
-            echo "========== CRASH LOG =========="
-            cat /tmp/crash_focused.txt
-            echo "==============================="
-
-            # Copy both files to workspace for artifact upload
-            cp /tmp/full_logcat.txt full_logcat.txt
-            cp /tmp/crash_focused.txt crash_focused.txt
+            cp /tmp/full_logcat.txt $GITHUB_WORKSPACE/full_logcat.txt
+            echo "=== CRASH LOG ==="
+            grep -E "AndroidRuntime|FATAL|Exception|Caused by|signalgate|koin" /tmp/full_logcat.txt || echo "No crash lines found"
+            echo "=== END CRASH LOG ==="
 
       - name: Upload Full Logcat
         if: always()
@@ -86,12 +64,4 @@ jobs:
         with:
           name: full-logcat
           path: full_logcat.txt
-          retention-days: 7
-
-      - name: Upload Crash Focused Log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: crash-focused-log
-          path: crash_focused.txt
           retention-days: 7
