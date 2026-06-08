@@ -2,8 +2,8 @@ package com.signalgate.multipoint.service
 
 import android.telecom.Call
 import android.telecom.CallScreeningService
-import com.signalgate.multipoint.data.dao.CallLogDao
-import com.signalgate.multipoint.data.dao.CallLogEntity
+import com.signalgate.multipoint.database.daos.CallLogDao
+import com.signalgate.multipoint.database.entities.CallLogEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,23 +21,19 @@ class AdvancedCallScreeningService : CallScreeningService() {
     override fun onScreenCall(callDetails: Call.Details) {
         val incomingNumber = callDetails.handle?.schemeSpecificPart ?: return
         
-        // 1. Immediately issue an asynchronous evaluation payload to prevent system blocking
+        // 1. Evaluate call and persist log
         serviceScope.launch {
-            val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-            
-            // Dummy placeholder record representing an intercepted threat vector
-            val mockEntity = CallLogEntity(
-                number = incomingNumber,
+            val callLog = CallLogEntry(
+                phoneNumber = incomingNumber,
+                normalizedPhoneNumber = incomingNumber.replace(Regex("[^0-9+]"), ""),
                 timestamp = System.currentTimeMillis(),
-                formattedTime = currentTime,
-                dispositionType = "SPAM",
-                cachedGeoLocation = "Detected Vector",
-                matchedFeedsList = listOf("Community Spam Feed"),
-                confidenceScore = 94
+                decision = "BLOCK", // Defaulting to BLOCK as per previous implementation
+                spamStatus = "SPAM",
+                confidence = 94,
+                riskLevel = "HIGH"
             )
             
-            // Persist straight to the Room database; your Compose UI updates instantly[cite: 1]
-            callLogDao.insertCallRecord(mockEntity)
+            callLogDao.insertCallLog(callLog)
         }
 
         // 2. Respond to the Android System with standard blocking instructions
