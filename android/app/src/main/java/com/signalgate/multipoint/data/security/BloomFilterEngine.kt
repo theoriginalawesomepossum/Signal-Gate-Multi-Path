@@ -41,13 +41,13 @@ class BloomFilterEngine(
                     ((data[index + 2].toInt() and 0xFF) shl 16) or
                     ((data[index + 3].toInt() and 0xFF) shl 24)
 
-            k1 *= 0xcc9e2d51
+            k1 *= 0xcc9e2d51.toInt()
             k1 = Integer.rotateLeft(k1, 15)
-            k1 *= 0x1b873593
+            k1 *= 0x1b873593.toInt()
 
             h1 = h1 xor k1
             h1 = Integer.rotateLeft(h1, 13)
-            h1 = h1 * 5 + 0xe6546b64
+            h1 = h1 * 5 + 0xe6546b64.toInt()
         }
 
         var k1 = 0
@@ -58,9 +58,9 @@ class BloomFilterEngine(
         if (left >= 2) k1 = k1 xor ((data[tailStart + 1].toInt() and 0xFF) shl 8)
         if (left >= 1) {
             k1 = k1 xor (data[tailStart].toInt() and 0xFF)
-            k1 *= 0xcc9e2d51
+            k1 *= 0xcc9e2d51.toInt()
             k1 = Integer.rotateLeft(k1, 15)
-            k1 *= 0x1b873593
+            k1 *= 0x1b873593.toInt()
             h1 = h1 xor k1
         }
 
