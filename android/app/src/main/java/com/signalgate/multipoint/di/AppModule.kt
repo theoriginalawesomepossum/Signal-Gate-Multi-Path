@@ -3,6 +3,7 @@ package com.signalgate.multipoint.di
 import androidx.room.Room
 import com.signalgate.multipoint.database.SignalGateDatabase
 import com.signalgate.multipoint.database.repositories.DataSourceRepository
+import com.signalgate.multipoint.database.repositories.CallLogRepository
 import com.signalgate.multipoint.ui.overlay.CallOverlayViewModel
 import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
 import com.signalgate.multipoint.logic.CallScreeningEngine
@@ -34,6 +35,7 @@ val databaseModule = module {
 
 val repositoryModule = module {
     single { DataSourceRepository(get(), get()) }
+    single { CallLogRepository(get()) }
 }
 
 val logicModule = module {
@@ -44,7 +46,7 @@ val logicModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { TelemetryViewModel() }
+    viewModel { TelemetryViewModel(get()) }
     viewModel { CallOverlayViewModel() }
     viewModel { DashboardViewModel(get()) }
     viewModel { BlockedNumbersViewModel(get()) }
