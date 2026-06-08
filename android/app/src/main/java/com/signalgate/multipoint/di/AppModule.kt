@@ -41,7 +41,7 @@ val repositoryModule = module {
 val logicModule = module {
     single { BloomFilterEngine() }
     single { SecureCsvParser() }
-    single { PrecedenceEngine(get(), hashSetOf(), hashSetOf()) }
+    single { PrecedenceEngine(get(), hashSetOf<String>(), hashSetOf<String>()) }
     single { CallScreeningEngine(get()) }
 }
 

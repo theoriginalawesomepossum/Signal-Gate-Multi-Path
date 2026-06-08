@@ -66,9 +66,9 @@ class BloomFilterEngine(
 
         h1 = h1 xor length
         h1 = h1 xor (h1 ushr 16)
-        h1 *= -0x7a143595
+        h1 *= -0x7a143595.toInt()
         h1 = h1 xor (h1 ushr 13)
-        h1 *= -0x3d4d51cb
+        h1 *= -0x3d4d51cb.toInt()
         h1 = h1 xor (h1 ushr 16)
 
         return h1
