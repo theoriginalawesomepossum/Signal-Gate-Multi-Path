@@ -1,0 +1,17 @@
+package com.signalgate.multipoint.database.repositories
+
+import com.signalgate.multipoint.database.daos.CallLogDao
+import com.signalgate.multipoint.database.entities.CallLogEntry
+import kotlinx.coroutines.flow.Flow
+
+class CallLogRepository(private val callLogDao: CallLogDao) {
+    val allLogsFlow: Flow<List<CallLogEntry>> = callLogDao.getRecentCalls(100)
+
+    suspend fun insertCallLog(entry: CallLogEntry) {
+        callLogDao.insertCallLog(entry)
+    }
+
+    suspend fun getCallsByPhoneNumber(phoneNumber: String): List<CallLogEntry> {
+        return callLogDao.getCallsByPhoneNumber(phoneNumber)
+    }
+}
