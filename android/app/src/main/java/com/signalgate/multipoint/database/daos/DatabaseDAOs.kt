@@ -63,10 +63,10 @@ interface UnifiedEntryDao {
     suspend fun deleteEntry(entry: UnifiedEntryEntity)
 
     @Query("SELECT * FROM unified_entries WHERE phoneNumber = :phoneNumber AND action = 'ALLOW' LIMIT 1")
-    suspend fun findAllowEntry(phoneNumber: String): UnifiedEntryEntity?
+    suspend fun findUnifiedAllowEntry(phoneNumber: String): UnifiedEntryEntity?
 
     @Query("SELECT * FROM unified_entries WHERE phoneNumber = :phoneNumber AND action = 'BLOCK' LIMIT 1")
-    suspend fun findBlockEntry(phoneNumber: String): UnifiedEntryEntity?
+    suspend fun findUnifiedBlockEntry(phoneNumber: String): UnifiedEntryEntity?
 
     @Query("SELECT * FROM unified_entries WHERE phoneNumber = :phoneNumber")
     suspend fun findEntriesByPhoneNumber(phoneNumber: String): List<UnifiedEntryEntity>
