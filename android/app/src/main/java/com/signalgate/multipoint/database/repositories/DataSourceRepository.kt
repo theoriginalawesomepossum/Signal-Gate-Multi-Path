@@ -139,11 +139,11 @@ class DataSourceRepository(
             return CallDecision("ALLOW", "Invalid number", 0, "default")
         }
 
-        entryDao.findAllowEntry(normalized)?.let {
+        entryDao.findUnifiedAllowEntry(normalized)?.let {
             return CallDecision("ALLOW", "Manual Allow List", it.confidence ?: 0, "manual_allow")
         }
 
-        entryDao.findBlockEntry(normalized)?.let {
+        entryDao.findUnifiedBlockEntry(normalized)?.let {
             return CallDecision("BLOCK", "Manual Block List", it.confidence ?: 0, "manual_block")
         }
 
