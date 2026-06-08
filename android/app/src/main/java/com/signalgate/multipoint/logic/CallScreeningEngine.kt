@@ -31,7 +31,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
         Log.d(TAG, "Screening call from: $phoneNumber (normalized: $normalizedNumber)")
 
         // Priority 1: Check Manual Allow-list (Whitelist)
-        val allowEntry = database.unifiedEntryDao().findAllowEntry(normalizedNumber)
+        val allowEntry = database.unifiedEntryDao().findUnifiedAllowEntry(normalizedNumber)
         if (allowEntry != null) {
             Log.d(TAG, "Call allowed by whitelist")
             return CallInfo(
@@ -47,7 +47,7 @@ class CallScreeningEngine(private val database: SignalGateDatabase) {
         }
 
         // Priority 2: Check Manual Block-list
-        val blockEntry = database.unifiedEntryDao().findBlockEntry(normalizedNumber)
+        val blockEntry = database.unifiedEntryDao().findUnifiedBlockEntry(normalizedNumber)
         if (blockEntry != null && !blockEntry.isPattern) {
             Log.d(TAG, "Call blocked by manual block list")
             return CallInfo(
