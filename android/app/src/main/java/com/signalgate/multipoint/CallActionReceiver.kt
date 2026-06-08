@@ -4,27 +4,27 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.signalgate.multipoint.database.SignalGateDatabase
 import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class CallActionReceiver : BroadcastReceiver() {
+class CallActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val repository: DataSourceRepository by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER") ?: return
         val action = intent.action ?: return
 
         scope.launch {
-            val db = SignalGateDatabase.getInstance(context)
-            val unifiedEntryDao = db.unifiedEntryDao()
-
             when (action) {
                 "ACTION_BLOCK_PERMANENT" -> {
-                    unifiedEntryDao.insertEntry(
+                    repository.insertEntry(
                         UnifiedEntryEntity(
                             phoneNumber = phoneNumber,
                             action = "BLOCK",
@@ -34,7 +34,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     showToast(context, "Number blocked permanently")
                 }
                 "ACTION_WHITELIST" -> {
-                    unifiedEntryDao.insertEntry(
+                    repository.insertEntry(
                         UnifiedEntryEntity(
                             phoneNumber = phoneNumber,
                             action = "ALLOW",
@@ -44,7 +44,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     showToast(context, "Number added to whitelist")
                 }
                 "ACTION_BLOCK_PREFIX" -> {
-                    unifiedEntryDao.insertEntry(
+                    repository.insertEntry(
                         UnifiedEntryEntity(
                             phoneNumber = phoneNumber,
                             action = "BLOCK",
@@ -56,7 +56,7 @@ class CallActionReceiver : BroadcastReceiver() {
                 }
                 "ACTION_BLOCK_AREA_CODE" -> {
                     val areaCode = phoneNumber.take(4) // first 4 digits as area code
-                    unifiedEntryDao.insertEntry(
+                    repository.insertEntry(
                         UnifiedEntryEntity(
                             phoneNumber = areaCode,
                             action = "BLOCK",
