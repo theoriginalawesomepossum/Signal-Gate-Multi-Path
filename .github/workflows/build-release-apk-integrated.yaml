@@ -40,7 +40,7 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew testDebugUnitTest --stacktrace --no-daemon
+          ./gradlew clean testDebugUnitTest --stacktrace --no-daemon
 
   build:
     name: Build Release APK
