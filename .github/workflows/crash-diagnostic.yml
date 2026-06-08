@@ -1,0 +1,97 @@
+name: Crash Diagnostic
+
+on:
+  workflow_dispatch:  # Manual trigger only — run this when you need a crash log
+
+jobs:
+  crash-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission for Gradle
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        run: cd android && ./gradlew assembleDebug --no-daemon
+
+      - name: Run Emulator and Capture Crash Log
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          force-avd-creation: false
+          disable-animations: true
+          script: |
+            echo "=== Emulator ready ==="
+
+            # Clear any existing logcat buffer
+            adb logcat -c
+
+            # Install the APK
+            echo "=== Installing APK ==="
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+
+            # Start capturing logcat in background immediately
+            adb logcat -v threadtime > /tmp/full_logcat.txt &
+            LOGCAT_PID=$!
+
+            # Launch the app
+            echo "=== Launching app ==="
+            adb shell am start -n com.signalgate.multipoint/.MainActivity
+
+            # Wait long enough for the crash to occur and be logged
+            sleep 15
+
+            # Stop logcat capture
+            kill $LOGCAT_PID 2>/dev/null || true
+
+            # Extract just the crash-relevant lines into a focused file
+            echo "=== Extracting crash info ==="
+            grep -E "AndroidRuntime|FATAL|crash|signalgate|koin|Koin|onCreate|Exception|Error|Caused by" \
+              /tmp/full_logcat.txt > /tmp/crash_focused.txt || true
+
+            # Print focused crash to Actions console so you can see it inline
+            echo "========== CRASH LOG =========="
+            cat /tmp/crash_focused.txt
+            echo "==============================="
+
+            # Copy both files to workspace for artifact upload
+            cp /tmp/full_logcat.txt full_logcat.txt
+            cp /tmp/crash_focused.txt crash_focused.txt
+
+      - name: Upload Full Logcat
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-logcat
+          path: full_logcat.txt
+          retention-days: 7
+
+      - name: Upload Crash Focused Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crash-focused-log
+          path: crash_focused.txt
+          retention-days: 7
