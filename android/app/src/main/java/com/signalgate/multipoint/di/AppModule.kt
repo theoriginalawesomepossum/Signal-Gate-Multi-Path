@@ -50,7 +50,7 @@ val viewModelModule = module {
     viewModel { CallOverlayViewModel() }
     viewModel { DashboardViewModel(get()) }
     viewModel { BlockedNumbersViewModel(get()) }
-    viewModel { RecentCallsViewModel(get()) }
+    viewModel { RecentCallsViewModel(get(), get()) }
 }
 
 val appModule = listOf(databaseModule, repositoryModule, logicModule, viewModelModule)

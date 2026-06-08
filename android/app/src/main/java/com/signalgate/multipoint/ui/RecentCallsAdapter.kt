@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
-import com.signalgate.multipoint.db.CallLogEntry
+import com.signalgate.multipoint.database.entities.CallLogEntry
 import com.signalgate.multipoint.utils.PhoneNumberUtils
 
 class RecentCallsAdapter(

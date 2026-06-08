@@ -9,21 +9,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.signalgate.multipoint.data.models.CallLogItem
-import com.signalgate.multipoint.data.models.CallType
+import com.signalgate.multipoint.ui.RecentCallsViewModel
 import com.signalgate.multipoint.ui.components.GlassmorphicCard
 import com.signalgate.multipoint.ui.theme.*
+import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun CallLogScreen(modifier: Modifier = Modifier) {
-    // In production, wire this via Koin using koinViewModel() linking to your CallScreeningService database records
-    val callLogs = remember {
-        listOf(
-            CallLogItem("1", "+1 (800) 555-0199", "United States", "Just now", CallType.SPAM, listOf("Community Feed", "Telemarketer DB"), 92),
-            CallLogItem("2", "+1 (555) 014-4821", "California", "15m ago", CallType.INCOMING, emptyList(), 0),
-            CallLogItem("3", "+1 (888) 234-9912", "Unknown Location", "1h ago", CallType.BLOCKED, listOf("Personal Block List"), 100)
-        )
-    }
+fun CallLogScreen(
+    modifier: Modifier = Modifier,
+    viewModel: RecentCallsViewModel = koinViewModel()
+) {
+    val callLogs by viewModel.recentCalls.collectAsState()
+    val dateFormat = remember { SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault()) }
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
         Text(
@@ -33,42 +32,56 @@ fun CallLogScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(items = callLogs, key = { it.id }) { log ->
-                GlassmorphicCard {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(log.phoneNumber, color = TextPrimary, fontSize = 16.sp)
-                            Text("${log.location} • ${log.timestamp}", color = TextSecondary, fontSize = 12.sp)
-                            
-                            if (log.matchedSources.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(4.dp))
+        if (callLogs.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No recent calls", color = TextSecondary)
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = callLogs, key = { it.id }) { log ->
+                    GlassmorphicCard {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(log.phoneNumber, color = TextPrimary, fontSize = 16.sp)
                                 Text(
-                                    text = "Matched: ${log.matchedSources.joinToString(", ")}",
-                                    color = NeonOrange,
-                                    fontSize = 11.sp
+                                    dateFormat.format(Date(log.timestamp)),
+                                    color = TextSecondary,
+                                    fontSize = 12.sp
                                 )
+                                
+                                log.matchedSources?.let { sources ->
+                                    if (sources.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Matched: $sources",
+                                            color = NeonOrange,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
                             }
-                        }
 
-                        Column(horizontalAlignment = Alignment.End) {
-                            val typeColor = when (log.type) {
-                                CallType.SPAM -> NeonOrange
-                                CallType.BLOCKED -> NeonRed
-                                CallType.INCOMING -> NeonGreen
-                                CallType.OUTGOING -> NeonCyan
-                            }
-                            Text(log.type.name, color = typeColor, fontSize = 14.sp)
-                            
-                            if (log.riskConfidence > 0) {
-                                Text("Risk: ${log.riskConfidence}%", color = NeonRed, fontSize = 12.sp)
+                            Column(horizontalAlignment = Alignment.End) {
+                                val typeColor = when (log.decision) {
+                                    "BLOCK" -> NeonRed
+                                    "ALLOW" -> NeonGreen
+                                    "SCREEN" -> NeonOrange
+                                    else -> TextSecondary
+                                }
+                                Text(log.decision, color = typeColor, fontSize = 14.sp)
+                                
+                                log.confidence?.let { confidence ->
+                                    if (confidence > 0) {
+                                        Text("Risk: $confidence%", color = NeonRed, fontSize = 12.sp)
+                                    }
+                                }
                             }
                         }
                     }

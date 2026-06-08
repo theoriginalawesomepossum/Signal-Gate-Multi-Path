@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.signalgate.multipoint.R
-import com.signalgate.multipoint.db.BlockEntry
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 
 class BlockedNumbersAdapter(
-    private val onDeleteClick: (BlockEntry) -> Unit,
-    private val onWhitelistClick: (BlockEntry) -> Unit
-) : ListAdapter<BlockEntry, BlockedNumbersAdapter.BlockViewHolder>(BlockEntryDiffCallback()) {
+    private val onDeleteClick: (UnifiedEntryEntity) -> Unit,
+    private val onWhitelistClick: (UnifiedEntryEntity) -> Unit
+) : ListAdapter<UnifiedEntryEntity, BlockedNumbersAdapter.BlockViewHolder>(BlockEntryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -31,19 +31,19 @@ class BlockedNumbersAdapter(
         private val labelTextView: TextView = itemView.findViewById(R.id.labelTextView)
         private val deleteButton: ImageButton = itemView.findViewById(R.id.deleteButton)
 
-        fun bind(entry: BlockEntry) {
+        fun bind(entry: UnifiedEntryEntity) {
             phoneNumberTextView.text = entry.phoneNumber
-            labelTextView.text = entry.label ?: if (entry.isPattern) "Pattern" else ""
+            labelTextView.text = entry.category ?: if (entry.isPattern) "Pattern" else ""
             deleteButton.setOnClickListener { onDeleteClick(entry) }
         }
     }
 
-    private class BlockEntryDiffCallback : DiffUtil.ItemCallback<BlockEntry>() {
-        override fun areItemsTheSame(oldItem: BlockEntry, newItem: BlockEntry): Boolean {
-            return oldItem.phoneNumber == newItem.phoneNumber
+    private class BlockEntryDiffCallback : DiffUtil.ItemCallback<UnifiedEntryEntity>() {
+        override fun areItemsTheSame(oldItem: UnifiedEntryEntity, newItem: UnifiedEntryEntity): Boolean {
+            return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: BlockEntry, newItem: BlockEntry): Boolean {
+        override fun areContentsTheSame(oldItem: UnifiedEntryEntity, newItem: UnifiedEntryEntity): Boolean {
             return oldItem == newItem
         }
     }
