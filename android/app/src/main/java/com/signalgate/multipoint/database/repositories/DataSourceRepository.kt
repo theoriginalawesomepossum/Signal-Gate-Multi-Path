@@ -3,6 +3,7 @@ package com.signalgate.multipoint.database.repositories
 import com.signalgate.multipoint.database.daos.SourceDao
 import com.signalgate.multipoint.database.daos.UnifiedEntryDao
 import com.signalgate.multipoint.database.entities.SourceEntity
+import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -75,7 +76,6 @@ class DataSourceRepository(
 
     /**
      * Toggles the enabled state of a data source.
-     * This will trigger the LED indicator update via the Flow.
      */
     suspend fun toggleSourceEnabled(sourceId: Int, isEnabled: Boolean) {
         sourceDao.updateSourceEnabled(sourceId, isEnabled)
@@ -119,4 +119,63 @@ class DataSourceRepository(
             total
         }
     }
+
+    // --- Methods migrated from legacy repository ---
+
+    private fun normalizePhoneNumber(raw: String): String {
+        if (raw.isBlank()) return ""
+        var cleaned = raw.replace(Regex("[^0-9+\\s]"), "").trim()
+        if (cleaned.startsWith("1") && cleaned.length == 11) {
+            cleaned = "+$cleaned"
+        } else if (!cleaned.startsWith("+")) {
+            cleaned = "+1$cleaned"
+        }
+        return cleaned
+    }
+
+    suspend fun getCallDecision(rawNumber: String): CallDecision {
+        val normalized = normalizePhoneNumber(rawNumber)
+        if (normalized.isBlank()) {
+            return CallDecision("ALLOW", "Invalid number", 0, "default")
+        }
+
+        entryDao.findAllowEntry(normalized)?.let {
+            return CallDecision("ALLOW", "Manual Allow List", it.confidence ?: 0, "manual_allow")
+        }
+
+        entryDao.findBlockEntry(normalized)?.let {
+            return CallDecision("BLOCK", "Manual Block List", it.confidence ?: 0, "manual_block")
+        }
+
+        val patterns = entryDao.getAllBlockPatterns()
+        patterns.find { normalized.startsWith(it.phoneNumber) }?.let {
+            return CallDecision("BLOCK", "Pattern: ${it.phoneNumber}", it.confidence ?: 0, "pattern")
+        }
+
+        entryDao.findEntriesByPhoneNumber(normalized).firstOrNull { it.action == "BLOCK" }?.let {
+            return CallDecision("BLOCK", it.metadata ?: "External Source", it.confidence ?: 0, "aggregated")
+        }
+
+        return CallDecision("ALLOW", "No rule matched", 0, "default")
+    }
+
+    suspend fun getAllEntries(): List<UnifiedEntryEntity> {
+        return entryDao.getAllEntries()
+    }
+
+    suspend fun insertEntry(entry: UnifiedEntryEntity) {
+        val sanitized = entry.copy(phoneNumber = normalizePhoneNumber(entry.phoneNumber))
+        entryDao.insertEntry(sanitized)
+    }
+
+    suspend fun deleteEntry(entry: UnifiedEntryEntity) {
+        entryDao.deleteEntry(entry)
+    }
+
+    data class CallDecision(
+        val action: String,
+        val reason: String,
+        val confidence: Int,
+        val source: String
+    )
 }

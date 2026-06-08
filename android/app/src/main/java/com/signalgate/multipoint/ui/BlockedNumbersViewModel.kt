@@ -3,7 +3,7 @@ package com.signalgate.multipoint.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
-import com.signalgate.multipoint.repository.DataSourceRepository
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,7 +23,6 @@ class BlockedNumbersViewModel(private val repository: DataSourceRepository) : Vi
         }
     }
 
-    // Fixed: Accepted type updated from PhoneEntry to UnifiedEntryEntity
     fun unblockNumber(entry: UnifiedEntryEntity) {
         viewModelScope.launch {
             repository.deleteEntry(entry)
@@ -31,7 +30,6 @@ class BlockedNumbersViewModel(private val repository: DataSourceRepository) : Vi
         }
     }
 
-    // Fixed: Accepted type updated from PhoneEntry to UnifiedEntryEntity
     fun blockNumber(entry: UnifiedEntryEntity) {
         viewModelScope.launch {
             repository.insertEntry(entry)

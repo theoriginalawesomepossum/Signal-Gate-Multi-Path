@@ -11,7 +11,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import com.signalgate.multipoint.ui.BlockedNumbersViewModel
 import com.signalgate.multipoint.ui.RecentCallsViewModel
-import com.signalgate.multipoint.repository.DataSourceRepository as LegacyRepository
 import com.signalgate.multipoint.data.security.BloomFilterEngine
 import com.signalgate.multipoint.data.security.PrecedenceEngine
 import com.signalgate.multipoint.data.security.SecureCsvParser
@@ -35,7 +34,6 @@ val databaseModule = module {
 
 val repositoryModule = module {
     single { DataSourceRepository(get(), get()) }
-    single { LegacyRepository(get<SignalGateDatabase>().unifiedEntryDao()) }
 }
 
 val logicModule = module {
