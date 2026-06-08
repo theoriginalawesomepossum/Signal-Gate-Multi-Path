@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.icons.Icons
-import androidx.compose.material3.icons.filled.List
-import androidx.compose.material3.icons.filled.LocationOn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +28,7 @@ fun SourceIcon(
     Box(
         modifier = modifier
             .size(40.dp)
-            .background(backgroundColor, shape = RoundedCornerShape(10.dp)),
+            .background(color = backgroundColor, shape = RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {
         Icon(
