@@ -56,7 +56,6 @@ fun OperationalDashboard(
             .padding(16.dp)
     ) {
         Column(modifier = Modifier.widthIn(min = 600.dp)) {
-            // Header with title and action buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,9 +85,7 @@ fun OperationalDashboard(
                         )
                     }
                 }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         onClick = onAddSource,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
@@ -110,7 +107,6 @@ fun OperationalDashboard(
                 }
             }
 
-            // Stats Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -123,7 +119,6 @@ fun OperationalDashboard(
                 StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.weight(1f))
             }
 
-            // Data Sources Section
             Text(
                 text = "DATA SOURCES",
                 color = Color.White,
@@ -143,7 +138,6 @@ fun OperationalDashboard(
                 }
             }
 
-            // Footer Stats
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -158,11 +152,7 @@ fun OperationalDashboard(
 }
 
 @Composable
-fun StatCard(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
+fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -170,17 +160,8 @@ fun StatCard(
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = label,
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 12.sp
-        )
-        Text(
-            text = value,
-            color = Color(0xFF00BCD4),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Text(text = label, color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+        Text(text = value, color = Color(0xFF00BCD4), fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -195,22 +176,10 @@ fun DataSourceCard(source: SourceEntity) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.width(160.dp)) {
-            Text(
-                text = source.name,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1
-            )
-            Text(
-                text = "${source.entriesCount} entries",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 12.sp
-            )
+            Text(text = source.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(text = "${source.entriesCount} entries", color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
         }
-
         Spacer(modifier = Modifier.width(16.dp))
-
         Column(modifier = Modifier.width(100.dp)) {
             Text(
                 text = source.healthStatus,
@@ -218,31 +187,14 @@ fun DataSourceCard(source: SourceEntity) {
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = "Status",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 10.sp
-            )
+            Text(text = "Status", color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp)
         }
-
         Spacer(modifier = Modifier.width(16.dp))
-
         Column(modifier = Modifier.width(100.dp)) {
-            Text(
-                text = formatLastSync(source.lastSynced),
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Last Synced",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 10.sp
-            )
+            Text(text = formatLastSync(source.lastSynced), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Last Synced", color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp)
         }
-
         Spacer(modifier = Modifier.weight(1f))
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
@@ -251,22 +203,13 @@ fun DataSourceCard(source: SourceEntity) {
                     .background(Color.Green.copy(alpha = 0.3f))
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Default.Refresh,
-                contentDescription = null,
-                tint = Color(0xFF00BCD4),
-                modifier = Modifier.size(20.dp)
-            )
+            Icon(imageVector = Icons.Default.Refresh, contentDescription = null, tint = Color(0xFF00BCD4), modifier = Modifier.size(20.dp))
         }
     }
 }
 
 @Composable
-fun FooterStatCard(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
+fun FooterStatCard(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -274,17 +217,8 @@ fun FooterStatCard(
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = label,
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 12.sp
-        )
-        Text(
-            text = value,
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Text(text = label, color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+        Text(text = value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
 }
 
