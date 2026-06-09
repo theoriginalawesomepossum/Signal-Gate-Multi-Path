@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         setContent {
             SignalGateTheme {
                 val navController = rememberNavController()
@@ -49,7 +49,8 @@ class MainActivity : ComponentActivity() {
                     Scaffold { innerPadding ->
                         SignalGateNavGraph(
                             navController = navController,
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier.padding(innerPadding),
+                            onOpenDrawer = { scope.launch { drawerState.open() } }
                         )
                     }
                 }
