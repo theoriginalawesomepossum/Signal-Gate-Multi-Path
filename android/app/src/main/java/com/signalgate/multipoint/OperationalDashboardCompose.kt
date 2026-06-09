@@ -22,31 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.signalgate.multipoint.database.SignalGateDatabase
-import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
-import com.signalgate.multipoint.ui.dashboard.DashboardViewModelFactory
 import com.signalgate.multipoint.database.entities.SourceEntity
+import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
 @Composable
 fun OperationalDashboard(
-    viewModel: DashboardViewModel = viewModel(
-        factory = DashboardViewModelFactory(
-            repository = DataSourceRepository(
-                sourceDao = SignalGateDatabase.getInstance(LocalContext.current).sourceDao(),
-                entryDao = SignalGateDatabase.getInstance(LocalContext.current).unifiedEntryDao()
-            )
-        )
-    ),
+    viewModel: DashboardViewModel = koinViewModel(),
     onAddSource: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
