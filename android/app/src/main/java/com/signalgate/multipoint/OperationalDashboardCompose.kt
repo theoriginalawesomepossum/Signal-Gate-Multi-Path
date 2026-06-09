@@ -444,8 +444,8 @@ private fun formatLastSync(timestamp: Long): String {
     val diff = System.currentTimeMillis() - timestamp
     return when {
         diff < 60_000L                -> "Just now"
-        diff < 3_600_000L             -> "${diff / 60_000}m ago"
-        diff < 86_400_000L            -> "${diff / 3_600_000}h ago"
+        diff < 3_600_000L             -> (diff / 60_000).toString() + "m ago"
+        diff < 86_400_000L            -> (diff / 3_600_000).toString() + "h ago"
         else                          -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
     }
 }
@@ -454,3 +454,4 @@ private fun formatLargeNumber(n: Int): String = when {
     n >= 1_000_000 -> String.format("%.1fM", n / 1_000_000.0)
     n >= 1_000     -> String.format("%.1fK", n / 1_000.0)
     else           -> n.toString()
+}
