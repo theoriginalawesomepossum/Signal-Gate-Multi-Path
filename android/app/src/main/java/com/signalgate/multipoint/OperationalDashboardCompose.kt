@@ -22,12 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.signalgate.multipoint.database.SignalGateDatabase
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModelFactory
 import com.signalgate.multipoint.database.entities.SourceEntity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,7 +39,13 @@ import java.util.*
 @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
 @Composable
 fun OperationalDashboard(
-    viewModel: DashboardViewModel = viewModel(),
+    viewModel: DashboardViewModel = viewModel(
+        factory = DashboardViewModelFactory(
+            repository = DataSourceRepository(
+                SignalGateDatabase.getInstance(LocalContext.current).sourceDao()
+            )
+        )
+    ),
     onAddSource: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
@@ -52,11 +62,10 @@ fun OperationalDashboard(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1a1a1a)) // Dark background
+            .background(Color(0xFF1a1a1a))
             .horizontalScroll(horizontalScrollState)
             .padding(16.dp)
     ) {
-        // Content container with minimum width to prevent jumbling
         Column(modifier = Modifier.widthIn(min = 600.dp)) {
             // Header with title and action buttons
             Row(
@@ -66,51 +75,51 @@ fun OperationalDashboard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.shield_logo),
-                    contentDescription = "Shield Logo",
-                    modifier = Modifier.size(48.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = "SIGNALGATE",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.shield_logo),
+                        contentDescription = "Shield Logo",
+                        modifier = Modifier.size(48.dp)
                     )
-                    Text(
-                        text = "MULTI-PORT",
-                        color = Color(0xFF00BCD4), // Cyan color
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "SIGNALGATE",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "MULTI-PORT",
+                            color = Color(0xFF00BCD4),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onAddSource,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
+                        modifier = Modifier.height(40.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Source", tint = Color.White)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Add Source", color = Color.White)
+                    }
+                    Button(
+                        onClick = { viewModel.syncAllSources() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
+                        modifier = Modifier.height(40.dp)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Sync All", tint = Color.White)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Sync All Now", color = Color.White)
+                    }
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = onAddSource,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
-                    modifier = Modifier.height(40.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Source", tint = Color.White)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Source", color = Color.White)
-                }
-                Button(
-                    onClick = { viewModel.syncAllSources() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
-                    modifier = Modifier.height(40.dp)
-                ) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Sync All", tint = Color.White)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Sync All Now", color = Color.White)
-                }
-            }
-        }
 
             // Stats Bar
             Row(
@@ -125,25 +134,25 @@ fun OperationalDashboard(
                 StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.weight(1f))
             }
 
-        // Data Sources Section
-        Text(
-            text = "DATA SOURCES",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+            // Data Sources Section
+            Text(
+                text = "DATA SOURCES",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(dataSources) { source ->
-                DataSourceCard(source)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(dataSources) { source ->
+                    DataSourceCard(source)
+                }
             }
-        }
 
             // Footer Stats
             Row(
@@ -196,7 +205,6 @@ fun DataSourceCard(source: SourceEntity) {
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Name and Entries
         Column(modifier = Modifier.width(160.dp)) {
             Text(
                 text = source.name,
@@ -211,10 +219,9 @@ fun DataSourceCard(source: SourceEntity) {
                 fontSize = 12.sp
             )
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Health Status
         Column(modifier = Modifier.width(100.dp)) {
             Text(
                 text = source.healthStatus,
@@ -231,7 +238,6 @@ fun DataSourceCard(source: SourceEntity) {
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Last Sync
         Column(modifier = Modifier.width(100.dp)) {
             Text(
                 text = formatLastSync(source.lastSynced),
@@ -248,9 +254,7 @@ fun DataSourceCard(source: SourceEntity) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Actions
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // Simplified action placeholder for Compose
             Box(
                 modifier = Modifier
                     .size(40.dp, 24.dp)
