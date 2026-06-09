@@ -1,181 +1,313 @@
-package com.signalgate.multipoint.database.repositories
+package com.signalgate.multipoint
 
-import com.signalgate.multipoint.database.daos.SourceDao
-import com.signalgate.multipoint.database.daos.UnifiedEntryDao
+import androidx.compose.runtime.Composable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.signalgate.multipoint.database.SignalGateDatabase
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModelFactory
 import com.signalgate.multipoint.database.entities.SourceEntity
-import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import java.text.SimpleDateFormat
+import java.util.*
 
-/**
- * DataSourceRepository handles all data source operations and state management.
- * Acts as a single source of truth for data source data.
- */
-class DataSourceRepository(
-    private val sourceDao: SourceDao,
-    private val entryDao: UnifiedEntryDao
+@Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
+@Composable
+fun OperationalDashboard(
+    viewModel: DashboardViewModel = viewModel(
+        factory = DashboardViewModelFactory(
+            repository = DataSourceRepository(
+                sourceDao = SignalGateDatabase.getInstance(LocalContext.current).sourceDao(),
+                entryDao = SignalGateDatabase.getInstance(LocalContext.current).unifiedEntryDao()
+            )
+        )
+    ),
+    onAddSource: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
+    val totalSources by viewModel.totalSources.collectAsState(initial = 0)
+    val totalEntries by viewModel.totalEntries.collectAsState(initial = 0)
+    val blockedToday by viewModel.blockedToday.collectAsState()
+    val dataSources by viewModel.dataSources.collectAsState(initial = emptyList())
+    val isSyncing by viewModel.isSyncing.collectAsState()
 
-    /**
-     * Gets all data sources from the database.
-     */
-    fun getAllSources(): Flow<List<SourceEntity>> {
-        return sourceDao.getAllSources()
-    }
+    val lastSyncTime = if (dataSources.isEmpty()) "Never" else formatLastSync(dataSources.maxOfOrNull { it.lastSynced } ?: 0)
 
-    /**
-     * Gets only enabled data sources.
-     */
-    fun getEnabledSources(): Flow<List<SourceEntity>> {
-        return sourceDao.getEnabledSources()
-    }
+    val horizontalScrollState = rememberScrollState()
 
-    /**
-     * Gets the count of all sources.
-     */
-    fun getSourceCount(): Flow<Int> {
-        return sourceDao.getSourceCount()
-    }
-
-    /**
-     * Gets the count of enabled sources.
-     */
-    fun getEnabledSourceCount(): Flow<Int> {
-        return getAllSources().map { sources ->
-            sources.count { it.isEnabled }
-        }
-    }
-
-    /**
-     * Gets a specific source by ID.
-     */
-    suspend fun getSourceById(id: Int): SourceEntity? {
-        return sourceDao.getSourceById(id)
-    }
-
-    /**
-     * Inserts a new data source.
-     */
-    suspend fun insertSource(source: SourceEntity): Long {
-        return sourceDao.insertSource(source)
-    }
-
-    /**
-     * Updates an existing data source.
-     */
-    suspend fun updateSource(source: SourceEntity) {
-        sourceDao.updateSource(source)
-    }
-
-    /**
-     * Deletes a data source.
-     */
-    suspend fun deleteSource(source: SourceEntity) {
-        sourceDao.deleteSource(source)
-    }
-
-    /**
-     * Toggles the enabled state of a data source.
-     */
-    suspend fun toggleSourceEnabled(sourceId: Int, isEnabled: Boolean) {
-        sourceDao.updateSourceEnabled(sourceId, isEnabled)
-    }
-
-    /**
-     * Updates the sync status of a data source.
-     */
-    suspend fun updateSourceSyncStatus(
-        sourceId: Int,
-        timestamp: Long,
-        entriesCount: Int,
-        healthStatus: String
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF1a1a1a))
+            .horizontalScroll(horizontalScrollState)
+            .padding(16.dp)
     ) {
-        sourceDao.updateSourceSyncStatus(sourceId, timestamp, entriesCount, healthStatus)
-    }
-
-    /**
-     * Gets the entry count for a specific source.
-     */
-    suspend fun getEntryCountBySourceId(sourceId: Int): Int {
-        return entryDao.getEntryCountBySourceId(sourceId)
-    }
-
-    /**
-     * Gets the total entry count across all sources.
-     */
-    fun getTotalEntryCount(): Flow<Int> {
-        return entryDao.getTotalEntryCount()
-    }
-
-    /**
-     * Gets the total entry count for enabled sources only.
-     */
-    fun getEnabledSourcesEntryCount(): Flow<Int> {
-        return getEnabledSources().map { sources ->
-            var total = 0
-            sources.forEach { source ->
-                total += source.entriesCount
+        Column(modifier = Modifier.widthIn(min = 600.dp)) {
+            // Header with title and action buttons
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.shield_logo),
+                        contentDescription = "Shield Logo",
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "SIGNALGATE",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "MULTI-PORT",
+                            color = Color(0xFF00BCD4),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onAddSource,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
+                        modifier = Modifier.height(40.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Source", tint = Color.White)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Add Source", color = Color.White)
+                    }
+                    Button(
+                        onClick = { viewModel.syncAllSources() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)),
+                        modifier = Modifier.height(40.dp)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Sync All", tint = Color.White)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Sync All Now", color = Color.White)
+                    }
+                }
             }
-            total
+
+            // Stats Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                StatCard(label = "Total Sources", value = totalSources.toString(), modifier = Modifier.weight(1f))
+                StatCard(label = "Total Entries", value = totalEntries.toString(), modifier = Modifier.weight(1.2f))
+                StatCard(label = "Last Sync", value = lastSyncTime, modifier = Modifier.weight(1f))
+                StatCard(label = "Blocked Today", value = blockedToday.toString(), modifier = Modifier.weight(1f))
+            }
+
+            // Data Sources Section
+            Text(
+                text = "DATA SOURCES",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(dataSources) { source ->
+                    DataSourceCard(source)
+                }
+            }
+
+            // Footer Stats
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FooterStatCard(label = "Sync Schedule", value = "Every 1 hour", modifier = Modifier.weight(1f))
+                FooterStatCard(label = "Database Health", value = "Good", modifier = Modifier.weight(1f))
+            }
         }
     }
+}
 
-    // --- Methods migrated from legacy repository ---
-
-    private fun normalizePhoneNumber(raw: String): String {
-        if (raw.isBlank()) return ""
-        var cleaned = raw.replace(Regex("[^0-9+\\s]"), "").trim()
-        if (cleaned.startsWith("1") && cleaned.length == 11) {
-            cleaned = "+$cleaned"
-        } else if (!cleaned.startsWith("+")) {
-            cleaned = "+1$cleaned"
-        }
-        return cleaned
+@Composable
+fun StatCard(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.White.copy(alpha = 0.05f))
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 12.sp
+        )
+        Text(
+            text = value,
+            color = Color(0xFF00BCD4),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
+}
 
-    suspend fun getCallDecision(rawNumber: String): CallDecision {
-        val normalized = normalizePhoneNumber(rawNumber)
-        if (normalized.isBlank()) {
-            return CallDecision("ALLOW", "Invalid number", 0, "default")
+@Composable
+fun DataSourceCard(source: SourceEntity) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.White.copy(alpha = 0.05f))
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.width(160.dp)) {
+            Text(
+                text = source.name,
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+            Text(
+                text = "${source.entriesCount} entries",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 12.sp
+            )
         }
 
-        entryDao.findUnifiedAllowEntry(normalized)?.let {
-            return CallDecision("ALLOW", "Manual Allow List", it.confidence ?: 0, "manual_allow")
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(modifier = Modifier.width(100.dp)) {
+            Text(
+                text = source.healthStatus,
+                color = if (source.healthStatus == "HEALTHY") Color.Green else Color.Yellow,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Status",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 10.sp
+            )
         }
 
-        entryDao.findUnifiedBlockEntry(normalized)?.let {
-            return CallDecision("BLOCK", "Manual Block List", it.confidence ?: 0, "manual_block")
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(modifier = Modifier.width(100.dp)) {
+            Text(
+                text = formatLastSync(source.lastSynced),
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Last Synced",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 10.sp
+            )
         }
 
-        val patterns = entryDao.getAllBlockPatterns()
-        patterns.find { normalized.startsWith(it.phoneNumber) }?.let {
-            return CallDecision("BLOCK", "Pattern: ${it.phoneNumber}", it.confidence ?: 0, "pattern")
-        }
+        Spacer(modifier = Modifier.weight(1f))
 
-        entryDao.findEntriesByPhoneNumber(normalized).firstOrNull { it.action == "BLOCK" }?.let {
-            return CallDecision("BLOCK", it.metadata ?: "External Source", it.confidence ?: 0, "aggregated")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp, 24.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Green.copy(alpha = 0.3f))
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                tint = Color(0xFF00BCD4),
+                modifier = Modifier.size(20.dp)
+            )
         }
-
-        return CallDecision("ALLOW", "No rule matched", 0, "default")
     }
+}
 
-    suspend fun getAllEntries(): List<UnifiedEntryEntity> {
-        return entryDao.getAllEntries()
+@Composable
+fun FooterStatCard(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.White.copy(alpha = 0.05f))
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 12.sp
+        )
+        Text(
+            text = value,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
+}
 
-    suspend fun insertEntry(entry: UnifiedEntryEntity) {
-        val sanitized = entry.copy(phoneNumber = normalizePhoneNumber(entry.phoneNumber))
-        entryDao.insertEntry(sanitized)
+private fun formatLastSync(timestamp: Long): String {
+    if (timestamp == 0L) return "Never"
+    val now = System.currentTimeMillis()
+    val diff = now - timestamp
+    return when {
+        diff < 60000 -> "Just now"
+        diff < 3600000 -> "${diff / 60000}m ago"
+        diff < 86400000 -> "${diff / 3600000}h ago"
+        else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
     }
-
-    suspend fun deleteEntry(entry: UnifiedEntryEntity) {
-        entryDao.deleteEntry(entry)
-    }
-
-    data class CallDecision(
-        val action: String,
-        val reason: String,
-        val confidence: Int,
-        val source: String
-    )
 }
