@@ -1,6 +1,7 @@
 package com.signalgate.multipoint.ui.dashboard
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.signalgate.multipoint.database.entities.SourceEntity
 import com.signalgate.multipoint.database.repositories.DataSourceRepository
@@ -14,7 +15,7 @@ class DashboardViewModel(
 
     val totalSources: Flow<Int> = repository.getSourceCount()
     val totalEntries: Flow<Int> = repository.getTotalEntryCount()
-    
+
     private val _blockedToday = MutableStateFlow(0)
     val blockedToday: StateFlow<Int> = _blockedToday.asStateFlow()
 
@@ -86,5 +87,17 @@ class DashboardViewModel(
                 _isSyncing.value = false
             }
         }
+    }
+}
+
+class DashboardViewModelFactory(
+    private val repository: DataSourceRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return DashboardViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
