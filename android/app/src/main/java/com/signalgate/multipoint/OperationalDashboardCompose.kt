@@ -42,7 +42,8 @@ fun OperationalDashboard(
     viewModel: DashboardViewModel = viewModel(
         factory = DashboardViewModelFactory(
             repository = DataSourceRepository(
-                SignalGateDatabase.getInstance(LocalContext.current).sourceDao()
+                sourceDao = SignalGateDatabase.getInstance(LocalContext.current).sourceDao(),
+                entryDao = SignalGateDatabase.getInstance(LocalContext.current).unifiedEntryDao()
             )
         )
     ),
