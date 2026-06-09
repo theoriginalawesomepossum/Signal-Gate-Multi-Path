@@ -4,17 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
-      - develop
-      - feature/compose-metrics-analysis
+      - develop        # Only build from develop — never from main or stale branches
   pull_request:
     branches:
-      - main
       - develop
-      - feature/compose-metrics-analysis
 
 permissions:
-  contents: write  # Required for creating releases and uploading assets
+  contents: write
 
 env:
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096M -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
@@ -27,15 +23,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref_name }}
-          
+          ref: develop    # Always explicit — never inferred from event context
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: gradle
-          
+
       - name: Run Unit Tests
         working-directory: android
         run: |
@@ -50,19 +46,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref_name }}
-          
+          ref: develop    # Always explicit — never inferred from event context
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: gradle
-          
+
       - name: Get build timestamp
         id: ts
         run: echo "ts=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
-        
+
       - name: Build release APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -76,7 +72,7 @@ jobs:
             -x connectedCheck \
             --stacktrace \
             --info
-            
+
       - name: Find APK Path
         id: find_apk
         run: |
@@ -87,14 +83,14 @@ jobs:
           fi
           echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
           echo "Found APK at: $APK_PATH"
-          
+
       - name: Upload release APK to artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: ${{ steps.find_apk.outputs.apk_path }}
           retention-days: 30
-          
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: success()
@@ -105,15 +101,15 @@ jobs:
           tag_name: release-${{ github.run_number }}
           body: |
             # Release APK Build #${{ github.run_number }}
-            
+
             **Build Date:** ${{ steps.ts.outputs.ts }}
-            **Branch:** ${{ github.event.inputs.branch || github.ref_name }}
+            **Branch:** develop
             **Commit:** ${{ github.sha }}
-            
+
             ## Status
             - Unit tests passed
             - Android release build complete
-            
+
       - name: Print APK location
         run: |
           echo "Release APK built successfully!"
