@@ -2,7 +2,6 @@ package com.signalgate.multipoint
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +45,11 @@ fun OperationalDashboard(
     val isSyncing by viewModel.isSyncing.collectAsState()
 
     val lastSyncTime = if (dataSources.isEmpty()) "Never"
-        else formatLastSync(dataSources.maxOfOrNull { it.lastSynced } ?: 0)
+    else formatLastSync(dataSources.maxOfOrNull { it.lastSynced } ?: 0)
+
+    // Responsive breakpoint — portrait phones are typically under 600dp wide
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val isPortrait = screenWidth < 600
 
     Column(
         modifier = Modifier
@@ -57,10 +60,10 @@ fun OperationalDashboard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Hamburger — opens the drawer
+            // Hamburger
             IconButton(onClick = onOpenDrawer) {
                 Icon(
                     imageVector = Icons.Default.Menu,
@@ -69,9 +72,9 @@ fun OperationalDashboard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
-            // Logo placeholder — replace with Image(painterResource) when asset is ready
+            // SG logo box
             Box(
                 modifier = Modifier
                     .size(36.dp)
@@ -79,80 +82,123 @@ fun OperationalDashboard(
                     .border(1.dp, NeonCyan, RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("SG", color = NeonCyan, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("SG", color = NeonCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
+            // App title
             Column {
                 Text(
                     text = "SIGNALGATE",
                     color = TextPrimary,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "MULTI-PORT",
                     color = NeonCyan,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Medium
                 )
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Shield status — reuses existing component
+            // Shield status — scaled down in portrait so it fits
             ShieldStatusGlow(
                 statusText = "ACTIVE",
-                glowColor = NeonGreen
+                glowColor = NeonGreen,
+                modifier = if (isPortrait) Modifier.scale(0.75f) else Modifier
             )
         }
 
         HorizontalDivider(color = BorderGlass, thickness = 1.dp)
 
-        // ── Scrollable content ────────────────────────────────────────────────
+        // ── Scrollable body ───────────────────────────────────────────────────
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(vertical = 12.dp)
         ) {
 
-            // ── Stats row ─────────────────────────────────────────────────────
+            // ── Stats — 2x2 grid in portrait, 1x4 row in landscape ───────────
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    DashStatCard(
-                        label = "Total Sources",
-                        value = totalSources.toString(),
-                        subLabel = "Enabled: $enabledCount",
-                        modifier = Modifier.weight(1f)
-                    )
-                    DashStatCard(
-                        label = "Total Entries",
-                        value = formatLargeNumber(totalEntries),
-                        subLabel = "Across all sources",
-                        modifier = Modifier.weight(1f)
-                    )
-                    DashStatCard(
-                        label = "Last Sync",
-                        value = lastSyncTime,
-                        subLabel = if (dataSources.isEmpty()) "" else "All sources OK",
-                        modifier = Modifier.weight(1f)
-                    )
-                    DashStatCard(
-                        label = "Blocked Today",
-                        value = blockedToday.toString(),
-                        subLabel = "+0 vs yesterday",
-                        modifier = Modifier.weight(1f)
-                    )
+                if (isPortrait) {
+                    // 2x2 grid — no word wrapping
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            DashStatCard(
+                                label = "Total Sources",
+                                value = totalSources.toString(),
+                                subLabel = "Enabled: $enabledCount",
+                                modifier = Modifier.weight(1f)
+                            )
+                            DashStatCard(
+                                label = "Total Entries",
+                                value = formatLargeNumber(totalEntries),
+                                subLabel = "Across all sources",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            DashStatCard(
+                                label = "Last Sync",
+                                value = lastSyncTime,
+                                subLabel = if (dataSources.isEmpty()) "No sources" else "All sources OK",
+                                modifier = Modifier.weight(1f)
+                            )
+                            DashStatCard(
+                                label = "Blocked Today",
+                                value = blockedToday.toString(),
+                                subLabel = "+0 vs yesterday",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                } else {
+                    // 1x4 row — landscape / tablet
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        DashStatCard(
+                            label = "Total Sources",
+                            value = totalSources.toString(),
+                            subLabel = "Enabled: $enabledCount",
+                            modifier = Modifier.weight(1f)
+                        )
+                        DashStatCard(
+                            label = "Total Entries",
+                            value = formatLargeNumber(totalEntries),
+                            subLabel = "Across all sources",
+                            modifier = Modifier.weight(1f)
+                        )
+                        DashStatCard(
+                            label = "Last Sync",
+                            value = lastSyncTime,
+                            subLabel = if (dataSources.isEmpty()) "No sources" else "All sources OK",
+                            modifier = Modifier.weight(1f)
+                        )
+                        DashStatCard(
+                            label = "Blocked Today",
+                            value = blockedToday.toString(),
+                            subLabel = "+0 vs yesterday",
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
 
-            // ── Data Sources header ───────────────────────────────────────────
+            // ── Data Sources header row ───────────────────────────────────────
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -166,37 +212,32 @@ fun OperationalDashboard(
                         letterSpacing = 1.sp,
                         modifier = Modifier.weight(1f)
                     )
-                    // Add Source button
-                    Button(
+                    OutlinedButton(
                         onClick = onAddSource,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        border = ButtonDefaults.outlinedButtonBorder,
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                        modifier = Modifier.height(32.dp)
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.height(30.dp),
+                        border = ButtonDefaults.outlinedButtonBorder
                     ) {
                         Icon(
                             Icons.Default.Add,
                             contentDescription = "Add Source",
                             tint = NeonCyan,
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(13.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text("Add Source", color = NeonCyan, fontSize = 11.sp)
                     }
                     Spacer(modifier = Modifier.width(6.dp))
-                    // Sync All button
                     Button(
                         onClick = { viewModel.syncAllSources() },
                         colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                        modifier = Modifier.height(32.dp)
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.height(30.dp)
                     ) {
                         if (isSyncing) {
                             CircularProgressIndicator(
                                 color = DeepSpaceBackground,
-                                modifier = Modifier.size(12.dp),
+                                modifier = Modifier.size(11.dp),
                                 strokeWidth = 2.dp
                             )
                         } else {
@@ -204,22 +245,22 @@ fun OperationalDashboard(
                                 Icons.Default.Refresh,
                                 contentDescription = "Sync All",
                                 tint = DeepSpaceBackground,
-                                modifier = Modifier.size(14.dp)
+                                modifier = Modifier.size(13.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text("Sync All Now", color = DeepSpaceBackground, fontSize = 11.sp)
                     }
                 }
             }
 
-            // ── Source cards ──────────────────────────────────────────────────
+            // ── Source cards or empty state ───────────────────────────────────
             if (dataSources.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 32.dp),
+                            .padding(vertical = 40.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -228,7 +269,7 @@ fun OperationalDashboard(
                                 color = TextSecondary,
                                 fontSize = 14.sp
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = "Tap + Add Source to get started",
                                 color = NeonCyan,
@@ -269,6 +310,7 @@ fun OperationalDashboard(
                         modifier = Modifier.weight(1f)
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -292,14 +334,29 @@ fun DashStatCard(
                 )
             )
             .border(1.dp, BorderGlass, RoundedCornerShape(10.dp))
-            .padding(10.dp),
-        horizontalAlignment = Alignment.Start
+            .padding(10.dp)
     ) {
-        Text(text = label, color = TextSecondary, fontSize = 10.sp)
+        Text(
+            text = label,
+            color = TextSecondary,
+            fontSize = 10.sp,
+            maxLines = 1
+        )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = value, color = NeonCyan, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = value,
+            color = NeonCyan,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
         if (subLabel.isNotBlank()) {
-            Text(text = subLabel, color = TextSecondary, fontSize = 10.sp)
+            Text(
+                text = subLabel,
+                color = TextSecondary,
+                fontSize = 10.sp,
+                maxLines = 1
+            )
         }
     }
 }
@@ -327,13 +384,12 @@ fun SourceCard(
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Source type indicator dot
+        // Health dot
         Box(
             modifier = Modifier
                 .size(8.dp)
                 .background(healthColor, RoundedCornerShape(4.dp))
         )
-
         Spacer(modifier = Modifier.width(10.dp))
 
         // Name + type
@@ -348,18 +404,19 @@ fun SourceCard(
             Text(
                 text = source.type,
                 color = TextSecondary,
-                fontSize = 11.sp
+                fontSize = 11.sp,
+                maxLines = 1
             )
         }
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Entries + health
+        // Entries + health status
         Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = formatLargeNumber(source.entriesCount),
                 color = TextPrimary,
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
@@ -367,22 +424,6 @@ fun SourceCard(
                 color = healthColor,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Last synced
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = formatLastSync(source.lastSynced),
-                color = TextSecondary,
-                fontSize = 11.sp
-            )
-            Text(
-                text = "Last synced",
-                color = TextSecondary,
-                fontSize = 10.sp
             )
         }
 
@@ -401,11 +442,14 @@ fun SourceCard(
             modifier = Modifier.scale(0.75f)
         )
 
-        // Sync button
-        IconButton(onClick = onSync, modifier = Modifier.size(32.dp)) {
+        // Sync icon
+        IconButton(
+            onClick = onSync,
+            modifier = Modifier.size(32.dp)
+        ) {
             Icon(
                 Icons.Default.Refresh,
-                contentDescription = "Sync",
+                contentDescription = "Sync source",
                 tint = NeonCyan,
                 modifier = Modifier.size(16.dp)
             )
@@ -430,10 +474,24 @@ fun FooterCard(
             .border(1.dp, BorderGlass, RoundedCornerShape(10.dp))
             .padding(12.dp)
     ) {
-        Text(text = label, color = TextSecondary, fontSize = 10.sp, letterSpacing = 0.5.sp)
+        Text(
+            text = label,
+            color = TextSecondary,
+            fontSize = 10.sp,
+            letterSpacing = 0.5.sp
+        )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = value, color = valueColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-        Text(text = subValue, color = TextSecondary, fontSize = 11.sp)
+        Text(
+            text = value,
+            color = valueColor,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = subValue,
+            color = TextSecondary,
+            fontSize = 11.sp
+        )
     }
 }
 
@@ -443,10 +501,10 @@ private fun formatLastSync(timestamp: Long): String {
     if (timestamp == 0L) return "Never"
     val diff = System.currentTimeMillis() - timestamp
     return when {
-        diff < 60_000L                -> "Just now"
-        diff < 3_600_000L             -> (diff / 60_000).toString() + "m ago"
-        diff < 86_400_000L            -> (diff / 3_600_000).toString() + "h ago"
-        else                          -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
+        diff < 60_000L     -> "Just now"
+        diff < 3_600_000L  -> (diff / 60_000).toString() + "m ago"
+        diff < 86_400_000L -> (diff / 3_600_000).toString() + "h ago"
+        else               -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
     }
 }
 
