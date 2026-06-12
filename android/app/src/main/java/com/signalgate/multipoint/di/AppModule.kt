@@ -53,8 +53,15 @@ val logicModule = module {
     }
     // CallScreeningEngine now uses DataSourceRepository (no direct DB access)
     single { CallScreeningEngine(get()) }
-    // DataSyncEngine now uses DataSourceRepository + SyncHistoryRepository
+    // Sync engine now uses DataSourceRepository + SyncHistoryRepository
     single { DataSyncEngine(get(), get()) }
+
+    // WorkManager workers (factory required for KoinWorkerFactory)
+    factory { (context: android.content.Context, params: androidx.work.WorkerParameters) ->
+        com.signalgate.multipoint.service.workers.MultiPortSyncWorker(
+            context, params, get(), get(), get()
+        )
+    }
 }
 
 val viewModelModule = module {
