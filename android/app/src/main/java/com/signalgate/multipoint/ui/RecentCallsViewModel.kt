@@ -2,17 +2,21 @@ package com.signalgate.multipoint.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.signalgate.multipoint.database.daos.CallLogDao
-import com.signalgate.multipoint.database.daos.UnifiedEntryDao
 import com.signalgate.multipoint.database.entities.CallLogEntry
 import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
+import com.signalgate.multipoint.database.repositories.CallLogRepository
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Uses [CallLogRepository] and [DataSourceRepository] as the production data path.
+ * Raw DAO access has been removed; all mutations go through the repository layer.
+ */
 class RecentCallsViewModel(
-    private val callLogDao: CallLogDao,
-    private val unifiedEntryDao: UnifiedEntryDao
+    private val callLogRepository: CallLogRepository,
+    private val dataSourceRepository: DataSourceRepository
 ) : ViewModel() {
 
     private val _recentCalls = MutableStateFlow<List<CallLogEntry>>(emptyList())
@@ -24,19 +28,19 @@ class RecentCallsViewModel(
 
     fun loadRecentCalls() {
         viewModelScope.launch {
-            callLogDao.getRecentCalls(100).collect {
-                _recentCalls.value = it
+            callLogRepository.allLogsFlow.collect { entries ->
+                _recentCalls.value = entries
             }
         }
     }
 
     fun blockNumber(phoneNumber: String) {
         viewModelScope.launch {
-            unifiedEntryDao.insertEntry(
+            dataSourceRepository.insertEntry(
                 UnifiedEntryEntity(
                     phoneNumber = phoneNumber,
                     action = "BLOCK",
-                    sourceId = 1 // Assuming 1 is the MANUAL source ID
+                    sourceId = 1 // Source ID 1 is the MANUAL entry source
                 )
             )
         }
@@ -44,11 +48,11 @@ class RecentCallsViewModel(
 
     fun whitelistNumber(phoneNumber: String) {
         viewModelScope.launch {
-            unifiedEntryDao.insertEntry(
+            dataSourceRepository.insertEntry(
                 UnifiedEntryEntity(
                     phoneNumber = phoneNumber,
                     action = "ALLOW",
-                    sourceId = 1 // Assuming 1 is the MANUAL source ID
+                    sourceId = 1 // Source ID 1 is the MANUAL entry source
                 )
             )
         }
