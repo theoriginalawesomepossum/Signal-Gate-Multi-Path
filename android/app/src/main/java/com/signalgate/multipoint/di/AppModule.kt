@@ -2,21 +2,22 @@ package com.signalgate.multipoint.di
 
 import androidx.room.Room
 import com.signalgate.multipoint.database.SignalGateDatabase
-import com.signalgate.multipoint.database.repositories.DataSourceRepository
 import com.signalgate.multipoint.database.repositories.CallLogRepository
-import com.signalgate.multipoint.ui.overlay.CallOverlayViewModel
-import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
+import com.signalgate.multipoint.database.repositories.SyncHistoryRepository
 import com.signalgate.multipoint.logic.CallScreeningEngine
-import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import com.signalgate.multipoint.logic.DataSyncEngine
 import com.signalgate.multipoint.ui.BlockedNumbersViewModel
 import com.signalgate.multipoint.ui.RecentCallsViewModel
+import com.signalgate.multipoint.ui.dashboard.DashboardViewModel
+import com.signalgate.multipoint.ui.overlay.CallOverlayViewModel
+import com.signalgate.multipoint.ui.viewmodels.TelemetryViewModel
 import com.signalgate.multipoint.data.security.BloomFilterEngine
 import com.signalgate.multipoint.data.security.PrecedenceEngine
 import com.signalgate.multipoint.data.security.SecureCsvParser
-import com.signalgate.multipoint.data.security.SanitizationEngine
-import com.signalgate.multipoint.ui.viewmodels.TelemetryViewModel
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 
 val databaseModule = module {
     single {
@@ -36,13 +37,24 @@ val databaseModule = module {
 val repositoryModule = module {
     single { DataSourceRepository(get(), get()) }
     single { CallLogRepository(get()) }
+    single { SyncHistoryRepository(get()) }
 }
 
 val logicModule = module {
+    // Security layer
     single { BloomFilterEngine() }
     single { SecureCsvParser(get()) }
-    single { PrecedenceEngine(get(), hashSetOf<String>(), hashSetOf<String>()) }
+    single {
+        PrecedenceEngine(
+            bloomFilter = get(),
+            localAllowListCache = hashSetOf(),
+            localManualBlockListCache = hashSetOf()
+        )
+    }
+    // CallScreeningEngine now uses DataSourceRepository (no direct DB access)
     single { CallScreeningEngine(get()) }
+    // DataSyncEngine now uses DataSourceRepository + SyncHistoryRepository
+    single { DataSyncEngine(get(), get()) }
 }
 
 val viewModelModule = module {
