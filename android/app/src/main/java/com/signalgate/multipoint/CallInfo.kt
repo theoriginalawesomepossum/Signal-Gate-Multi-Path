@@ -16,5 +16,5 @@ data class CallInfo(
     val confidence: Int?, // 0-100 confidence percentage
     val riskLevel: String?, // e.g., HIGH, MEDIUM, LOW
     val matchedSources: List<String>, // e.g., Community Feed, Telemarketer DB, User Reports
-    val callDecision: CallScreeningService.CallDecision // The decision for this call
+    val callDecision: SignalGateCallScreeningService.CallDecision // The decision for this call
 ) : Parcelable
