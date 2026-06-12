@@ -3,24 +3,27 @@ package com.signalgate.multipoint
 import android.content.Intent
 import android.os.Build
 import android.telecom.Call
-import android.telecom.CallScreeningService
-import org.koin.android.ext.android.inject
-import com.signalgate.multipoint.logic.CallScreeningEngine
+import android.telecom.CallScreeningService as TelecomCallScreeningService
 import android.util.Log
+import com.signalgate.multipoint.logic.CallScreeningEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 /**
- * CallScreeningService handles incoming calls and determines whether to allow, block, or screen them.
- * It implements the Priority Hierarchy:
+ * SignalGateCallScreeningService extends the Android framework's CallScreeningService.
+ * The class is intentionally named differently from the framework class to avoid
+ * the self-extension compile error that existed in the previous revision.
+ *
+ * Implements the Priority Hierarchy:
  * 1. Manual Allow-list (Whitelist)
  * 2. Manual Block-list
  * 3. Pattern/Prefix Rules
  * 4. Aggregated Data Sources
  * 5. Default (Allow)
  */
-class CallScreeningService : CallScreeningService() {
+class SignalGateCallScreeningService : TelecomCallScreeningService() {
     private val screeningEngine: CallScreeningEngine by inject()
 
     companion object {
@@ -57,8 +60,13 @@ class CallScreeningService : CallScreeningService() {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error screening call", e)
-                // Default to allowing the call on error
-                respondToCall(details, CallDecision.ALLOW)
+                // Default to allowing the call on error — build a safe ALLOW response
+                val safeResponse = CallResponse.Builder()
+                    .setDisallowCall(false)
+                    .setSkipCallLog(false)
+                    .setSkipNotification(false)
+                    .build()
+                respondToCall(details, safeResponse)
             }
         }
     }
@@ -93,43 +101,20 @@ class CallScreeningService : CallScreeningService() {
     }
 
     /**
-     * Applies the call decision by responding to the call.
+     * Applies the call decision by building a [CallResponse] and responding to the call.
      */
     private fun applyCallDecision(details: Call.Details, decision: CallDecision) {
-        respondToCall(details, decision)
-    }
-
-    /**
-     * Responds to the call with the specified decision.
-     */
-    private fun respondToCall(details: Call.Details, decision: CallDecision) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return
         val response = when (decision) {
-            CallDecision.ALLOW -> {
-                CallResponse.Builder()
-                    .setDisallowCall(false)
-                    .setSkipCallLog(false)
-                    .setSkipNotification(false)
-                    .build()
-            }
-            CallDecision.BLOCK -> {
-                CallResponse.Builder()
-                    .setDisallowCall(true)
-                    .setSkipCallLog(true)
-                    .setSkipNotification(true)
-                    .build()
-            }
-            CallDecision.SCREEN -> {
-                CallResponse.Builder()
-                    .setDisallowCall(false)
-                    .setSkipCallLog(false)
-                    .setSkipNotification(false)
-                    .build()
-            }
+            CallDecision.ALLOW -> CallResponse.Builder()
+                .setDisallowCall(false).setSkipCallLog(false).setSkipNotification(false).build()
+            CallDecision.BLOCK -> CallResponse.Builder()
+                .setDisallowCall(true).setSkipCallLog(true).setSkipNotification(true).build()
+            CallDecision.SCREEN -> CallResponse.Builder()
+                .setDisallowCall(false).setSkipCallLog(false).setSkipNotification(false).build()
         }
-
-        super.respondToCall(details, response)
+        respondToCall(details, response)
     }
+
 
     /**
      * Triggers the overlay service to display the incoming call shield.
