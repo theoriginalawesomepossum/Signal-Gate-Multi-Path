@@ -1,11 +1,12 @@
 package com.signalgate.multipoint.logic
 
 import android.util.Log
-import com.signalgate.multipoint.database.SignalGateDatabase
-import com.signalgate.multipoint.database.entities.SourceEntity
 import com.signalgate.multipoint.database.entities.SyncHistoryEntry
 import com.signalgate.multipoint.database.entities.UnifiedEntryEntity
+import com.signalgate.multipoint.database.repositories.DataSourceRepository
+import com.signalgate.multipoint.database.repositories.SyncHistoryRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
@@ -14,9 +15,15 @@ import java.net.URL
 
 /**
  * DataSyncEngine handles syncing data from various sources (local files, remote URLs).
- * It implements chunked processing to handle large datasets efficiently.
+ * Uses [DataSourceRepository] and [SyncHistoryRepository] as the production data path —
+ * no direct database or DAO access.
+ *
+ * Implements chunked processing to handle large datasets efficiently.
  */
-class DataSyncEngine(private val database: SignalGateDatabase) {
+class DataSyncEngine(
+    private val dataSourceRepository: DataSourceRepository,
+    private val syncHistoryRepository: SyncHistoryRepository
+) {
 
     companion object {
         private const val TAG = "DataSyncEngine"
@@ -24,53 +31,53 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
     }
 
     /**
-     * Syncs a single data source.
+     * Syncs a single data source by [sourceId].
+     * Returns a [SyncHistoryEntry] describing the outcome.
      */
     suspend fun syncSource(sourceId: Int): SyncHistoryEntry {
         return withContext(Dispatchers.IO) {
             val startTime = System.currentTimeMillis()
-            val source = database.sourceDao().getSourceById(sourceId)
+            val source = dataSourceRepository.getSourceById(sourceId)
                 ?: return@withContext createFailedSyncHistory(sourceId, "Source not found", startTime)
 
             try {
                 Log.d(TAG, "Starting sync for source: ${source.name}")
 
-                val entries = when (source.type) {
+                val rawEntries = when (source.type) {
                     "CSV" -> parseCSVFile(source.pathOrUrl)
                     "XLSX" -> parseXLSXFile(source.pathOrUrl)
                     "URL" -> fetchAndParseRemoteURL(source.pathOrUrl)
                     else -> {
                         Log.e(TAG, "Unknown source type: ${source.type}")
-                        return@withContext createFailedSyncHistory(sourceId, "Unknown source type", startTime)
+                        return@withContext createFailedSyncHistory(
+                            sourceId, "Unknown source type: ${source.type}", startTime
+                        )
                     }
                 }
 
-                // Clear old entries for this source
-                database.unifiedEntryDao().deleteEntriesBySourceId(sourceId)
+                // Stamp each entry with the correct sourceId before inserting
+                val entries = rawEntries.map { it.copy(sourceId = sourceId) }
 
-                // Insert new entries in chunks
+                // Insert new entries in chunks via the repository
                 var entriesAdded = 0
                 for (i in entries.indices step CHUNK_SIZE) {
-                    val chunk = entries.subList(
-                        i,
-                        minOf(i + CHUNK_SIZE, entries.size)
-                    )
-                    database.unifiedEntryDao().insertEntries(chunk)
+                    val chunk = entries.subList(i, minOf(i + CHUNK_SIZE, entries.size))
+                    chunk.forEach { dataSourceRepository.insertEntry(it) }
                     entriesAdded += chunk.size
                 }
 
-                // Update source sync status
+                // Update source sync status via the repository
                 val duration = System.currentTimeMillis() - startTime
-                database.sourceDao().updateSourceSyncStatus(
-                    sourceId,
-                    System.currentTimeMillis(),
-                    entriesAdded,
-                    "HEALTHY"
+                dataSourceRepository.updateSourceSyncStatus(
+                    sourceId = sourceId,
+                    timestamp = System.currentTimeMillis(),
+                    entriesCount = entriesAdded,
+                    healthStatus = "HEALTHY"
                 )
 
                 Log.d(TAG, "Sync completed for source: ${source.name} ($entriesAdded entries)")
 
-                return@withContext SyncHistoryEntry(
+                SyncHistoryEntry(
                     sourceId = sourceId,
                     status = "SUCCESS",
                     entriesAdded = entriesAdded,
@@ -78,41 +85,40 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "Error syncing source: ${source.name}", e)
-                database.sourceDao().updateSourceSyncStatus(
-                    sourceId,
-                    System.currentTimeMillis(),
-                    0,
-                    "ERROR"
+                dataSourceRepository.updateSourceSyncStatus(
+                    sourceId = sourceId,
+                    timestamp = System.currentTimeMillis(),
+                    entriesCount = 0,
+                    healthStatus = "ERROR"
                 )
-                return@withContext createFailedSyncHistory(sourceId, e.message ?: "Unknown error", startTime)
+                createFailedSyncHistory(sourceId, e.message ?: "Unknown error", startTime)
             }
         }
     }
 
     /**
-     * Syncs all enabled sources.
+     * Syncs all enabled sources and persists each result to [SyncHistoryRepository].
      */
     suspend fun syncAllSources(): List<SyncHistoryEntry> {
         return withContext(Dispatchers.IO) {
-            val sources = database.sourceDao().getEnabledSources()
+            val enabledSources = dataSourceRepository.getEnabledSources().first()
             val syncResults = mutableListOf<SyncHistoryEntry>()
 
-            // Collect sources from Flow
-            val sourceList = mutableListOf<SourceEntity>()
-            sources.collect { sourceList.addAll(it) }
-
-            for (source in sourceList) {
+            for (source in enabledSources) {
                 val result = syncSource(source.id)
+                syncHistoryRepository.insertSyncHistory(result)
                 syncResults.add(result)
-                database.syncHistoryDao().insertSyncHistory(result)
             }
 
-            return@withContext syncResults
+            syncResults
         }
     }
 
+    // ── Parsers ───────────────────────────────────────────────────────────────
+
     /**
-     * Parses a CSV file and returns a list of UnifiedEntryEntity objects.
+     * Parses a local CSV file and returns a list of [UnifiedEntryEntity] objects.
+     * sourceId is set to 0 here and stamped by the caller before insertion.
      */
     private suspend fun parseCSVFile(filePath: String): List<UnifiedEntryEntity> {
         return withContext(Dispatchers.IO) {
@@ -127,7 +133,7 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
                 var lineNumber = 0
                 reader.forEachLine { line ->
                     lineNumber++
-                    if (lineNumber == 1) return@forEachLine // Skip header
+                    if (lineNumber == 1) return@forEachLine // Skip header row
 
                     val parts = line.split(",")
                     if (parts.size >= 2) {
@@ -140,7 +146,7 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
                                     UnifiedEntryEntity(
                                         phoneNumber = phoneNumber,
                                         action = action,
-                                        sourceId = 0, // Will be set by caller
+                                        sourceId = 0, // Stamped by caller
                                         isPattern = phoneNumber.contains("*"),
                                         category = if (parts.size > 2) parts[2].trim() else null,
                                         confidence = if (parts.size > 3) parts[3].trim().toIntOrNull() else null
@@ -155,25 +161,24 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
             }
 
             Log.d(TAG, "Parsed ${entries.size} entries from CSV file")
-            return@withContext entries
+            entries
         }
     }
 
     /**
-     * Parses an XLSX file and returns a list of UnifiedEntryEntity objects.
-     * Note: This is a placeholder. Full XLSX parsing requires Apache POI library.
+     * Placeholder for XLSX parsing. Full implementation requires Apache POI.
      */
-    private suspend fun parseXLSXFile(@Suppress("UNUSED_PARAMETER") filePath: String): List<UnifiedEntryEntity> {
+    @Suppress("UNUSED_PARAMETER")
+    private suspend fun parseXLSXFile(filePath: String): List<UnifiedEntryEntity> {
         return withContext(Dispatchers.IO) {
             // TODO: Implement XLSX parsing using Apache POI
-            // For now, return empty list
             Log.w(TAG, "XLSX parsing not yet implemented")
-            return@withContext emptyList()
+            emptyList()
         }
     }
 
     /**
-     * Fetches data from a remote URL and parses it.
+     * Fetches data from a remote URL and parses it as CSV.
      */
     private suspend fun fetchAndParseRemoteURL(urlString: String): List<UnifiedEntryEntity> {
         return withContext(Dispatchers.IO) {
@@ -189,7 +194,7 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
                     var lineNumber = 0
                     reader.forEachLine { line ->
                         lineNumber++
-                        if (lineNumber == 1) return@forEachLine // Skip header
+                        if (lineNumber == 1) return@forEachLine // Skip header row
 
                         val parts = line.split(",")
                         if (parts.size >= 2) {
@@ -202,7 +207,7 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
                                         UnifiedEntryEntity(
                                             phoneNumber = phoneNumber,
                                             action = action,
-                                            sourceId = 0, // Will be set by caller
+                                            sourceId = 0, // Stamped by caller
                                             isPattern = phoneNumber.contains("*"),
                                             category = if (parts.size > 2) parts[2].trim() else null,
                                             confidence = if (parts.size > 3) parts[3].trim().toIntOrNull() else null
@@ -216,20 +221,23 @@ class DataSyncEngine(private val database: SignalGateDatabase) {
                     }
                 }
 
-                Log.d(TAG, "Fetched and parsed ${entries.size} entries from URL")
+                Log.d(TAG, "Fetched and parsed ${entries.size} entries from URL: $urlString")
             } catch (e: Exception) {
                 Log.e(TAG, "Error fetching from URL: $urlString", e)
                 throw e
             }
 
-            return@withContext entries
+            entries
         }
     }
 
-    /**
-     * Creates a failed sync history entry.
-     */
-    private fun createFailedSyncHistory(sourceId: Int, errorMessage: String, startTime: Long): SyncHistoryEntry {
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private fun createFailedSyncHistory(
+        sourceId: Int,
+        errorMessage: String,
+        startTime: Long
+    ): SyncHistoryEntry {
         return SyncHistoryEntry(
             sourceId = sourceId,
             status = "FAILURE",
