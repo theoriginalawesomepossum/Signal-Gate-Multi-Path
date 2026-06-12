@@ -24,6 +24,7 @@ jobs:
         cache: 'gradle'
 
     - name: Grant Execute Permission for Gradle
+      working-directory: android
       run: chmod +x ./gradlew
 
     - name: Enable Reactive Device Cache
@@ -45,4 +46,4 @@ jobs:
         force-avd-creation: false
         select-header-indexes: ''
         disable-animations: true
-        script: ./gradlew connectedCheck --stacktrace
+        script: cd android && ./gradlew connectedCheck --stacktrace

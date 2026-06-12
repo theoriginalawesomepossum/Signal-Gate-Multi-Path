@@ -20,15 +20,38 @@ class ComposeMetricsAnalyzer:
 
     def __init__(self, metrics_dir: str):
         self.metrics_dir = Path(metrics_dir)
-        self.classes_file = self.metrics_dir / "classes.txt"
-        self.composables_file = self.metrics_dir / "composables.txt"
-        self.metrics_file = self.metrics_dir / "composables-metrics.txt"
+        # Compose compiler 1.5.x generates prefixed filenames (e.g. app_debug-classes.txt).
+        # Resolve the actual file paths by searching for the suffix pattern first,
+        # then falling back to the legacy unprefixed names.
+        self.classes_file = self._resolve_file("classes.txt")
+        self.composables_file = self._resolve_file("composables.txt")
+        self.metrics_file = self._resolve_file("composables-metrics.txt")
         
         # Security-relevant UI components to watch closely
         self.critical_components = {
             "CallOverlay", "Shield", "SignalGateOverlay", "Dashboard", 
             "QuickActions", "RiskIndicator"
         }
+
+    def _resolve_file(self, suffix: str) -> Path:
+        """Return the first file in metrics_dir whose name ends with the given suffix.
+
+        Compose compiler 1.5.x prefixes output files with the module/variant name
+        (e.g. ``app_debug-classes.txt``).  This helper locates the file regardless
+        of the prefix so the analyzer works with both naming conventions.
+        """
+        # Exact match (legacy / unprefixed)
+        exact = self.metrics_dir / suffix
+        if exact.exists():
+            return exact
+        # Prefix-agnostic glob: any file ending with "-<suffix>" or exactly "<suffix>"
+        stem = Path(suffix).stem   # e.g. "classes"
+        ext  = Path(suffix).suffix  # e.g. ".txt"
+        candidates = list(self.metrics_dir.glob(f"*-{stem}{ext}"))
+        if candidates:
+            return candidates[0]
+        # Return the expected path even if missing so validate() can report it
+        return exact
 
     def validate(self) -> bool:
         """Validate metrics directory and files."""

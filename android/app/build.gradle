@@ -55,6 +55,14 @@ android {
         }
     }
 
+    lint {
+        // WorkManager on-demand init: MainApplication implements Configuration.Provider,
+        // so the default WorkManagerInitializer is intentionally absent from the manifest.
+        // Suppressing the lint rule that incorrectly flags this as an error.
+        disable 'RemoveWorkManagerInitializer'
+        abortOnError true
+    }
+
     packagingOptions {
         pickFirst 'lib/armeabi-v7a/libc++_shared.so'
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
