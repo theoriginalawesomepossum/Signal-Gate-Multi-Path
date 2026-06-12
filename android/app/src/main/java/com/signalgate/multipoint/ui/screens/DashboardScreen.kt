@@ -1,4 +1,4 @@
-package com.signalgate.multipoint
+package com.signalgate.multipoint.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.signalgate.multipoint.OperationalDashboard
+import com.signalgate.multipoint.ui.screens.OperationalDashboard
 import com.signalgate.multipoint.ui.screens.CallLogScreen
 import com.signalgate.multipoint.ui.screens.SettingsScreen
 import com.signalgate.multipoint.ui.screens.SourcesScreen
