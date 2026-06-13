@@ -26,16 +26,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./android/gradlew
 
-    - name: Cache Gradle Dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-
     - name: Build Pulse Debug APK
       working-directory: ./android
       run: ./gradlew :app:assemblePulseDebug --stacktrace --parallel
