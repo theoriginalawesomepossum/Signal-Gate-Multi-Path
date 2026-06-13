@@ -25,6 +25,8 @@ ignore_paths:
   - "**/*.jpeg"
   - "**/*.webp"
   - "**/error_corrections.md"
+  - "**/compose-metrics/**"
+  - "**/compose-reports/**"
 
 prompting:
   use_styleguide: true
@@ -32,4 +34,53 @@ prompting:
   ask_before_large_refactors: true
 
 custom_instructions: |
-  [Paste the full Purpose + Review priorities + Android-specific rules + Code style + Repetitive task behavior you provided earlier here]
+  This repository is an Android app focused on call protection, call screening, overlays, and related UI/telephony flows. 
+  Reviews must prioritize correctness, consistency and security with existing app architecture, and minimal safe changes.
+
+  === ARCHITECTURE CONTRACT REFERENCE ===
+  All reviews MUST enforce the SignalGate Pulse Architecture Contract v1.0 (see Architecture-Contract.md):
+  - Single Activity (MainActivity only)
+  - Pure Compose Navigation
+  - Koin DI only
+  - Room + SQLCipher persistence
+  - One ViewModel per screen
+  - Strict OSI Layer Mapping with Security Boundaries
+  - Lower layers never depend on upper layers
+  - Reference the contract in every relevant finding
+
+  === REVIEW PRIORITIES ===
+  - Catch syntax, resource, and build-breaking issues.
+  - Flag mismatches with nearby files, naming, or architectural patterns (OSI layers, security boundaries, one VM per screen, etc.).
+  - Check that changes fit the existing app reference model and Development Roadmap.
+  - Prefer small, targeted edits over broad refactors.
+  - Keep behavior aligned with the current call-screening and overlay flow.
+
+  === ANDROID-SPECIFIC RULES ===
+  - Verify manifest entries, permissions, receivers, services, and exported flags carefully.
+  - Check resource references, IDs, drawables, styles, themes, and layout names for consistency.
+  - Flag duplicate IDs, invalid XML attributes, invalid layout gravity usage, and broken resource links.
+  - Watch for foreground service, overlay, call screening, and telephony permission issues.
+  - If a change touches a view, service, receiver, or permission, compare it against related files in the repo.
+
+  === CODE STYLE ===
+  - Follow the existing naming conventions in the repository.
+  - Do not introduce new patterns unless they clearly improve the current design.
+  - Avoid rewriting working code unless the change is necessary.
+  - If changes are deemed necessary, create a PR detailing why and attain permission from the owner prior to rewriting the code.
+  - Preserve public APIs and file names unless a rename is explicitly requested.
+
+  === REPETITIVE TASK BEHAVIOR ===
+  When asked to search for patterns like DAO, TODO, debug logging, duplicate layout IDs, or repeated strings:
+  - Search the repository broadly,
+  - Report every relevant match,
+  - Apply the requested change consistently,
+  - Mention any files that were intentionally skipped.
+
+  === LOGGING REQUIREMENT ===
+  - For every file checked or modified, append findings and corrections to error_corrections.md in the root.
+  - Use this format:
+    ## YYYY-MM-DD HH:MM UTC - filename.ext
+    ### Issues Found
+    - ...
+    ### Corrections Applied
+    - ...
