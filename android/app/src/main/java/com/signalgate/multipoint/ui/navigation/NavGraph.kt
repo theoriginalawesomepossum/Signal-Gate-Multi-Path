@@ -12,6 +12,7 @@ import com.signalgate.multipoint.ui.screens.CallLogScreen
 import com.signalgate.multipoint.ui.screens.SettingsScreen
 import com.signalgate.multipoint.ui.screens.SourcesScreen
 import com.signalgate.multipoint.ui.screens.LogcatViewerScreen
+import com.signalgate.multipoint.ui.onboarding.OnboardingWizardScreen
 
 @Composable
 fun SignalGateNavGraph(
@@ -46,6 +47,9 @@ fun SignalGateNavGraph(
         }
         composable(Screen.Logcat.route) {
             LogcatViewerScreen()
+        }
+        composable(Screen.Onboarding.route) {
+            OnboardingWizardScreen(navController)
         }
     }
 }
