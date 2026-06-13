@@ -43,7 +43,7 @@ fun SignalGateNavGraph(
             )
         }
         composable(Screen.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(onNavigateToLogcat = { navController.navigate(Screen.Logcat.route) })
         }
         composable(Screen.Logcat.route) {
             LogcatViewerScreen()
