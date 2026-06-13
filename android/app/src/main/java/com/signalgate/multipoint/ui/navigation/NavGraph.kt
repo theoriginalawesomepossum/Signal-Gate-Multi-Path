@@ -27,7 +27,8 @@ fun SignalGateNavGraph(
     ) {
         composable(Screen.Dashboard.route) {
             OperationalDashboard(
-                onOpenDrawer = onOpenDrawer
+                onOpenDrawer = onOpenDrawer,
+                onLaunchOnboarding = { navController.navigate(Screen.Onboarding.route) }
             )
         }
         composable(Screen.Sources.route) {
