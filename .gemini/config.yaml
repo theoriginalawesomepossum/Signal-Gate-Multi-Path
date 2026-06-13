@@ -3,6 +3,7 @@ review:
   pull_request_open_review: true
   comment_on_findings: true
   minimum_severity: medium
+  auto_apply_fixes: true
 
 behavior:
   prefer_repository_context: true
@@ -10,6 +11,7 @@ behavior:
   focus_on_build_breakers: true
   focus_on_android_resource_consistency: true
   allow_repetitive_repo_tasks: true
+  full_repo_scan_on_ci: true
 
 ignore_paths:
   - "**/build/**"
@@ -22,8 +24,12 @@ ignore_paths:
   - "**/*.jpg"
   - "**/*.jpeg"
   - "**/*.webp"
+  - "**/error_corrections.md"
 
 prompting:
   use_styleguide: true
   use_repo_context: true
   ask_before_large_refactors: true
+
+custom_instructions: |
+  [Paste the full Purpose + Review priorities + Android-specific rules + Code style + Repetitive task behavior you provided earlier here]
