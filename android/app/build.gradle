@@ -70,6 +70,25 @@ android {
         pickFirst 'lib/x86_64/libc++_shared.so'
     }
 
+
+
+    // ... existing config ...
+
+    flavorDimensions "version"
+
+    productFlavors {
+        pulse {
+            dimension "version"
+            applicationId "com.signalgate.multipoint.pulse"
+            // Optional: versionNameSuffix = "-pulse"
+            // You can override resources, manifests, etc. per flavor here
+        }
+        // Future: multiport { ... }, entraworlds { ... }
+    }
+
+    // Update buildTypes if needed for flavor-specific signing
+}
+
     ksp {
         arg("room.incremental", "true")
     }
