@@ -4,14 +4,10 @@ on:
   push:
     branches:
       - main
-      - develop
-      - feature/compose-metrics-analysis
   pull_request:
     branches:
       - main
-      - develop
-      - feature/compose-metrics-analysis
-
+      
 permissions:
   contents: write  # Required for creating releases and uploading assets
 
