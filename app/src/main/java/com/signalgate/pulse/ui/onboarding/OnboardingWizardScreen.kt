@@ -313,32 +313,101 @@ fun ContactsImportStep(
 }
 
 @Composable
-fun SourcesSelectionStep(navController: NavHostController) {
+fun SourcesSelectionStep(
+    navController: NavHostController,
+    viewModel: SourcesViewModel = koinViewModel()
+) {
+    val selections by viewModel.selections.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Data Sources",
+                text = "Block List Sources",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "SignalGate uses community-maintained block lists to identify spam and scam callers. You can manage sources later in Settings.",
+                text = "Choose which trusted sources SignalGate should use to identify spam and scam calls.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(viewModel.catalog) { source ->
+                    val isSelected = selections[source.name] ?: source.defaultEnabled
+                    SourceRow(
+                        name = source.name,
+                        description = source.description,
+                        tier = source.tier,
+                        isSelected = isSelected,
+                        isAvailable = source.url.isNotBlank(),
+                        onToggle = { viewModel.toggleSource(source.name) }
+                    )
+                }
+            }
         }
+
         Button(
-            onClick = { navController.navigate("risk") },
+            onClick = {
+                viewModel.saveSelections()
+                navController.navigate("risk")
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Continue")
         }
+    }
+}
+
+@Composable
+private fun SourceRow(
+    name: String,
+    description: String,
+    tier: com.signalgate.multipoint.data.sources.TrustedSourceCatalog.TrustTier,
+    isSelected: Boolean,
+    isAvailable: Boolean,
+    onToggle: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = when (tier) {
+                        com.signalgate.multipoint.data.sources.TrustedSourceCatalog.TrustTier.GOVERNMENT -> "Government"
+                        com.signalgate.multipoint.data.sources.TrustedSourceCatalog.TrustTier.COMMUNITY_VETTED -> "Community"
+                        com.signalgate.multipoint.data.sources.TrustedSourceCatalog.TrustTier.COMMUNITY_FUTURE -> "Coming Soon"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = isSelected,
+            onCheckedChange = { onToggle() },
+            enabled = isAvailable
+        )
     }
 }
 
