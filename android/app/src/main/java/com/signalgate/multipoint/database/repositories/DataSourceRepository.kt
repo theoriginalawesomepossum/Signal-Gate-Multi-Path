@@ -131,6 +131,21 @@ class DataSourceRepository(
         entryDao.deleteEntry(entry)
     }
 
+    suspend fun seedTrustedSources() {
+    com.signalgate.multipoint.data.sources.TrustedSourceCatalog.sources.forEach { trusted ->
+        val existing = sourceDao.getAllSources()
+        // Avoid duplicate seeding — check by name via a simple query pattern
+        insertSource(
+            SourceEntity(
+                name = trusted.name,
+                type = trusted.type,
+                pathOrUrl = trusted.url,
+                isEnabled = trusted.defaultEnabled,
+                priority = trusted.defaultPriority
+            )
+        )
+    }
+
     data class CallDecision(
         val action: String,
         val reason: String,
