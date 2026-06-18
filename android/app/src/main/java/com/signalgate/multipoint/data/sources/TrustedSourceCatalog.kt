@@ -59,7 +59,7 @@ object TrustedSourceCatalog {
         TrustedSource(
             name = "SignalGate Community Repo",
             description = "SignalGate's own community-contributed block list. Coming soon.",
-            url = "",
+            url = null,
             type = "URL",
             tier = TrustTier.COMMUNITY_FUTURE,
             defaultPriority = 50,
