@@ -131,6 +131,26 @@ class DataSourceRepository(
         entryDao.deleteEntry(entry)
     }
 
+        suspend fun seedTrustedSources() {
+        // Fetch existing sources once outside the loop to avoid N+1 queries
+        // Note: You will need to import kotlinx.coroutines.flow.first
+        val existingNames = sourceDao.getAllSources().first().map { it.name }.toSet()
+
+        com.signalgate.multipoint.data.sources.TrustedSourceCatalog.sources.forEach { trusted ->
+            if (trusted.name !in existingNames) {
+                insertSource(
+                    SourceEntity(
+                        name = trusted.name,
+                        type = trusted.type,
+                        pathOrUrl = trusted.url,
+                        isEnabled = trusted.defaultEnabled,
+                        priority = trusted.defaultPriority
+                    )
+                )
+            }
+        }
+    }
+  
     data class CallDecision(
         val action: String,
         val reason: String,
