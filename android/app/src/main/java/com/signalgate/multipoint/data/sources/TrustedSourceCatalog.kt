@@ -21,7 +21,7 @@ object TrustedSourceCatalog {
     data class TrustedSource(
         val name: String,
         val description: String,
-        val url: String,
+        val url: String?,
         val type: String, // matches SourceEntity.type: "CSV", "URL"
         val tier: TrustTier,
         val defaultPriority: Int,
