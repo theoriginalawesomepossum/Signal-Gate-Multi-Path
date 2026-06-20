@@ -16,6 +16,6 @@ fun OnboardingWizardScreen(
 ) {
     // Multi-step logic using NavHost or state
     // For full polish: Permissions, Contacts, Sources, Risk
-    Text("Onboarding Wizard - Polished Version")
+    Text("Onboarding Wizard For SignalGate Pulse")
     // Full implementation would go here with steps
 }
